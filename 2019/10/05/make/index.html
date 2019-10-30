@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1. Makemake 是 linux 系统的实用程序。它用于管理对于大型程序的自动编译任务，自动决定程序某一部分需要重新编译，并发出编译指令。虽然，我们最常见于 C 语言程序的编译。但是，make 不限于某一特定语言，凡是可以通过 shell 命令来运行编译器的语言都可以使用 make 。除此之外，你甚至可以用 make 描述任何构建任务，这些任务中，文件需要在其依赖的文件发生变动后自动更新。">
+<meta name="keywords" content="linux make">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Make 快速入门">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;10&#x2F;05&#x2F;make&#x2F;index.html">
+<meta property="og:site_name" content="ken爱编程">
+<meta property="og:description" content="1. Makemake 是 linux 系统的实用程序。它用于管理对于大型程序的自动编译任务，自动决定程序某一部分需要重新编译，并发出编译指令。虽然，我们最常见于 C 语言程序的编译。但是，make 不限于某一特定语言，凡是可以通过 shell 命令来运行编译器的语言都可以使用 make 。除此之外，你甚至可以用 make 描述任何构建任务，这些任务中，文件需要在其依赖的文件发生变动后自动更新。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-30T02:33:29.646Z">
+<meta name="twitter:card" content="summary">
+  <link rel="canonical" href="http://kenblog.top/2019/10/05/make/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Make 快速入门 | ken爱编程</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ken爱编程</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">面向“对象”编程</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">35</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">35</span></a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/10/05/make/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ken">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/ken_red.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ken爱编程">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            Make 快速入门
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-05 23:20:13" itemprop="dateCreated datePublished" datetime="2019-10-05T23:20:13+08:00">2019-10-05</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 10:33:29" itemprop="dateModified" datetime="2019-10-30T10:33:29+08:00">2019-10-30</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-Make"><a href="#1-Make" class="headerlink" title="1. Make"></a>1. Make</h2><p>make 是 linux 系统的实用程序。它用于管理对于大型程序的自动编译任务，自动决定程序某一部分需要重新编译，并发出编译指令。虽然，我们最常见于 C 语言程序的编译。但是，make 不限于某一特定语言，凡是可以通过 shell 命令来运行编译器的语言都可以使用 make 。除此之外，你甚至可以用 make 描述任何构建任务，这些任务中，文件需要在其依赖的文件发生变动后自动更新。</p>
+<h2 id="2-Makefile"><a href="#2-Makefile" class="headerlink" title="2. Makefile"></a>2. Makefile</h2><p>在使用 make 之前，你必须在当前目录下添加一个 <em>Makefile</em> 文件，它描述了文件之间的依赖(输入输出)关系，并提供更新文件的 Shell 命令。<code>Makefile</code> 文件名可以是 <code>Makefile</code> 也可以是 <code>makefile</code> ，推荐使用 <code>Makefile</code>。</p>
+<h3 id="2-1-构成"><a href="#2-1-构成" class="headerlink" title="2.1 构成"></a>2.1 构成</h3><p>简单的 <code>Makefile</code> 文件由若干如下格式的规则(<code>rule</code>)组成:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">target: prerequisites</span></span><br><span class="line">        recipe</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<ul>
+<li>target : 通常是程序生成(输出)的一个或多个文件名，例如：可执行文件或目标文件；它也可以是要执行任务的名称，例如用于清理生成文件的 <code>clean</code> 任务。</li>
+<li>prerequisites: 先决条件是用于生成 target 文件的输入文件或是完成 target 任务前需要先执行的任务 。一个 target 可以没有先决条件，也可以有一个或多个先决条件。</li>
+<li>recipe: 中文翻译为菜谱，它是 make 用于生成 target 文件或完成 target 任务而执行一系列 shell 命令。这些命令可以放在同一行里，也可以每个命令占一行。值得注意的是，recipe 默认以制表符开头，而不是空格。</li>
+</ul>
+<h3 id="2-2-运行-make"><a href="#2-2-运行-make" class="headerlink" title="2.2 运行 make"></a>2.2 运行 make</h3><p>在当前目录下创建一个 Makefile 文件， 命名为 Makefile 。将以下内容复制到新建的 Makefile 文件中。</p>
+<p><b style="color: red">注意</b>:  recipe 默认是以制表符开头，不是空格。如果复制到文件是空格，需要手动将空格改成制表符，即按键盘 tab 键。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">.PHONY</span>: help clean mk</span></span><br><span class="line"></span><br><span class="line">help :</span><br><span class="line">	@echo <span class="string">"help info"</span></span><br><span class="line"></span><br><span class="line">dist :</span><br><span class="line">	@mkdir dist</span><br><span class="line"></span><br><span class="line">clean :</span><br><span class="line">	@rm -rf dist</span><br></pre></td></tr></table></figure>
+
+<p><code>.PHONY: help clean mk</code> 用于告诉 make 指定 target 列表不是文件名。可以理解是纯粹的任务，而不生成文件。</p>
+<p>在 Makefile 所在目录运行不带参数的 make 命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make</span><br></pre></td></tr></table></figure>
+
+<p>会启动 Makefile 文件中第一个 target ，本例是 help , make 将 Makefile 中第一个出现的 target 作为默认目标 。</p>
+<p>要启动其他 target，需要在 make 命令后指定 target 名称。如下分别启动目标 dist 和 clean 。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make dist</span><br><span class="line">make clean</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-扩展：对比-npm-scripts"><a href="#2-3-扩展：对比-npm-scripts" class="headerlink" title="*2.3 扩展：对比 npm scripts"></a>*2.3 扩展：对比 npm scripts</h3><p>对于前端的同学，最熟悉的构建方式莫过于 npm package.json 中 scripts 构建命令。在不使用项目中安装的包的情况下，即项目目录下 node_modules 里的包，完全可以使用 Makefile 来完成一些构建任务，make 的优势在于更好管理相互依赖的构建任务。</p>
+<h2 id="3-变量"><a href="#3-变量" class="headerlink" title="3. 变量"></a>3. 变量</h2><p>make 中的变量本质是一种宏替换，用于简化和维护重复出现的字符串和字符串列表。既可以出现在目标，先决条件，也可以出现在“菜谱”的 shell 命令中；可以是命令本身，也可以是命令的选项，或者输入输出文件；甚至也可以出现在另一个变量的引用中（计算变量）。</p>
+<h3 id="3-1-定义变量"><a href="#3-1-定义变量" class="headerlink" title="3.1 定义变量"></a>3.1 定义变量</h3><p>make 变量定义和 shell 变量的定义非常相似。不同的是 make 变量的名称可以是任何不包含 <code>:</code>, <code>#</code>, <code>=</code> 和空字符的字符序列，并且等号两边可以有空格（shell 定义变量的等号两个不允许出现空格）。</p>
+<p>如下定义一个变量 objs ，用于表示 c 语言编译器输出的一系列目标文件。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objs = main.o model.o view.o controller.o</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-使用变量"><a href="#3-2-使用变量" class="headerlink" title="3.2 使用变量"></a>3.2 使用变量</h3><p>make 变量支持和 shell 变量一样，在变量标识符前加美元符 <code>$</code> 来引用，因此，如果在”菜谱”中使用 shell 变量，需要使用双美元符 <code>$$</code> 作为前缀加以区分；但更推荐的使用方式是使用美元符后跟一对圆括号的方式，例如使用上文创建的变量 objs ，可以这样 <code>$(objs)</code>。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">build: <span class="variable">$(objs)</span></span></span><br><span class="line">    cc -o app <span class="variable">$(objs)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-函数"><a href="#4-函数" class="headerlink" title="4. 函数"></a>4. 函数</h2><p>make 中的函数用于处理 Makefile 文件中的文本，例如：计算操作的文件列表，“菜谱”中使用的命令等。</p>
+<h3 id="4-1-函数调用"><a href="#4-1-函数调用" class="headerlink" title="4.1 函数调用"></a>4.1 函数调用</h3><p>函数调用类似于变量引用，它可以出现在任何变量引用可以出现的地方。调用方式如下：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$(function arguments)</span></span><br></pre></td></tr></table></figure>
+
+<p>或者：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$&#123;function arguments&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，<em>function</em> 是函数名称，<em>arguments</em> 是函数的参数。函数名与参数之间用空格或制表符隔开，多个参数之间用逗号 <code>,</code> 隔开。</p>
+<h3 id="4-2-用于字符串替换和分析的函数"><a href="#4-2-用于字符串替换和分析的函数" class="headerlink" title="4.2 用于字符串替换和分析的函数"></a>4.2 用于字符串替换和分析的函数</h3><h4 id="4-2-1-subst-from-to-text"><a href="#4-2-1-subst-from-to-text" class="headerlink" title="4.2.1 $(subst from,to,text)"></a>4.2.1 $(subst from,to,text)</h4><p>在 <code>text</code> 上执行文本替换，将出现的所有 <code>from</code> 替换成 <code>to</code> 。 </p>
+<p>Makefile：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">subst:</span></span><br><span class="line">	@echo <span class="variable">$(<span class="built_in">subst</span> o,O,hello world)</span></span><br></pre></td></tr></table></figure>
+
+<p>make:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ make subst</span><br><span class="line">hellO wOrld</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-2-2-patsubst-pattern-replacement-text"><a href="#4-2-2-patsubst-pattern-replacement-text" class="headerlink" title="4.2.2 $(patsubst pattern,replacement,text)"></a>4.2.2 $(patsubst pattern,replacement,text)</h4><p>在 <code>text</code> 中寻找空格分隔的单词，如果单词匹配 <code>pattern</code> , 就将匹配的单词替换成 <code>replacement</code> 。<code>pattern</code> 和 <code>replacement</code> 都可以包含通配符 <code>%</code>，匹配任意数量的任意字符。当 <code>pattern</code> 和 <code>replacement</code> 同时包含通配符 <code>%</code>，则将 <code>replacement</code> 中 <code>%</code> 替换成与 <code>pattern</code> 中 <code>%</code> 匹配的文本。</p>
+<p>Makefile：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">patsubst:</span></span><br><span class="line">	@echo <span class="variable">$(<span class="built_in">patsubst</span> %.c,%.o,hello.c.c world.c)</span></span><br></pre></td></tr></table></figure>
+
+<p>make:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ make patsubst</span><br><span class="line">hello.c.o world.o</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-2-3-strip-string"><a href="#4-2-3-strip-string" class="headerlink" title="4.2.3 $(strip string)"></a>4.2.3 $(strip string)</h4><p>移除字符串 <code>string</code> 首尾空格，并且将字符串中的多个空格替换成一个空格。</p>
+<p>Makefile：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">strip:</span></span><br><span class="line">	@echo <span class="variable">$(<span class="built_in">strip</span>    hello     world   !  )</span></span><br></pre></td></tr></table></figure>
+
+<p>make:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ make strip</span><br><span class="line">hello world !</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-2-4-sort-list"><a href="#4-2-4-sort-list" class="headerlink" title="4.2.4 $(sort list)"></a>4.2.4 $(sort list)</h4><p>按英文字母表顺序对列表 <code>list</code> 中的单词进行排序，删除重复的单词。输出是由单个空格分隔的单词列表。</p>
+<p>Makefile：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">sort:</span></span><br><span class="line">	@echo <span class="variable">$(<span class="built_in">sort</span> dog cat animal fox bear fox elephant)</span></span><br></pre></td></tr></table></figure>
+
+<p>make:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ make sort</span><br><span class="line">animal bear cat dog elephant fox</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-2-5-words-text"><a href="#4-2-5-words-text" class="headerlink" title="4.2.5 $(words text)"></a>4.2.5 $(words text)</h4><p>返回 <code>text</code> 中单词数量。</p>
+<p>Makefile：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">words:</span></span><br><span class="line">	@echo <span class="variable">$(words dog cat animal fox bear fox elephant)</span></span><br></pre></td></tr></table></figure>
+
+<p>make:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ make words</span><br><span class="line">7</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-2-6-word-n-text"><a href="#4-2-6-word-n-text" class="headerlink" title="4.2.6 $(word n,text)"></a>4.2.6 $(word n,text)</h4><p>返回 <code>text</code> 中第 <code>n</code> 个单词，<code>n</code> 从 1 开始计数。</p>
+<p>Makefile：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">animals = bear cat dog elephant fox</span><br><span class="line"><span class="section">word:</span></span><br><span class="line">	@echo <span class="variable">$(<span class="built_in">word</span> $(words <span class="variable">$(animals)</span>)</span>, <span class="variable">$(animals)</span>)</span><br></pre></td></tr></table></figure>
+
+<p>make:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ make word</span><br><span class="line">fox</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-隐式规则"><a href="#5-隐式规则" class="headerlink" title="5. 隐式规则"></a>5. 隐式规则</h2><p>某些重新生成目标文件的方式非常常用。例如，使用 C 编译器 <code>cc</code> 从 <code>.c</code> 源文件编译生成 <code>.o</code> 目标文件。 隐式规则将告诉 <code>make</code> 如何使用常用的技术，让你在使用时不必给出全部细节，简化书写。例如，make 为 C 语言编译提供一个隐式规则。文件名决定将应用哪个隐式规则。比如，C 编译通常输入 <code>.c</code> 文件，输出 <code>.o</code> 文件。 因此，当看到文件名结尾符合这种组合时，make 将隐式规则应用于 C 编译。</p>
+<p>Makefile:</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">app : main.o utils.o</span><br><span class="line">	cc -o app main.o utils.o</span><br><span class="line"></span><br><span class="line">main.o : main.c utils.h</span><br><span class="line">	cc -c main.c</span><br><span class="line"></span><br><span class="line">utils.o : utils.c</span><br><span class="line">	cc -c utils.c</span><br></pre></td></tr></table></figure>
+
+<p>可以去掉编译命令，简写为：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">app : main.o utils.o</span><br><span class="line">	cc -o app main.o utils.o</span><br><span class="line"></span><br><span class="line">main.o : main.c utils.h</span><br><span class="line"></span><br><span class="line">utils.o : utils.c</span><br></pre></td></tr></table></figure>
+
+<p>make:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ make</span><br><span class="line">cc    -c -o main.o main.c</span><br><span class="line">cc    -c -o utils.o utils.c</span><br><span class="line">cc -o app main.o utils.o</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>[1] <span class="exturl" data-url="aHR0cDovL3d3dy5nbnUub3JnL3NvZnR3YXJlL21ha2UvbWFudWFsL21ha2UuaHRtbA==" title="http://www.gnu.org/software/make/manual/make.html">gnu.org: GNU make<i class="fa fa-external-link"></i></span></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="ken wechat" style="width: 200px; max-width: 100%;">
+  <div>微信扫描二维码，第一时间收到最新原创文章！</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="ken 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="ken 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/10/05/make/" title="Make 快速入门">http://kenblog.top/2019/10/05/make/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/linux-make/" rel="tag"># linux make</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/30/shell/" rel="next" title="Shell 编程入门">
+                  <i class="fa fa-chevron-left"></i> Shell 编程入门
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/06/kaggle-com-dogs-vs-cats-1/" rel="prev" title="kaggle 图像分类竞赛实战（一）：数据集下载和清洗">
+                  kaggle 图像分类竞赛实战（一）：数据集下载和清洗 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Make"><span class="nav-number">1.</span> <span class="nav-text">1. Make</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Makefile"><span class="nav-number">2.</span> <span class="nav-text">2. Makefile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-构成"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 构成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-运行-make"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 运行 make</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-扩展：对比-npm-scripts"><span class="nav-number">2.3.</span> <span class="nav-text">*2.3 扩展：对比 npm scripts</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-变量"><span class="nav-number">3.</span> <span class="nav-text">3. 变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-定义变量"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 定义变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-使用变量"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 使用变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-函数"><span class="nav-number">4.</span> <span class="nav-text">4. 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-函数调用"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 函数调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-用于字符串替换和分析的函数"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 用于字符串替换和分析的函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-1-subst-from-to-text"><span class="nav-number">4.2.1.</span> <span class="nav-text">4.2.1 $(subst from,to,text)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-2-patsubst-pattern-replacement-text"><span class="nav-number">4.2.2.</span> <span class="nav-text">4.2.2 $(patsubst pattern,replacement,text)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-3-strip-string"><span class="nav-number">4.2.3.</span> <span class="nav-text">4.2.3 $(strip string)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-4-sort-list"><span class="nav-number">4.2.4.</span> <span class="nav-text">4.2.4 $(sort list)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-5-words-text"><span class="nav-number">4.2.5.</span> <span class="nav-text">4.2.5 $(words text)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-6-word-n-text"><span class="nav-number">4.2.6.</span> <span class="nav-text">4.2.6 $(word n,text)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-隐式规则"><span class="nav-number">5.</span> <span class="nav-text">5. 隐式规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">6.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/ken_red.jpg"
+      alt="ken">
+  <p class="site-author-name" itemprop="name">ken</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

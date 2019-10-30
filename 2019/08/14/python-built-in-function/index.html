@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="所谓内置函数，就是无需import，就可以直接使用的函数  1. python2 &amp;amp; python3 内置函数统计python2: 76 个python3: 69 个2. Python2与Python3公有的内置函数2.1 数学计算（7个）   序号 函数 作用 示例    1 abs() 求绝对值 &amp;gt;&amp;gt;&amp;gt; abs(-1)1   2 round() 将小数四舍五入，默认">
+<meta name="keywords" content="python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python内置函数">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;08&#x2F;14&#x2F;python-built-in-function&#x2F;index.html">
+<meta property="og:site_name" content="ken爱编程">
+<meta property="og:description" content="所谓内置函数，就是无需import，就可以直接使用的函数  1. python2 &amp;amp; python3 内置函数统计python2: 76 个python3: 69 个2. Python2与Python3公有的内置函数2.1 数学计算（7个）   序号 函数 作用 示例    1 abs() 求绝对值 &amp;gt;&amp;gt;&amp;gt; abs(-1)1   2 round() 将小数四舍五入，默认">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-30T01:43:47.831Z">
+<meta name="twitter:card" content="summary">
+  <link rel="canonical" href="http://kenblog.top/2019/08/14/python-built-in-function/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Python内置函数 | ken爱编程</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ken爱编程</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">面向“对象”编程</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">35</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">35</span></a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/08/14/python-built-in-function/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ken">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/ken_red.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ken爱编程">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            Python内置函数
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-14 18:01:05" itemprop="dateCreated datePublished" datetime="2019-08-14T18:01:05+08:00">2019-08-14</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 09:43:47" itemprop="dateModified" datetime="2019-10-30T09:43:47+08:00">2019-10-30</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>所谓内置函数，就是无需import，就可以直接使用的函数</p>
+</blockquote>
+<h2 id="1-python2-amp-python3-内置函数统计"><a href="#1-python2-amp-python3-内置函数统计" class="headerlink" title="1. python2 &amp; python3 内置函数统计"></a>1. python2 &amp; python3 内置函数统计</h2><h3 id="python2-76-个"><a href="#python2-76-个" class="headerlink" title="python2: 76 个"></a>python2: 76 个</h3><h3 id="python3-69-个"><a href="#python3-69-个" class="headerlink" title="python3: 69 个"></a>python3: 69 个</h3><h2 id="2-Python2与Python3公有的内置函数"><a href="#2-Python2与Python3公有的内置函数" class="headerlink" title="2. Python2与Python3公有的内置函数"></a>2. Python2与Python3公有的内置函数</h2><h3 id="2-1-数学计算（7个）"><a href="#2-1-数学计算（7个）" class="headerlink" title="2.1 数学计算（7个）"></a>2.1 数学计算（7个）</h3><table>
+<thead>
+<tr>
+<th align="center">序号</th>
+<th align="left">函数</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="left">abs()</td>
+<td align="left">求绝对值</td>
+<td align="left">&gt;&gt;&gt; <code>abs(-1)</code><br>1</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="left">round()</td>
+<td align="left">将小数四舍五入，默认保留0位小数</td>
+<td align="left">&gt;&gt;&gt; <code>round(1.4)</code><br>1 <br>&gt;&gt;&gt; <code>round(1.55, 1)</code><br>1.6</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="left">pow()</td>
+<td align="left">指数求幂, 等价于幂运算符： x**y</td>
+<td align="left">&gt;&gt;&gt; <code>pow(2, 3)</code><br>8</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="left">min()</td>
+<td align="left">求可迭代对象的最小值, 传入字典，需要提供key参数，返回最小值对应键</td>
+<td align="left">&gt;&gt;&gt; <code>min([2, 1, 3])</code><br>1<br>&gt;&gt;&gt; <code>d={&#39;a&#39;: 2, &#39;b&#39;:1}; min(d, key=d.get)</code><br>b</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="left">max()</td>
+<td align="left">求可迭代对象的最大值, 传入字典，需要提供key参数，返回最大值对应键</td>
+<td align="left">&gt;&gt;&gt; <code>max([2, 1, 3])</code><br>3<br>&gt;&gt;&gt; <code>d={&#39;a&#39;: 2, &#39;b&#39;:1}; max(d, key=d.get)</code><br>a</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="left">sum()</td>
+<td align="left">求可迭代对象的和, 可提供初始累加值，默认为0</td>
+<td align="left">&gt;&gt;&gt; <code>sum([1, 2, 3])</code><br>6<br>&gt;&gt;&gt; <code>sum([1, 2, 3], 1)</code><br>7</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="left">divmod()</td>
+<td align="left">返回一对商和余数</td>
+<td align="left">&gt;&gt;&gt; <code>divmod(5, 2)</code><br>(2, 1)</td>
+</tr>
+</tbody></table>
+<a id="more"></a>
+
+<h3 id="2-2-数据操作（9个）"><a href="#2-2-数据操作（9个）" class="headerlink" title="2.2 数据操作（9个）"></a>2.2 数据操作（9个）</h3><table>
+<thead>
+<tr>
+<th align="center">序号</th>
+<th align="left">函数</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="left">len()</td>
+<td align="left">返回元素个数</td>
+<td align="left">&gt;&gt;&gt; <code>len([1, 2])</code><br>2</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="left">sorted()</td>
+<td align="left">排序</td>
+<td align="left">&gt;&gt;&gt; <code>sorted([2, 1])</code><br>[1, 2]<br>&gt;&gt;&gt; <code>sorted([{&#39;a&#39;: 2, &#39;b&#39;: &#39;1&#39;}, {&#39;a&#39;: 1, &#39;b&#39;: 2}], key=lambda x: x[&#39;a&#39;])</code><br>[{‘a’: 1, ‘b’: 2}, {‘a’: 2, ‘b’: ‘1’}]<br>&gt;&gt;&gt; <code>d = {&#39;a&#39;:2, &#39;b&#39;:1}; sorted(d, key=d.get, reverse=True)</code><br>[‘a’, ‘b’]</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="left">reversed()</td>
+<td align="left">反向, 返回<span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9nbG9zc2FyeS5odG1sI3Rlcm0taXRlcmF0b3I=" title="https://docs.python.org/zh-cn/3/glossary.html#term-iterator">iterator<i class="fa fa-external-link"></i></span>对象</td>
+<td align="left">&gt;&gt;&gt; <code>list(reversed([2, 1]))</code><br>[1, 2]</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="left">slice()</td>
+<td align="left">返回<span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9nbG9zc2FyeS5odG1sI3Rlcm0tc2xpY2U=" title="https://docs.python.org/zh-cn/3/glossary.html#term-slice">slice(切片)<i class="fa fa-external-link"></i></span>对象, 等价于[start:stop:step]</td>
+<td align="left">&gt;&gt;&gt; <code>[1, 2, 3][slice(1, 2)]</code><br>[2]</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="left">next()</td>
+<td align="left">调用__next__() 方法获取下一个元素</td>
+<td align="left">&gt;&gt;&gt; <code>next(iter([1,2,3]))</code><br>1</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="left">all()</td>
+<td align="left">所有元素为真，返回真</td>
+<td align="left">&gt;&gt;&gt; <code>all([True, True])</code><br>True</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="left">any()</td>
+<td align="left">任一元素为真，返回真</td>
+<td align="left">&gt;&gt;&gt; <code>any([True, False])</code><br>True</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="left">filter()</td>
+<td align="left">返回为真的元素</td>
+<td align="left">&gt;&gt;&gt; <code>[i for i in filter(None, [True, False])]</code><br>[True]<br>&gt;&gt;&gt; <code>list(filter(lambda x: x[&#39;s&#39;], [{&#39;s&#39;: False}, {&#39;s&#39;: None}, {&#39;s&#39;: True}]))</code><br>[{‘s’: True}]</td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td align="left">map()</td>
+<td align="left">对元素进行处理，返回新的迭代器</td>
+<td align="left">&gt;&gt;&gt; <code>list(map(lambda x: round(x), [1.4, 1.5]))</code><br>[1, 2]</td>
+</tr>
+</tbody></table>
+<h3 id="2-3-文件-amp-系统（6个）"><a href="#2-3-文件-amp-系统（6个）" class="headerlink" title="2.3 文件&amp;系统（6个）"></a>2.3 文件&amp;系统（6个）</h3><table>
+<thead>
+<tr>
+<th align="center">序号</th>
+<th align="left">函数</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="left">open()</td>
+<td align="left">打开文件</td>
+<td align="left">&gt;&gt;&gt; <code>with open(&#39;1.txt&#39;, &#39;w&#39;) as f:</code><br><code>... f.write(&#39;hello world!&#39;)</code><br>12<br>&gt;&gt;&gt; <code>with open(&#39;1.txt&#39;, &#39;r&#39;) as f:</code><br><code>...  f.read()</code><br>‘hello world!’</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="left">input()</td>
+<td align="left">等待获取用户输入</td>
+<td align="left">&gt;&gt;&gt; <code>input(&#39;are you ok?\n&#39;)</code><br>are you ok?<br>fuck<br>‘fuck’</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="left">print()</td>
+<td align="left">打印到标准输出</td>
+<td align="left">&gt;&gt;&gt; <code>print(&#39;hello world!&#39;)</code><br>hello world!</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="left">locals()</td>
+<td align="left">更新并返回表示当前本地符号表的字典</td>
+<td align="left">&gt;&gt;&gt; <code>locals()</code></td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="left">globals()</td>
+<td align="left">返回表示当前全局符号表的字典</td>
+<td align="left">&gt;&gt;&gt; <code>globals()</code></td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="left">vars()</td>
+<td align="left">返回对象的__dict__属性；不带参数, 等价<code>locals</code></td>
+<td align="left">&gt;&gt;&gt; <code>class Klass:</code><br><code>...   __dict__ = [&#39;a&#39;, &#39;b&#39;]</code><br>&gt;&gt;&gt; <code>vars(Klass())</code><br>[‘a’, ‘b’]</td>
+</tr>
+</tbody></table>
+<h3 id="2-4-类（12个）"><a href="#2-4-类（12个）" class="headerlink" title="2.4 类（12个）"></a>2.4 类（12个）</h3><table>
+<thead>
+<tr>
+<th align="center">序号</th>
+<th align="left">函数</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="left">type()</td>
+<td align="left">返回对象类型, 等效于object.__class__</td>
+<td align="left">&gt;&gt;&gt; <code>type({&#39;a&#39;: 1})</code><br>&lt;class ‘dict’&gt;</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="left">isinstance()</td>
+<td align="left">对象是否是类的实例</td>
+<td align="left">&gt;&gt;&gt; <code>k = Klass(); isinstance(k, Klass)</code><br>True</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="left">issubclass()</td>
+<td align="left">类是否是父类的子类</td>
+<td align="left">&gt;&gt;&gt; <code>class SubKlass(Klass):</code><br><code>... pass</code><br>&gt;&gt;&gt; <code>issubclass(SubKlass, Klass)</code><br>True</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="left">classmethod()</td>
+<td align="left"><span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9nbG9zc2FyeS5odG1sI3Rlcm0tZGVjb3JhdG9y" title="https://docs.python.org/zh-cn/3/glossary.html#term-decorator">decorator<i class="fa fa-external-link"></i></span>把方法封装成类方法</td>
+<td align="left">&gt;&gt;&gt; <code>class C:</code><br><code>... @classmethod</code><br><code>...   def f(cls):</code><br><code>...     pass</code></td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="left">staticmethod()</td>
+<td align="left"><span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9nbG9zc2FyeS5odG1sI3Rlcm0tZGVjb3JhdG9y" title="https://docs.python.org/zh-cn/3/glossary.html#term-decorator">decorator<i class="fa fa-external-link"></i></span>将方法转换为静态方法</td>
+<td align="left">&gt;&gt;&gt; <code>class C:</code><br><code>... @staticmethod</code><br><code>...   def f(cls):</code><br><code>...     pass</code></td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="left">super()</td>
+<td align="left">返回一个代理对象，将方法调用<br>委托给父类或兄弟类。了解<span class="exturl" data-url="aHR0cHM6Ly9yaGV0dGluZ2VyLndvcmRwcmVzcy5jb20vMjAxMS8wNS8yNi9zdXBlci1jb25zaWRlcmVkLXN1cGVyLw==" title="https://rhettinger.wordpress.com/2011/05/26/super-considered-super/">super设计协作类<i class="fa fa-external-link"></i></span></td>
+<td align="left">&gt;&gt;&gt; <code>class Animal:</code><br><code>... def eat(self): print(&#39;wa wa ...&#39;)</code><br>&gt;&gt;&gt; <code>class Dog(Animal):</code><br><code>... def eat(self):</code><br><code>... super().eat()</code><br><code>... print(&#39;give me meat.&#39;)</code><br><code>&gt;&gt;&gt; Dog().eat()</code><br>wa wa …<br>give me meat.</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="left">hasattr()</td>
+<td align="left">对象是否具有属性</td>
+<td align="left">&gt;&gt;&gt; <code>dog = Dog(); hasattr(dog, &#39;name&#39;)</code><br>False</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="left">setattr()</td>
+<td align="left">给对象添加新属性</td>
+<td align="left">&gt;&gt;&gt; <code>setattr(dog, &#39;name&#39;, &quot;旺财&quot;)</code></td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td align="left">getattr()</td>
+<td align="left">获取对象属性值</td>
+<td align="left">&gt;&gt;&gt; <code>getattr(dog, &#39;name&#39;)</code><br>‘旺财’</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td align="left">dir()</td>
+<td align="left">返回模块或对象的有效属性列表</td>
+<td align="left">&gt;&gt;&gt; <code>dir(dog)</code><br>[…, ‘eat’, ‘name’]</td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td align="left">delattr()</td>
+<td align="left">删除对象属性</td>
+<td align="left">&gt;&gt;&gt; <code>delattr(dog, &#39;name&#39;)</code><br></td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td align="left">property()</td>
+<td align="left">返回property属性</td>
+<td align="left">&gt;&gt;&gt; <code>class Klass:</code><br><code>... def __init__(self):self._x = 0</code><br><code>... @property</code><br><code>... def x(self):return self._x</code><br>&gt;&gt;&gt; <code>Klass().x</code><br>0</td>
+</tr>
+</tbody></table>
+<h3 id="2-5-数据类型创建-amp-转换（23个）"><a href="#2-5-数据类型创建-amp-转换（23个）" class="headerlink" title="2.5 数据类型创建&amp;转换（23个）"></a>2.5 数据类型创建&amp;转换（23个）</h3><table>
+<thead>
+<tr>
+<th align="center">序号</th>
+<th align="left">函数</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="left">int()</td>
+<td align="left">返回十进制整数,<br> 默认传入为十进制</td>
+<td align="left">&gt;&gt;&gt; <code>int()</code><br>0<br>&gt;&gt;&gt; <code>int(&#39;f&#39;, 16)</code><br>15<br>&gt;&gt;&gt; <code>int(&#39;g&#39;, 17)</code><br>16</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="left">float()</td>
+<td align="left">返回小数</td>
+<td align="left">&gt;&gt;&gt; <code>float()</code><br>0.0<br>&gt;&gt;&gt; <code>float(&#39;1e-2&#39;)</code><br>0.01<br>&gt;&gt;&gt; <code>float(&#39;-Infinity&#39;)</code><br>-inf</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="left">str()</td>
+<td align="left">将数字或对象转换成字符串 <span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9saWJyYXJ5L3N0ZHR5cGVzLmh0bWwjdGV4dHNlcQ==" title="https://docs.python.org/zh-cn/3/library/stdtypes.html#textseq">了解更多<i class="fa fa-external-link"></i></span></td>
+<td align="left">&gt;&gt;&gt; <code>str(1.5)</code><br>‘1.5’<br> &gt;&gt;&gt; <code>str([1, 2, 3])</code><br>‘[1, 2, 3]’</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="left">bool()</td>
+<td align="left">返回一个布尔值</td>
+<td align="left">&gt;&gt;&gt; <code>bool(0)</code><br>False<br>&gt;&gt;&gt; <code>bool(None)</code><br>False<br>&gt;&gt;&gt; <code>bool([])</code><br>False<br>&gt;&gt;&gt; <code>bool({})</code><br>False<br>&gt;&gt;&gt; <code>bool(1)</code><br>True</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="left">tuple()</td>
+<td align="left">返回一个元组，<span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9saWJyYXJ5L3N0ZHR5cGVzLmh0bWwjdHlwZXNzZXE=" title="https://docs.python.org/zh-cn/3/library/stdtypes.html#typesseq">了解更多<i class="fa fa-external-link"></i></span></td>
+<td align="left">&gt;&gt;&gt; <code>tuple([1, 2, 3])</code><br>(1, 2, 3)<br>&gt;&gt;&gt; <code>tuple({1, 2, 3})</code><br>(1, 2, 3)<br>&gt;&gt;&gt; <code>tuple(range(1, 3))</code><br>(1, 2)</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="left">set()</td>
+<td align="left">返回一个集合</td>
+<td align="left">&gt;&gt;&gt; <code>set([1, 2, 3])</code><br>{1, 2, 3}<br>&gt;&gt;&gt; <code>set((1, 2, 3))</code><br>{1, 2, 3}<br>&gt;&gt;&gt; <code>set(range(1, 3))</code><br>{1, 2}</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="left">list()</td>
+<td align="left">返回一个列表</td>
+<td align="left">&gt;&gt;&gt; <code>list((1, 2, 3))</code><br>[1, 2, 3]<br>&gt;&gt;&gt; <code>list({1, 2, 3})</code><br>[1, 2, 3]<br>&gt;&gt;&gt; <code>list(range(1, 3))</code><br>[1, 2]</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="left">dict()</td>
+<td align="left">返回一个字典</td>
+<td align="left">&gt;&gt;&gt; <code>dict(one=1, two=2, three=3)</code><br>{‘one’: 1, ‘two’: 2, ‘three’: 3}<br>&gt;&gt;&gt; <code>dict([(&#39;two&#39;, 2), (&#39;one&#39;, 1), (&#39;three&#39;, 3)])</code><br>{‘two’: 2, ‘one’: 1, ‘three’: 3}<br>&gt;&gt;&gt; <code>dict(zip([&#39;one&#39;, &#39;two&#39;, &#39;three&#39;], [1, 2, 3]))</code><br>{‘one’: 1, ‘two’: 2, ‘three’: 3}</td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td align="left">complex()</td>
+<td align="left">返回一个复数</td>
+<td align="left">&gt;&gt;&gt; <code>complex(1, 2)</code><br>(1+2j)</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td align="left">bin()</td>
+<td align="left">返回一个二进制字符串</td>
+<td align="left">&gt;&gt;&gt; <code>bin(10)</code><br>‘0b1010’</td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td align="left">oct()</td>
+<td align="left">返回一个八进制字符串</td>
+<td align="left">&gt;&gt;&gt; <code>oct(10)</code><br>‘0o12’</td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td align="left">hex()</td>
+<td align="left">返回一个十六进制字符串</td>
+<td align="left">&gt;&gt;&gt; <code>hex(10)</code><br>‘0xa’</td>
+</tr>
+<tr>
+<td align="center">13</td>
+<td align="left">range()</td>
+<td align="left">返回一个range对象</td>
+<td align="left">&gt;&gt;&gt; <code>list(range(1, 9, 2))</code><br>[1, 3, 5, 7]</td>
+</tr>
+<tr>
+<td align="center">14</td>
+<td align="left">zip()</td>
+<td align="left">创建一个聚合了来自每个可迭代对象中的元素的迭代器</td>
+<td align="left">&gt;&gt;&gt; <code>list(zip((1, 4, 7), [2, 5, 8], range(3, 10, 3)))</code><br>[(1, 2, 3), (4, 5, 6), (7, 8, 9)]</td>
+</tr>
+<tr>
+<td align="center">15</td>
+<td align="left">enumerate()</td>
+<td align="left">返回一个枚举对象</td>
+<td align="left">&gt;&gt;&gt; <code>list(enumerate([&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]))</code><br>[(0, ‘a’), (1, ‘b’), (2, ‘c’)]<br>&gt;&gt;&gt; <code>list(enumerate([&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], 1))</code><br>[(1, ‘a’), (2, ‘b’), (3, ‘c’)]</td>
+</tr>
+<tr>
+<td align="center">16</td>
+<td align="left">iter()</td>
+<td align="left">返回一个<span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9nbG9zc2FyeS5odG1sI3Rlcm0taXRlcmF0b3I=" title="https://docs.python.org/zh-cn/3/glossary.html#term-iterator">迭代<i class="fa fa-external-link"></i></span>器对象</td>
+<td align="left">&gt;&gt;&gt; <code>next(iter([1, 2, 3]))</code><br>1</td>
+</tr>
+<tr>
+<td align="center">17</td>
+<td align="left">object()</td>
+<td align="left">返回一个没有特征的新对象</td>
+<td align="left">&gt;&gt;&gt; <code>dir(object())</code><br>[‘__class__‘, …]</td>
+</tr>
+<tr>
+<td align="center">18</td>
+<td align="left">bytearray()</td>
+<td align="left">返回一个新的 bytes 数组</td>
+<td align="left">&gt;&gt;&gt; <code>[i for i in bytearray(&#39;hello world!&#39;, encoding=&#39;utf8&#39;)]</code><br>[104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33]</td>
+</tr>
+<tr>
+<td align="center">19</td>
+<td align="left">hash()</td>
+<td align="left">返回对象的哈希值</td>
+<td align="left">&gt;&gt;&gt; <code>hash(&#39;hello&#39;)</code><br>116457751260220756</td>
+</tr>
+<tr>
+<td align="center">20</td>
+<td align="left">id()</td>
+<td align="left">返回对象的“标识值”</td>
+<td align="left">&gt;&gt;&gt; <code>id(&#39;hello&#39;)</code><br>2590383091640</td>
+</tr>
+<tr>
+<td align="center">21</td>
+<td align="left">chr()</td>
+<td align="left">返回整数Unicode的字符串格式</td>
+<td align="left">&gt;&gt;&gt; <code>chr(8364)</code><br>‘€’</td>
+</tr>
+<tr>
+<td align="center">22</td>
+<td align="left">ord()</td>
+<td align="left">Unicode字符转整数</td>
+<td align="left">&gt;&gt;&gt; <code>ord(&#39;€&#39;)</code><br>8364</td>
+</tr>
+<tr>
+<td align="center">23</td>
+<td align="left">frozenset()</td>
+<td align="left">返回一个新的<span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9saWJyYXJ5L3N0ZHR5cGVzLmh0bWwjZnJvemVuc2V0" title="https://docs.python.org/zh-cn/3/library/stdtypes.html#frozenset">frozenset<i class="fa fa-external-link"></i></span>对象</td>
+<td align="left">&gt;&gt;&gt; <code>frozenset([1, 2, 3])</code><br>frozenset({1, 2, 3})</td>
+</tr>
+</tbody></table>
+<h3 id="2-6-其他（8个）"><a href="#2-6-其他（8个）" class="headerlink" title="2.6 其他（8个）"></a>2.6 其他（8个）</h3><table>
+<thead>
+<tr>
+<th align="center">序号</th>
+<th align="left">函数</th>
+<th align="left">作用</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="left">callable()</td>
+<td align="left">是否可调用</td>
+<td align="left">&gt;&gt;&gt; <code>callable(abs)</code><br>True</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="left">compile()</td>
+<td align="left">将source编译成代码或AST对象</td>
+<td align="left">&gt;&gt;&gt; <code>compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1)</code><br></td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="left">eval()</td>
+<td align="left">对表达式字符串解析求值</td>
+<td align="left">&gt;&gt;&gt; <code>x = 1; eval(&#39;x+1&#39;)</code><br>2</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="left">help()</td>
+<td align="left">启动内置的帮助系统（此函数主要在交互式中使用）</td>
+<td align="left">&gt;&gt;&gt; <code>help()</code><br></td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="left">repr()</td>
+<td align="left">返回对象的可打印表示形式的字符串</td>
+<td align="left">&gt;&gt;&gt; <code>repr(Klass())</code><br>‘&lt;<strong>main</strong>.Klass object at 0x000001CF7A8D2CC0&gt;’</td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="left">memoryview()</td>
+<td align="left">返回由给定实参创建的“<span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9saWJyYXJ5L3N0ZHR5cGVzLmh0bWwjdHlwZW1lbW9yeXZpZXc=" title="https://docs.python.org/zh-cn/3/library/stdtypes.html#typememoryview">内存视图<i class="fa fa-external-link"></i></span>”对象</td>
+<td align="left">&gt;&gt;&gt; <code>memoryview(bytearray([1, 2]))</code><br>&lt;memory at 0x000001CF7AA357C8&gt;</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="left">format()</td>
+<td align="left">返回格式化字符串</td>
+<td align="left">&gt;&gt;&gt; <code>format(value[, format_spec])</code><br></td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="left">__import__()</td>
+<td align="left">此函数会由import语句发起调用,日常 Python 编程中不需要用到的高级函数</td>
+<td align="left">-</td>
+</tr>
+</tbody></table>
+<h2 id="3-Python2与Python3私有的内置函数"><a href="#3-Python2与Python3私有的内置函数" class="headerlink" title="3. Python2与Python3私有的内置函数"></a>3. Python2与Python3私有的内置函数</h2><h3 id="3-1-python3新增函数-4个"><a href="#3-1-python3新增函数-4个" class="headerlink" title="3.1 python3新增函数(4个):"></a>3.1 python3新增函数(4个):</h3><ul>
+<li>ascii()</li>
+<li>breakpoint()</li>
+<li>bytes()</li>
+<li>exec()</li>
+</ul>
+<h3 id="3-1-python2有python3移除函数-11个"><a href="#3-1-python2有python3移除函数-11个" class="headerlink" title="3.1 python2有python3移除函数(11个):"></a>3.1 python2有python3移除函数(11个):</h3><ul>
+<li>basestring()</li>
+<li>cmp()</li>
+<li>execfile()</li>
+<li>file()</li>
+<li>long()</li>
+<li>raw_input()</li>
+<li>reduce()</li>
+<li>reload()</li>
+<li>unichr()</li>
+<li>unicode()</li>
+<li>xrange()</li>
+</ul>
+<h2 id="4-python2-7-16-与-python3-7-4-对照表（共80个）"><a href="#4-python2-7-16-与-python3-7-4-对照表（共80个）" class="headerlink" title="4 python2.7.16 与 python3.7.4 对照表（共80个）"></a>4 python2.7.16 与 python3.7.4 对照表（共80个）</h2><table>
+<thead>
+<tr>
+<th align="center">序号</th>
+<th align="left">函数</th>
+<th align="left">python2.7.16</th>
+<th align="left">python3.7.4</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="left">abs()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="left">all()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">3</td>
+<td align="left">any()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="left">ascii()</td>
+<td align="left"><span style="color:red">no</span></td>
+<td align="left"><span style="color: green">yes</span></td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="left">basestring()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">6</td>
+<td align="left">bin()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="left">bool()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="left">breakpoint()</td>
+<td align="left"><span style="color:red">no</span></td>
+<td align="left"><span style="color: green">yes</span></td>
+</tr>
+<tr>
+<td align="center">9</td>
+<td align="left">bytearray()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">10</td>
+<td align="left">bytes()</td>
+<td align="left"><span style="color:red">no</span></td>
+<td align="left"><span style="color: green">yes</span></td>
+</tr>
+<tr>
+<td align="center">11</td>
+<td align="left">callable()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">12</td>
+<td align="left">chr()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">13</td>
+<td align="left">classmethod()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">14</td>
+<td align="left">cmp()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">15</td>
+<td align="left">compile()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">16</td>
+<td align="left">complex()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">17</td>
+<td align="left">delattr()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">18</td>
+<td align="left">dict()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">19</td>
+<td align="left">dir()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">20</td>
+<td align="left">divmod()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">21</td>
+<td align="left">enumerate()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">22</td>
+<td align="left">eval()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">23</td>
+<td align="left">exec()</td>
+<td align="left"><span style="color:red">no</span></td>
+<td align="left"><span style="color: green">yes</span></td>
+</tr>
+<tr>
+<td align="center">24</td>
+<td align="left">execfile()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">25</td>
+<td align="left">file()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">26</td>
+<td align="left">filter()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">27</td>
+<td align="left">float()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">28</td>
+<td align="left">format()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">29</td>
+<td align="left">frozenset()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">30</td>
+<td align="left">getattr()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">31</td>
+<td align="left">globals()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">32</td>
+<td align="left">hasattr()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">33</td>
+<td align="left">hash()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">34</td>
+<td align="left">help()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">35</td>
+<td align="left">hex()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">36</td>
+<td align="left">id()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">37</td>
+<td align="left">input()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">38</td>
+<td align="left">int()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">39</td>
+<td align="left">isinstance()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">40</td>
+<td align="left">issubclass()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">41</td>
+<td align="left">iter()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">42</td>
+<td align="left">len()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">43</td>
+<td align="left">list()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">44</td>
+<td align="left">locals()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">45</td>
+<td align="left">long()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">46</td>
+<td align="left">map()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">47</td>
+<td align="left">max()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">48</td>
+<td align="left">memoryview()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">49</td>
+<td align="left">min()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">50</td>
+<td align="left">next()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">51</td>
+<td align="left">object()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">52</td>
+<td align="left">oct()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">53</td>
+<td align="left">open()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">54</td>
+<td align="left">ord()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">55</td>
+<td align="left">pow()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">56</td>
+<td align="left">print()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">57</td>
+<td align="left">property()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">58</td>
+<td align="left">range()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">59</td>
+<td align="left">raw_input()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">60</td>
+<td align="left">reduce()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">61</td>
+<td align="left">reload()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">62</td>
+<td align="left">repr()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">63</td>
+<td align="left">reversed()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">64</td>
+<td align="left">round()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">65</td>
+<td align="left">set()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">66</td>
+<td align="left">setattr()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">67</td>
+<td align="left">slice()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">68</td>
+<td align="left">sorted()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">69</td>
+<td align="left">staticmethod()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">70</td>
+<td align="left">str()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">71</td>
+<td align="left">sum()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">72</td>
+<td align="left">super()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">73</td>
+<td align="left">tuple()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">74</td>
+<td align="left">type()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">75</td>
+<td align="left">unichr()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">76</td>
+<td align="left">unicode()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">77</td>
+<td align="left">vars()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">78</td>
+<td align="left">xrange()</td>
+<td align="left">yes</td>
+<td align="left"><span style="color:red">no</span></td>
+</tr>
+<tr>
+<td align="center">79</td>
+<td align="left">zip()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="center">80</td>
+<td align="left">__import__()</td>
+<td align="left">yes</td>
+<td align="left">yes</td>
+</tr>
+</tbody></table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>[1] <span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9saWJyYXJ5L2Z1bmN0aW9ucy5odG1s" title="https://docs.python.org/zh-cn/3/library/functions.html">https://docs.python.org/zh-cn/3/library/functions.html<i class="fa fa-external-link"></i></span></li>
+<li>[2] <span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMi9saWJyYXJ5L2Z1bmN0aW9ucy5odG1s" title="https://docs.python.org/zh-cn/2/library/functions.html">https://docs.python.org/zh-cn/2/library/functions.html<i class="fa fa-external-link"></i></span></li>
+<li>[3] 菜鸟教程 <span class="exturl" data-url="aHR0cHM6Ly93d3cucnVub29iLmNvbS9weXRob24zL3B5dGhvbjMtYnVpbHQtaW4tZnVuY3Rpb25zLmh0bWw=" title="https://www.runoob.com/python3/python3-built-in-functions.html">Python3 内置函数<i class="fa fa-external-link"></i></span></li>
+<li>[4] 菜鸟教程 <span class="exturl" data-url="aHR0cHM6Ly93d3cucnVub29iLmNvbS9weXRob24vcHl0aG9uLWJ1aWx0LWluLWZ1bmN0aW9ucy5odG1s" title="https://www.runoob.com/python/python-built-in-functions.html">Python 内置函数<i class="fa fa-external-link"></i></span></li>
+<li>[5] <span class="exturl" data-url="aHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvemgtY24vMy9nbG9zc2FyeS5odG1s" title="https://docs.python.org/zh-cn/3/glossary.html">Python3 术语对照表<i class="fa fa-external-link"></i></span></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="ken wechat" style="width: 200px; max-width: 100%;">
+  <div>微信扫描二维码，第一时间收到最新原创文章！</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="ken 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="ken 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/08/14/python-built-in-function/" title="Python内置函数">http://kenblog.top/2019/08/14/python-built-in-function/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/python/" rel="tag"># python</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/08/06/jupyter-notebook-kernel-c-cpp/" rel="next" title="jupyter_notebook_kernel_c_cpp">
+                  <i class="fa fa-chevron-left"></i> jupyter_notebook_kernel_c_cpp
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/03/jpeg-data-store-format/" rel="prev" title="JPEG 图片存储格式与元数据解析">
+                  JPEG 图片存储格式与元数据解析 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-python2-amp-python3-内置函数统计"><span class="nav-number">1.</span> <span class="nav-text">1. python2 &amp; python3 内置函数统计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#python2-76-个"><span class="nav-number">1.1.</span> <span class="nav-text">python2: 76 个</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python3-69-个"><span class="nav-number">1.2.</span> <span class="nav-text">python3: 69 个</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Python2与Python3公有的内置函数"><span class="nav-number">2.</span> <span class="nav-text">2. Python2与Python3公有的内置函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-数学计算（7个）"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 数学计算（7个）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-数据操作（9个）"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 数据操作（9个）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-文件-amp-系统（6个）"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 文件&amp;系统（6个）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-类（12个）"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 类（12个）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-数据类型创建-amp-转换（23个）"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 数据类型创建&amp;转换（23个）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-其他（8个）"><span class="nav-number">2.6.</span> <span class="nav-text">2.6 其他（8个）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Python2与Python3私有的内置函数"><span class="nav-number">3.</span> <span class="nav-text">3. Python2与Python3私有的内置函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-python3新增函数-4个"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 python3新增函数(4个):</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-python2有python3移除函数-11个"><span class="nav-number">3.2.</span> <span class="nav-text">3.1 python2有python3移除函数(11个):</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-python2-7-16-与-python3-7-4-对照表（共80个）"><span class="nav-number">4.</span> <span class="nav-text">4 python2.7.16 与 python3.7.4 对照表（共80个）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/ken_red.jpg"
+      alt="ken">
+  <p class="site-author-name" itemprop="name">ken</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

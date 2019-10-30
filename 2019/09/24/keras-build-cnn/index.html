@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content=".mjpage .MJX-monospace {                             font-family: monospace                             }                              .mjpage .MJX-sans-serif {">
+<meta name="keywords" content="cnn keras">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Keras 搭建图片分类 CNN （卷积神经网络）">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;09&#x2F;24&#x2F;keras-build-cnn&#x2F;index.html">
+<meta property="og:site_name" content="ken爱编程">
+<meta property="og:description" content=".mjpage .MJX-monospace {                             font-family: monospace                             }                              .mjpage .MJX-sans-serif {">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;convolution-schematic.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;max-pooling.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;alexnet_2012.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vgg_2014.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;ResNet_2015.png">
+<meta property="og:updated_time" content="2019-10-30T02:27:24.163Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;convolution-schematic.gif">
+  <link rel="canonical" href="http://kenblog.top/2019/09/24/keras-build-cnn/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Keras 搭建图片分类 CNN （卷积神经网络） | ken爱编程</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ken爱编程</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">面向“对象”编程</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">35</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">35</span></a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/09/24/keras-build-cnn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ken">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/ken_red.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ken爱编程">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            Keras 搭建图片分类 CNN （卷积神经网络）
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-24 16:25:57" itemprop="dateCreated datePublished" datetime="2019-09-24T16:25:57+08:00">2019-09-24</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 10:27:24" itemprop="dateModified" datetime="2019-10-30T10:27:24+08:00">2019-10-30</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index">
+                    <span itemprop="name">深度学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <html><head><style type="text/css">
+                            .mjpage .MJX-monospace {
+                            font-family: monospace
+                            }
+
+                            .mjpage .MJX-sans-serif {
+                            font-family: sans-serif
+                            }
+
+                            .mjpage {
+                            display: inline;
+                            font-style: normal;
+                            font-weight: normal;
+                            line-height: normal;
+                            font-size: 100%;
+                            font-size-adjust: none;
+                            text-indent: 0;
+                            text-align: left;
+                            text-transform: none;
+                            letter-spacing: normal;
+                            word-spacing: normal;
+                            word-wrap: normal;
+                            white-space: nowrap;
+                            float: none;
+                            direction: ltr;
+                            max-width: none;
+                            max-height: none;
+                            min-width: 0;
+                            min-height: 0;
+                            border: 0;
+                            padding: 0;
+                            margin: 0
+                            }
+
+                            .mjpage * {
+                            transition: none;
+                            -webkit-transition: none;
+                            -moz-transition: none;
+                            -ms-transition: none;
+                            -o-transition: none
+                            }
+
+                            .mjx-svg-href {
+                            fill: blue;
+                            stroke: blue
+                            }
+
+                            .MathJax_SVG_LineBox {
+                            display: table!important
+                            }
+
+                            .MathJax_SVG_LineBox span {
+                            display: table-cell!important;
+                            width: 10000em!important;
+                            min-width: 0;
+                            max-width: none;
+                            padding: 0;
+                            border: 0;
+                            margin: 0
+                            }
+
+                            .mjpage__block {
+                            text-align: center;
+                            margin: 1em 0em;
+                            position: relative;
+                            display: block!important;
+                            text-indent: 0;
+                            max-width: none;
+                            max-height: none;
+                            min-width: 0;
+                            min-height: 0;
+                            width: 100%
+                            }</style></head><body><h2 id="1-导入keras"><a href="#1-导入keras" class="headerlink" title="1. 导入keras"></a>1. 导入keras</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Conv2D, MaxPooling2D, Flatten, Dense</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="2-Conv2D"><a href="#2-Conv2D" class="headerlink" title="2. Conv2D"></a>2. Conv2D</h2><p>构建卷积层。用于从输入的高维数组中提取特征。卷积层的每个过滤器就是一个特征映射，用于提取某一个特征，过滤器的数量决定了卷积层输出特征个数，或者输出深度。因此，图片等高维数据每经过一个卷积层，深度都会增加，并且等于过滤器的数量。</p>
+<p><img src="http://cdn.kenblog.top/convolution-schematic.gif" alt=""></p>
+<a id="more"></a>
+
+<p>Conv2D(filters, kernel_size, strides, padding, activation=’relu’, input_shape)</p>
+<ul>
+<li><code>filters</code>: 过滤器数量</li>
+<li><code>kernel_size</code>: 指定（方形）卷积窗口的高和宽的数字</li>
+<li><code>strides</code>: 卷积步长, 默认为 1</li>
+<li><code>padding</code>: 卷积如何处理边缘。选项包括 ‘valid’ 和 ‘same’。默认为 ‘valid’</li>
+<li><code>activation</code>: 激活函数，通常设为 <code>relu</code>。如果未指定任何值，则不应用任何激活函数。强烈建议你向网络中的每个卷积层添加一个 ReLU 激活函数</li>
+<li><code>input_shape</code>: 指定输入层的高度，宽度和深度的元组。当卷积层作为模型第一层时，必须提供此参数，否则不需要</li>
+</ul>
+<p><strong>示例1</strong>：构建一个CNN，输入层接受的是 <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="9.815ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 4225.9 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-1-Title">
+<title id="MathJax-SVG-1-Title">200 \times 200</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E1-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path>
+<path stroke-width="1" id="E1-MJMAIN-D7" d="M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E1-MJMAIN-32"></use>
+ <use xlink:href="#E1-MJMAIN-30" x="500" y="0"></use>
+ <use xlink:href="#E1-MJMAIN-30" x="1001" y="0"></use>
+ <use xlink:href="#E1-MJMAIN-D7" x="1723" y="0"></use>
+<g transform="translate(2724,0)">
+ <use xlink:href="#E1-MJMAIN-32"></use>
+ <use xlink:href="#E1-MJMAIN-30" x="500" y="0"></use>
+ <use xlink:href="#E1-MJMAIN-30" x="1001" y="0"></use>
+</g>
+</g>
+</svg></span> 像素的灰度图片；输入层后面是卷积层，具有 16 个过滤器，宽高分别为 2；在进行卷积操作时，我希望过滤器每次跳转 2 个像素。并且，不希望过滤器超出图片界限之外，就是说，不用0填充图片。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Conv2D(filters=<span class="number">16</span>, kernel_size=<span class="number">2</span>, strides=<span class="number">2</span>, activation=<span class="string">'relu'</span>, input_shape=(<span class="number">200</span>, <span class="number">200</span>, <span class="number">1</span>))</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>示例2</strong>：在示例1卷积层后再增加一层卷积层。新的卷积层有 32 个过滤器，每个的宽高都是 3。在进行卷积操作时，希望过滤器每次移动1个像素。并且希望卷积层查看上一层级的所有区域，因此，不介意在进行卷积操作时是否超过上一层级的边缘。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Conv2D(filters=<span class="number">32</span>, kernel_size=<span class="number">3</span>, padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>示例3</strong>：简化写法。创建具有 64 个过滤器，每个的过滤器大小是 <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="5.165ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 2223.9 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-2-Title">
+<title id="MathJax-SVG-2-Title">2 \times 2</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E2-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E2-MJMAIN-D7" d="M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E2-MJMAIN-32" x="0" y="0"></use>
+ <use xlink:href="#E2-MJMAIN-D7" x="722" y="0"></use>
+ <use xlink:href="#E2-MJMAIN-32" x="1723" y="0"></use>
+</g>
+</svg></span>。层级具有 ReLU 激活函数。卷积操作每次移动一个像素。并且丢弃边缘像素。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Conv2D(<span class="number">64</span>, (<span class="number">2</span>,<span class="number">2</span>), activation=<span class="string">'relu'</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="3-MaxPooling2D"><a href="#3-MaxPooling2D" class="headerlink" title="3. MaxPooling2D"></a>3. MaxPooling2D</h2><p>构建最大池化层。如果说，卷积层通过过滤器从高维数据中提取特征，增加了输出的深度（特征数），那么，最大池化层的作用是降低输出维度（宽高）。在 CNN 架构中，最大池化层通常出现在卷积层后，后面接着下一个卷积层，交替出现，结果是，输入的高维数组，深度逐次增加，而维度逐次降低。最终，高维的空间信息，逐渐转换成 1 维的特征向量，然后连接全联接层或其他分类算法，得到模型输出。</p>
+<p><img src="http://cdn.kenblog.top/max-pooling.png" alt=""></p>
+<p>MaxPooling2D(pool_size, strides, padding)</p>
+<ul>
+<li>pool_size: 指定池化窗口高度和宽度的数字</li>
+<li>strides: 垂直和水平 stride。如果不指定任何值，则 strides 默认为 pool_size</li>
+<li>padding: 选项包括 <code>valid</code> 和 <code>same</code>。如果不指定任何值，则 padding 设为 <code>valid</code></li>
+</ul>
+<p><strong>示例</strong>：在卷积层后面添加最大池化层，降低卷积层的维度。假设卷积层的大小是 (100, 100, 15)，希望最大池化层的大小为 (50, 50, 15)。要实现这一点，可以在最大池化层中使用 2x2 窗口，stride 设为 2，代码如下：</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MaxPooling2D(pool_size=<span class="number">2</span>, strides=<span class="number">2</span>)</span><br></pre></td></tr></tbody></table></figure>
+
+<h2 id="4-构建图片分类-CNN"><a href="#4-构建图片分类-CNN" class="headerlink" title="4. 构建图片分类 CNN"></a>4. 构建图片分类 CNN</h2><h3 id="4-1-创建序列化模型"><a href="#4-1-创建序列化模型" class="headerlink" title="4.1 创建序列化模型"></a>4.1 创建序列化模型</h3><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model = Sequential()</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="4-2-添加卷积层和最大池化层"><a href="#4-2-添加卷积层和最大池化层" class="headerlink" title="4.2 添加卷积层和最大池化层"></a>4.2 添加卷积层和最大池化层</h3><p>这里分别添加了 3 层卷积层和 3 层最大池化层。卷积层的过滤器数量逐次增加，并且 padding 参数都为 <code>same</code>，strides 使用默认值 1，这意味着，卷积层不会改变图片的宽高，只会通过过滤器层层提取更多特征。而最大池化层，strides 默认和 pool_size 想等设置为 2，意味着，最大池化层每次都能将图片宽高压缩一半。</p>
+<p>需要注意的两个地方：</p>
+<ul>
+<li>模型第一层卷积层接受输入，因此需要设置一个 input_shape 参数指定输入维度。这里设置的 (32, 32, 3) ，表示输入图片需要是宽高为 32 像素的 RGB 彩色图片。第一层之后的层都不需要设置 input_shape, 因为,模型会自动将前一层的输出 shape 作为 后一层的输入 shape。</li>
+<li>由于，我们习惯使得卷积层不改变维度，而让最大池化层每次将维度缩小一般，即宽高都除以 2，为了能一直整除，最好将输入 shape 设置为 2 的整数幂，如下本文设置为 <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="7.64ex" height="2.676ex" style="vertical-align: -0.338ex;" viewBox="0 -1006.6 3289.5 1152.1" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-3-Title">
+<title id="MathJax-SVG-3-Title">2^5 = 32</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E3-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-35" d="M164 157Q164 133 148 117T109 101H102Q148 22 224 22Q294 22 326 82Q345 115 345 210Q345 313 318 349Q292 382 260 382H254Q176 382 136 314Q132 307 129 306T114 304Q97 304 95 310Q93 314 93 485V614Q93 664 98 664Q100 666 102 666Q103 666 123 658T178 642T253 634Q324 634 389 662Q397 666 402 666Q410 666 410 648V635Q328 538 205 538Q174 538 149 544L139 546V374Q158 388 169 396T205 412T256 420Q337 420 393 355T449 201Q449 109 385 44T229 -22Q148 -22 99 32T50 154Q50 178 61 192T84 210T107 214Q132 214 148 197T164 157Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
+<path stroke-width="1" id="E3-MJMAIN-33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E3-MJMAIN-32" x="0" y="0"></use>
+ <use transform="scale(0.707)" xlink:href="#E3-MJMAIN-35" x="707" y="557"></use>
+ <use xlink:href="#E3-MJMAIN-3D" x="1232" y="0"></use>
+<g transform="translate(2288,0)">
+ <use xlink:href="#E3-MJMAIN-33"></use>
+ <use xlink:href="#E3-MJMAIN-32" x="500" y="0"></use>
+</g>
+</g>
+</svg></span>。</li>
+</ul>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">model.add(Conv2D(filters=<span class="number">16</span>, kernel_size=<span class="number">2</span>, padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>, input_shape=(<span class="number">32</span>, <span class="number">32</span>, <span class="number">3</span>)))</span><br><span class="line">model.add(MaxPooling2D(pool_size=<span class="number">2</span>))</span><br><span class="line"></span><br><span class="line">model.add(Conv2D(filters=<span class="number">32</span>, kernel_size=<span class="number">2</span>, padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>))</span><br><span class="line">model.add(MaxPooling2D(pool_size=<span class="number">2</span>))</span><br><span class="line"></span><br><span class="line">model.add(Conv2D(filters=<span class="number">64</span>, kernel_size=<span class="number">2</span>, padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>))</span><br><span class="line">model.add(MaxPooling2D(pool_size=<span class="number">2</span>))</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="4-3-扁平层"><a href="#4-3-扁平层" class="headerlink" title="4.3 扁平层"></a>4.3 扁平层</h3><p>模型输入 shape 为 (32, 32, 3) ，经过前面的卷积和最大池化，可以得到现在的输出宽高为 <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18.594ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 8005.9 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-4-Title">
+<title id="MathJax-SVG-4-Title">32 \div 2 \div 2 \div 2 = 4</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E4-MJMAIN-33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path>
+<path stroke-width="1" id="E4-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E4-MJMAIN-F7" d="M318 466Q318 500 339 518T386 537Q418 537 438 517T458 466Q458 438 440 417T388 396Q355 396 337 417T318 466ZM56 237T56 250T70 270H706Q721 262 721 250T706 230H70Q56 237 56 250ZM318 34Q318 68 339 86T386 105Q418 105 438 85T458 34Q458 6 440 -15T388 -36Q355 -36 337 -15T318 34Z"></path>
+<path stroke-width="1" id="E4-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
+<path stroke-width="1" id="E4-MJMAIN-34" d="M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E4-MJMAIN-33"></use>
+ <use xlink:href="#E4-MJMAIN-32" x="500" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-F7" x="1223" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-32" x="2223" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-F7" x="2946" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-32" x="3947" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-F7" x="4670" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-32" x="5670" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-3D" x="6449" y="0"></use>
+ <use xlink:href="#E4-MJMAIN-34" x="7505" y="0"></use>
+</g>
+</svg></span>，深度为最后一层卷积层过滤器数量 64，因此，输出 shape 为 (4, 4, 64)。扁平层的作用将这个多维数组（行业术语叫<code>张量</code>），转换为相同数量 1 维向量, 因此，向量的长度为 <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="18.079ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 7783.9 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-5-Title">
+<title id="MathJax-SVG-5-Title">4 \times 4 \times 64 = 1024</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E5-MJMAIN-34" d="M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z"></path>
+<path stroke-width="1" id="E5-MJMAIN-D7" d="M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z"></path>
+<path stroke-width="1" id="E5-MJMAIN-36" d="M42 313Q42 476 123 571T303 666Q372 666 402 630T432 550Q432 525 418 510T379 495Q356 495 341 509T326 548Q326 592 373 601Q351 623 311 626Q240 626 194 566Q147 500 147 364L148 360Q153 366 156 373Q197 433 263 433H267Q313 433 348 414Q372 400 396 374T435 317Q456 268 456 210V192Q456 169 451 149Q440 90 387 34T253 -22Q225 -22 199 -14T143 16T92 75T56 172T42 313ZM257 397Q227 397 205 380T171 335T154 278T148 216Q148 133 160 97T198 39Q222 21 251 21Q302 21 329 59Q342 77 347 104T352 209Q352 289 347 316T329 361Q302 397 257 397Z"></path>
+<path stroke-width="1" id="E5-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path>
+<path stroke-width="1" id="E5-MJMAIN-31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path>
+<path stroke-width="1" id="E5-MJMAIN-30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z"></path>
+<path stroke-width="1" id="E5-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E5-MJMAIN-34" x="0" y="0"></use>
+ <use xlink:href="#E5-MJMAIN-D7" x="722" y="0"></use>
+ <use xlink:href="#E5-MJMAIN-34" x="1723" y="0"></use>
+ <use xlink:href="#E5-MJMAIN-D7" x="2446" y="0"></use>
+<g transform="translate(3446,0)">
+ <use xlink:href="#E5-MJMAIN-36"></use>
+ <use xlink:href="#E5-MJMAIN-34" x="500" y="0"></use>
+</g>
+ <use xlink:href="#E5-MJMAIN-3D" x="4725" y="0"></use>
+<g transform="translate(5781,0)">
+ <use xlink:href="#E5-MJMAIN-31"></use>
+ <use xlink:href="#E5-MJMAIN-30" x="500" y="0"></use>
+ <use xlink:href="#E5-MJMAIN-32" x="1001" y="0"></use>
+ <use xlink:href="#E5-MJMAIN-34" x="1501" y="0"></use>
+</g>
+</g>
+</svg></span>。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model.add(Flatten())</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="4-4-全联接层分类输出"><a href="#4-4-全联接层分类输出" class="headerlink" title="4.4 全联接层分类输出"></a>4.4 全联接层分类输出</h3><p>正如前文所说，卷积层和最大池化层组合使用，从二维的图片中提取特征，将空间信息解构为特征向量后，就可以连接分类器，进而得到模型预测输出。这里分类器采用的是两个全联接层，最后一层全联接层也是输出层，采用了 <code>softmax</code> 作为激活层，因此，输出长度为 10 的向量，对应 10 个分类的预测概率值。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">model.add(Dense(<span class="number">500</span>, activation=<span class="string">'relu'</span>))</span><br><span class="line">model.add(Dense(<span class="number">10</span>, activation=<span class="string">'softmax'</span>))</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="4-5-查看完整模型的架构"><a href="#4-5-查看完整模型的架构" class="headerlink" title="4.5 查看完整模型的架构"></a>4.5 查看完整模型的架构</h3><p>到此为止，我们已经完成了一个非常简单，却非常完整的用于图像分类的卷积神经网络(CNN)的架构设计。我们可以通过模型的 <code>summary()</code> 方法一览整个模型，确保模型架构符合自己的预期。<code>summary()</code> 方法会将模型每一层的参数个数，以及整个模型参数总数和可以训练参数个数显示出来，帮助我们非常便捷地掌握模型的复杂程度。可以看到，我们这个模型的一共有 <code>528,054</code> 个参数。信心的读者，还会发现，只有卷积层和全连接层有参数，而且全连接层的参数个数远远超过卷积层。事实上，这也揭露一个事实，相对于全联接，卷积层是局部连接的，它的参数个数也是可以通过卷积层传入的参数计算出来的。关于参数个数的计算实际很简单，但不是本文的重点，感兴趣的读者可以自行百度一下，或关注笔者博客后续更新。</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">model.summary()</span><br></pre></td></tr></tbody></table></figure>
+
+<pre><code>_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d_4 (Conv2D)            (None, 32, 32, 16)        208       
+_________________________________________________________________
+max_pooling2d_2 (MaxPooling2 (None, 16, 16, 16)        0         
+_________________________________________________________________
+conv2d_5 (Conv2D)            (None, 16, 16, 32)        2080      
+_________________________________________________________________
+max_pooling2d_3 (MaxPooling2 (None, 8, 8, 32)          0         
+_________________________________________________________________
+conv2d_6 (Conv2D)            (None, 8, 8, 64)          8256      
+_________________________________________________________________
+max_pooling2d_4 (MaxPooling2 (None, 4, 4, 64)          0         
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 1024)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 500)               512500    
+_________________________________________________________________
+dense_2 (Dense)              (None, 10)                5010      
+=================================================================
+Total params: 528,054
+Trainable params: 528,054
+Non-trainable params: 0
+_________________________________________________________________</code></pre><h2 id="5-突破性的CNN架构"><a href="#5-突破性的CNN架构" class="headerlink" title="5. 突破性的CNN架构"></a>5. 突破性的CNN架构</h2><h3 id="5-1-AlexNet"><a href="#5-1-AlexNet" class="headerlink" title="5.1 AlexNet"></a>5.1 AlexNet</h3><p>2012 年，由多伦多大学的团队开发。使用当时最强大的 GPU 在一周内训练完该网络。AlexNet 使用了 ReLU 激活函数和 dropout 层来避免过拟合这一方面走在了前沿。卷积层使用 <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="7.49ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 3224.9 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-6-Title">
+<title id="MathJax-SVG-6-Title">11 \times 11</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E6-MJMAIN-31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path>
+<path stroke-width="1" id="E6-MJMAIN-D7" d="M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E6-MJMAIN-31"></use>
+ <use xlink:href="#E6-MJMAIN-31" x="500" y="0"></use>
+ <use xlink:href="#E6-MJMAIN-D7" x="1223" y="0"></use>
+<g transform="translate(2223,0)">
+ <use xlink:href="#E6-MJMAIN-31"></use>
+ <use xlink:href="#E6-MJMAIN-31" x="500" y="0"></use>
+</g>
+</g>
+</svg></span> 大窗口。</p>
+<p><img src="http://cdn.kenblog.top/alexnet_2012.png" alt=""></p>
+<h3 id="5-2-VGG"><a href="#5-2-VGG" class="headerlink" title="5.2 VGG"></a>5.2 VGG</h3><p>2014 年，由牛津大学的视觉几何组开发。VGG 有两个版本，VGG16 和 VGG19，分别有 16 个层级和19个层级。两个版本都非常简洁美观，由一个很长的 <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="5.165ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 2223.9 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-7-Title">
+<title id="MathJax-SVG-7-Title">3 \times 3</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E7-MJMAIN-33" d="M127 463Q100 463 85 480T69 524Q69 579 117 622T233 665Q268 665 277 664Q351 652 390 611T430 522Q430 470 396 421T302 350L299 348Q299 347 308 345T337 336T375 315Q457 262 457 175Q457 96 395 37T238 -22Q158 -22 100 21T42 130Q42 158 60 175T105 193Q133 193 151 175T169 130Q169 119 166 110T159 94T148 82T136 74T126 70T118 67L114 66Q165 21 238 21Q293 21 321 74Q338 107 338 175V195Q338 290 274 322Q259 328 213 329L171 330L168 332Q166 335 166 348Q166 366 174 366Q202 366 232 371Q266 376 294 413T322 525V533Q322 590 287 612Q265 626 240 626Q208 626 181 615T143 592T132 580H135Q138 579 143 578T153 573T165 566T175 555T183 540T186 520Q186 498 172 481T127 463Z"></path>
+<path stroke-width="1" id="E7-MJMAIN-D7" d="M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E7-MJMAIN-33" x="0" y="0"></use>
+ <use xlink:href="#E7-MJMAIN-D7" x="722" y="0"></use>
+ <use xlink:href="#E7-MJMAIN-33" x="1723" y="0"></use>
+</g>
+</svg></span> 卷积序列，穿插着 <span class="mjpage"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="5.165ex" height="2.176ex" style="vertical-align: -0.338ex;" viewBox="0 -791.3 2223.9 936.9" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" aria-labelledby="MathJax-SVG-8-Title">
+<title id="MathJax-SVG-8-Title">2 \times 2</title>
+<defs aria-hidden="true">
+<path stroke-width="1" id="E8-MJMAIN-32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path>
+<path stroke-width="1" id="E8-MJMAIN-D7" d="M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z"></path>
+</defs>
+<g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)" aria-hidden="true">
+ <use xlink:href="#E8-MJMAIN-32" x="0" y="0"></use>
+ <use xlink:href="#E8-MJMAIN-D7" x="722" y="0"></use>
+ <use xlink:href="#E8-MJMAIN-32" x="1723" y="0"></use>
+</g>
+</svg></span> 的池化层，最后是 3 个全连接层。</p>
+<p><img src="http://cdn.kenblog.top/vgg_2014.png" alt=""></p>
+<h3 id="5-3-ResNet"><a href="#5-3-ResNet" class="headerlink" title="5.3 ResNet"></a>5.3 ResNet</h3><p>2015 年，由微软研究部门开发。ResNet 也具有不同版本，区别在于层级的数量，最大的网络具有破纪录的 152 个层级。</p>
+<p><img src="http://cdn.kenblog.top/ResNet_2015.png" alt=""></p>
+<h2 id="6-结语"><a href="#6-结语" class="headerlink" title="6. 结语"></a>6. 结语</h2><p>本文介绍了使用 Keras 用于图像分类的 CNN 架构设计方法，并进一步介绍3个著名的CNN架构。关于如何训练一个CNN，实现一个完整的图片分类模型，放在一篇文章，显得过于冗长，想了解更多，可关注笔者后续专栏。</p>
+</body></html>
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="ken wechat" style="width: 200px; max-width: 100%;">
+  <div>微信扫描二维码，第一时间收到最新原创文章！</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="ken 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="ken 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/09/24/keras-build-cnn/" title="Keras 搭建图片分类 CNN （卷积神经网络）">http://kenblog.top/2019/09/24/keras-build-cnn/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/cnn-keras/" rel="tag"># cnn keras</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/23/how-to-package-python/" rel="next" title="如何发布自己的 python 包？">
+                  <i class="fa fa-chevron-left"></i> 如何发布自己的 python 包？
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/25/keras-build-vgg16/" rel="prev" title="Keras 手动搭建 VGG 卷积神经网络识别 ImageNet 1000 种常见分类">
+                  Keras 手动搭建 VGG 卷积神经网络识别 ImageNet 1000 种常见分类 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-导入keras"><span class="nav-number">1.</span> <span class="nav-text">1. 导入keras</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Conv2D"><span class="nav-number">2.</span> <span class="nav-text">2. Conv2D</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-MaxPooling2D"><span class="nav-number">3.</span> <span class="nav-text">3. MaxPooling2D</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-构建图片分类-CNN"><span class="nav-number">4.</span> <span class="nav-text">4. 构建图片分类 CNN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-创建序列化模型"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 创建序列化模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-添加卷积层和最大池化层"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 添加卷积层和最大池化层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-扁平层"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 扁平层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-全联接层分类输出"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 全联接层分类输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-查看完整模型的架构"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 查看完整模型的架构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-突破性的CNN架构"><span class="nav-number">5.</span> <span class="nav-text">5. 突破性的CNN架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-AlexNet"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 AlexNet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-VGG"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 VGG</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-ResNet"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 ResNet</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-结语"><span class="nav-number">6.</span> <span class="nav-text">6. 结语</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/ken_red.jpg"
+      alt="ken">
+  <p class="site-author-name" itemprop="name">ken</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

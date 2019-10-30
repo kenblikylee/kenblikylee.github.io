@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言本文集以 Kaggle 网站真实竞赛《dogs-vs-cats-redux-kernels-edition》为主线，讲解如何使用深度学习技术解决图像分类问题。本文作为文集第一篇，讲解图像数据集的下载和清洗。 1. kaggle 命令行 不熟悉 kaggle 命令行接口的读者可参考专栏 《Kaggle 命令行工具查看 AI 最新竞赛和下载数据集》。  通过关键词搜索竞赛: 12345$ kagg">
+<meta name="keywords" content="Kaggle 深度学习 AI 图像分类 数据清洗">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kaggle 图像分类竞赛实战（一）：数据集下载和清洗">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;10&#x2F;06&#x2F;kaggle-com-dogs-vs-cats-1&#x2F;index.html">
+<meta property="og:site_name" content="ken爱编程">
+<meta property="og:description" content="前言本文集以 Kaggle 网站真实竞赛《dogs-vs-cats-redux-kernels-edition》为主线，讲解如何使用深度学习技术解决图像分类问题。本文作为文集第一篇，讲解图像数据集的下载和清洗。 1. kaggle 命令行 不熟悉 kaggle 命令行接口的读者可参考专栏 《Kaggle 命令行工具查看 AI 最新竞赛和下载数据集》。  通过关键词搜索竞赛: 12345$ kagg">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dogs_vs_cats_clean_1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dogs_vs_cats_clean_2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dogs_vs_cats_clean_3.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dogs_vs_cats_clean_4.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dogs_vs_cats_clean_5.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dogs_vs_cats_clean_6.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dogs_vs_cats_clean_7.png">
+<meta property="og:updated_time" content="2019-10-30T03:07:14.673Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dogs_vs_cats_clean_1.png">
+  <link rel="canonical" href="http://kenblog.top/2019/10/06/kaggle-com-dogs-vs-cats-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>kaggle 图像分类竞赛实战（一）：数据集下载和清洗 | ken爱编程</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ken爱编程</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">面向“对象”编程</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">35</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">35</span></a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/10/06/kaggle-com-dogs-vs-cats-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ken">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/ken_red.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ken爱编程">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            kaggle 图像分类竞赛实战（一）：数据集下载和清洗
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-06 15:48:11" itemprop="dateCreated datePublished" datetime="2019-10-06T15:48:11+08:00">2019-10-06</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 11:07:14" itemprop="dateModified" datetime="2019-10-30T11:07:14+08:00">2019-10-30</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文集以 Kaggle 网站真实竞赛<span class="exturl" data-url="aHR0cHM6Ly93d3cua2FnZ2xlLmNvbS9jL2RvZ3MtdnMtY2F0cy1yZWR1eC1rZXJuZWxzLWVkaXRpb24=" title="https://www.kaggle.com/c/dogs-vs-cats-redux-kernels-edition">《dogs-vs-cats-redux-kernels-edition》<i class="fa fa-external-link"></i></span>为主线，讲解如何使用深度学习技术解决图像分类问题。本文作为文集第一篇，讲解图像数据集的下载和清洗。</p>
+<h2 id="1-kaggle-命令行"><a href="#1-kaggle-命令行" class="headerlink" title="1. kaggle 命令行"></a>1. kaggle 命令行</h2><blockquote>
+<p>不熟悉 kaggle 命令行接口的读者可参考专栏 <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vcG9zdC81ZDkwNjI4M2YyNjVkYTViYjE1Mjg3Zjc=" title="https://juejin.im/post/5d906283f265da5bb15287f7">《Kaggle 命令行工具查看 AI 最新竞赛和下载数据集》<i class="fa fa-external-link"></i></span>。</p>
+</blockquote>
+<p>通过关键词搜索竞赛:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ kaggle competitions list -s <span class="string">"dog cat"</span></span><br><span class="line">ref                                 deadline             category       reward  teamCount  userHasEntered  </span><br><span class="line">----------------------------------  -------------------  ----------  ---------  ---------  --------------  </span><br><span class="line">dogs-vs-cats                        2014-02-01 23:59:00  Playground       Swag        215           False  </span><br><span class="line">dogs-vs-cats-redux-kernels-edition  2017-03-02 23:59:00  Playground  Knowledge       1314            True</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>下载竞赛数据:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ kaggle competitions download -c dogs-vs-cats-redux-kernels-edition</span><br><span class="line">Downloading dogs-vs-cats-redux-kernels-edition.zip to ~/dogs-vs-cats</span><br><span class="line">100%|███████████████████████████████████████| 814M/814M [01:48&lt;00:00, 7.37MB/s]</span><br><span class="line">100%|███████████████████████████████████████| 814M/814M [01:48&lt;00:00, 7.86MB/s]</span><br></pre></td></tr></table></figure>
+
+<p>查看数据:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ls -l | grep .zip</span><br><span class="line">-rw-r--r--    1 ken  staff  853083283 10  6 10:32 dogs-vs-cats-redux-kernels-edition.zip</span><br></pre></td></tr></table></figure>
+
+<p>解压数据:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ unzip dogs-vs-cats-redux-kernels-edition.zip -d datasets</span><br><span class="line">Archive:  dogs-vs-cats-redux-kernels-edition.zip</span><br><span class="line">  inflating: datasets/train.zip      </span><br><span class="line">  inflating: datasets/sample_submission.csv  </span><br><span class="line">  inflating: datasets/test.zip</span><br></pre></td></tr></table></figure>
+
+<p>查看解压数据:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> datasets &amp;&amp; ls</span><br><span class="line">sample_submission.csv	test.zip		train.zip</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-数据处理"><a href="#2-数据处理" class="headerlink" title="2. 数据处理"></a>2. 数据处理</h2><h3 id="2-1-查看数据集"><a href="#2-1-查看数据集" class="headerlink" title="2.1 查看数据集"></a>2.1 查看数据集</h3><h4 id="2-1-1-解压数据集"><a href="#2-1-1-解压数据集" class="headerlink" title="2.1.1 解压数据集"></a>2.1.1 解压数据集</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ unzip train.zip &amp;&amp; unzip test.zip</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-2-查看训练集和测试集图片数量"><a href="#2-1-2-查看训练集和测试集图片数量" class="headerlink" title="2.1.2 查看训练集和测试集图片数量"></a>2.1.2 查看训练集和测试集图片数量</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 训练集数量</span></span><br><span class="line">$ ls train | wc -l</span><br><span class="line">25000</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试集数量</span></span><br><span class="line">$ ls <span class="built_in">test</span> | wc -l</span><br><span class="line">12500</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-3-加载训练集和测试集"><a href="#2-1-3-加载训练集和测试集" class="headerlink" title="2.1.3 加载训练集和测试集"></a>2.1.3 加载训练集和测试集</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_datasets</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">load</span><span class="params">(d)</span>:</span></span><br><span class="line">        datasets = []</span><br><span class="line">        <span class="keyword">for</span> fn <span class="keyword">in</span> os.listdir(d):</span><br><span class="line">            fp = os.path.join(d, fn)</span><br><span class="line">            <span class="keyword">if</span> os.path.isfile(fp):</span><br><span class="line">                datasets.append(fp)</span><br><span class="line">        <span class="keyword">return</span> datasets</span><br><span class="line">    <span class="keyword">return</span> load(<span class="string">'datasets/train'</span>), load(<span class="string">'datasets/test'</span>)</span><br><span class="line"></span><br><span class="line">train_datasets, test_datasets = load_datasets()</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-4-随机查看数据集"><a href="#2-1-4-随机查看数据集" class="headerlink" title="2.1.4 随机查看数据集"></a>2.1.4 随机查看数据集</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_img</span><span class="params">(img, ax=None, title=None)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> ax <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        ax.imshow(img)</span><br><span class="line">        ax.axis(<span class="string">'off'</span>)</span><br><span class="line">        <span class="keyword">if</span> title <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            ax.set_title(title)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        plt.title(title)</span><br><span class="line">        plt.imshow(img)</span><br><span class="line">        plt.axis(<span class="string">'off'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_img_by_path</span><span class="params">(imgpath, **argkw)</span>:</span></span><br><span class="line">    show_img(Image.open(imgpath), title=os.path.basename(imgpath), **argkw)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_imgsets</span><span class="params">(imgsets, shape=<span class="params">(<span class="number">2</span>, <span class="number">5</span>)</span>, **argkw)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> isinstance(imgsets, list):</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    rows, cols = shape</span><br><span class="line">    size = rows * cols</span><br><span class="line">    imgsets = np.array(imgsets[:size]).reshape(shape)</span><br><span class="line"></span><br><span class="line">    fig, axs = plt.subplots(rows, cols, **argkw)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> row <span class="keyword">in</span> range(rows):</span><br><span class="line">        <span class="keyword">for</span> col <span class="keyword">in</span> range(cols):</span><br><span class="line">            show_img_by_path(imgsets[row, col], ax=axs[row, col])</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">randsample</span><span class="params">(imgsets, shape=<span class="params">(<span class="number">2</span>, <span class="number">5</span>)</span>, **argkw)</span>:</span></span><br><span class="line">    imgsets = random.choices(imgsets, k=shape[<span class="number">0</span>]*shape[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">    show_imgsets(imgsets, shape=shape, **argkw)</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">randsample(train_datasets, shape=(<span class="number">10</span>, <span class="number">10</span>), figsize=(<span class="number">16</span>, <span class="number">16</span>))</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/dogs_vs_cats_clean_1.png" alt></p>
+<h3 id="2-2-训练集图片清洗"><a href="#2-2-训练集图片清洗" class="headerlink" title="2.2 训练集图片清洗"></a>2.2 训练集图片清洗</h3><h4 id="2-2-1-搭建模型"><a href="#2-2-1-搭建模型" class="headerlink" title="2.2.1 搭建模型"></a>2.2.1 搭建模型</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras.preprocessing <span class="keyword">import</span> image</span><br><span class="line"><span class="keyword">from</span> keras.applications.resnet50 <span class="keyword">import</span> preprocess_input</span><br><span class="line"><span class="keyword">from</span> keras.applications.resnet50 <span class="keyword">import</span> ResNet50</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ImgModel</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mc)</span>:</span></span><br><span class="line">        self.model = mc(weights=<span class="string">'imagenet'</span>)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_totensor</span><span class="params">(self, img_path)</span>:</span></span><br><span class="line">        img = image.load_img(img_path, target_size=(<span class="number">224</span>, <span class="number">224</span>))</span><br><span class="line">        x = image.img_to_array(img)</span><br><span class="line">        tensor = np.expand_dims(x, axis=<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> preprocess_input(tensor)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, img_path)</span>:</span></span><br><span class="line">        tensor = self._totensor(img_path)</span><br><span class="line">        predict_label = self.model.predict(tensor)</span><br><span class="line">        <span class="keyword">return</span> np.argmax(predict_label)</span><br><span class="line"></span><br><span class="line">model = ImgModel(ResNet50)</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-2-找出模型无法识别出是狗和猫的图片"><a href="#2-2-2-找出模型无法识别出是狗和猫的图片" class="headerlink" title="2.2.2 找出模型无法识别出是狗和猫的图片"></a>2.2.2 找出模型无法识别出是狗和猫的图片</h4><p>根据 ImageNet <span class="exturl" data-url="aHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20veXJldmFyLzk0MmQzYTBhYzA5ZWM5ZTVlYjNh" title="https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a">图像标签<i class="fa fa-external-link"></i></span> ，标签 151-268 是狗，标签 281-285 是猫。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">is_dog_or_cat</span><span class="params">(img_path)</span>:</span></span><br><span class="line">    prediction = model.predict(img_path)</span><br><span class="line">    <span class="keyword">if</span> (prediction &gt;= <span class="number">151</span>) <span class="keyword">and</span> (prediction &lt;= <span class="number">268</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">if</span> (prediction &gt;= <span class="number">281</span>) <span class="keyword">and</span> (prediction &lt;= <span class="number">285</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">find_unknown</span><span class="params">(datasets)</span>:</span></span><br><span class="line">    unknown = list()</span><br><span class="line">    <span class="keyword">for</span> img_path <span class="keyword">in</span> datasets:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> is_dog_or_cat(img_path):</span><br><span class="line">            unknown.append(img_path)</span><br><span class="line">    <span class="keyword">return</span> unknown</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">train_unknown = find_unknown(train_datasets)</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">randsample(train_unknown, shape=(<span class="number">10</span>, <span class="number">10</span>), figsize=(<span class="number">16</span>, <span class="number">16</span>))</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/dogs_vs_cats_clean_2.png" alt></p>
+<p>经过模型的初步筛选，在原有 25,000 张图片的训练集中，有 3,430 张图片模型未识别出是狗或者猫。但通过对这些未识别出来的图片随机抽样观察，发现存在很多明显是猫的图，以及少量是狗的图片。说明我们前面的设定的标签范围并未涵盖所有猫狗的分类。为了进一步找出这些标签，我们不妨看看这些未识别的出来的标签是否真的是我们需要的。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">find_unknown_labels</span><span class="params">(unknown)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> [model.predict(img_path) <span class="keyword">for</span> img_path <span class="keyword">in</span> unknown]</span><br><span class="line">unknown_labels = find_unknown_labels(train_unknown)</span><br></pre></td></tr></table></figure>
+
+<p>为了能直观查看图片和标签，我们需要对前文查看图片的函数 <code>show_img_by_path()</code> 稍作修改，以便在查看图片的同时，在标题栏显示标签。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_img_by_path2</span><span class="params">(imgpath, **argkw)</span>:</span></span><br><span class="line">    show_img(Image.open(imgpath), **argkw)</span><br></pre></td></tr></table></figure>
+
+<p>编写一个生成器，实现依次查看未识别出来的图像标签。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">unknown_iter</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> img_path, label <span class="keyword">in</span> zip(train_unknown, unknown_labels):</span><br><span class="line">        <span class="keyword">yield</span> img_path, label</span><br><span class="line"></span><br><span class="line">unknown = unknown_iter()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_unknown</span><span class="params">(unknown, **argkw)</span>:</span></span><br><span class="line">    img_path, label = next(unknown)</span><br><span class="line">    show_img_by_path2(img_path, title=label, **argkw)</span><br></pre></td></tr></table></figure>
+
+<p>从第一张未识别图片开始，每调用一次函数 show_unknown()，依次显示下一张图片，直到看完所有图片。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show_unknown(unknown)</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/dogs_vs_cats_clean_3.png" alt></p>
+<p>如果觉得一次看一张图片效率太低，可以再编写一个函数实现一次看多张图片。注意，为了从第一张开始看，我们需要重新初始化 <code>unknown</code> 变量。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">show_unknowns</span><span class="params">(unknown, shape=<span class="params">(<span class="number">10</span>, <span class="number">10</span>)</span>, **argkw)</span>:</span></span><br><span class="line">    rows, cols = shape</span><br><span class="line">    fig, axs = plt.subplots(rows, cols, **argkw)</span><br><span class="line">    <span class="keyword">for</span> row <span class="keyword">in</span> range(rows):</span><br><span class="line">        <span class="keyword">for</span> col <span class="keyword">in</span> range(cols):</span><br><span class="line">            show_unknown(unknown, ax=axs[row, col])</span><br><span class="line"></span><br><span class="line">unknown = unknown_iter()</span><br></pre></td></tr></table></figure>
+
+<p>每调用一次函数 show_unknowns() 顺序显示下一百张图片。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show_unknowns(unknown, figsize=(<span class="number">16</span>, <span class="number">16</span>))</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/dogs_vs_cats_clean_4.png" alt></p>
+<p>如果对数字标签不满意，想看文本分类名称(只有英文)。可以参考专栏 <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vcG9zdC81ZDhiMjczOTZmYjlhMDRkZDg1OTA5YWIjaGVhZGluZy0xMA==" title="https://juejin.im/post/5d8b27396fb9a04dd85909ab#heading-10">《Keras 手动搭建 VGG 卷积神经网络识别 ImageNet 1000 种常见分类》第 3.5 小节<i class="fa fa-external-link"></i></span> 。这里直接使用相关代码获取数字标签到文本标签的映射字典。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_imagenet_classes</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">import</span> pickle</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'imagenet1000_clsid_to_human.pkl'</span>, <span class="string">'rb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        classes = pickle.load(f)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> classes</span><br><span class="line"></span><br><span class="line">imagenet_classes = get_imagenet_classes()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">unknown_iter2</span><span class="params">()</span>:</span></span><br><span class="line">    labels = [str(i)+<span class="string">'-'</span>+imagenet_classes[i] <span class="keyword">for</span> i <span class="keyword">in</span> unknown_labels]</span><br><span class="line">    <span class="keyword">for</span> img_path, label <span class="keyword">in</span> zip(train_unknown, labels):</span><br><span class="line">        <span class="keyword">yield</span> img_path, label</span><br><span class="line"></span><br><span class="line">unknown2 = unknown_iter2()</span><br></pre></td></tr></table></figure>
+
+<p>一次显示 20 张图片。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">show_unknowns(unknown2, shape=(<span class="number">5</span>, <span class="number">4</span>), figsize=(<span class="number">16</span>, <span class="number">16</span>))</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/dogs_vs_cats_clean_5.png" alt></p>
+<h4 id="2-2-3-改进筛选模型"><a href="#2-2-3-改进筛选模型" class="headerlink" title="2.2.3 改进筛选模型"></a>2.2.3 改进筛选模型</h4><p>通过上一小节的观察，我们发现，简单对图片预测单一分类（概率最高的），会因为图片中存在其他物体干扰，而导致无法识别出猫和狗。因此，我们需要改进一一下模型，在概率最高的前10个分类中，查看是否有猫或者狗。</p>
+<p>与 <code>ImgModel</code> 基本一样，仅仅在 <code>predict()</code> 方法返回时，不是返回概率最大的标签，而是按概率倒序排序，即概率最大的排在前面，返回标签列表。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ImgModel2</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mc)</span>:</span></span><br><span class="line">        self.model = mc(weights=<span class="string">'imagenet'</span>)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_totensor</span><span class="params">(self, img_path)</span>:</span></span><br><span class="line">        img = image.load_img(img_path, target_size=(<span class="number">224</span>, <span class="number">224</span>))</span><br><span class="line">        x = image.img_to_array(img)</span><br><span class="line">        tensor = np.expand_dims(x, axis=<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> preprocess_input(tensor)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(self, img_path)</span>:</span></span><br><span class="line">        tensor = self._totensor(img_path)</span><br><span class="line">        predict_labels = self.model.predict(tensor)</span><br><span class="line">        sort_labels = sorted(list(zip(range(<span class="number">1000</span>), predict_labels.flatten())), key=<span class="keyword">lambda</span> x:x[<span class="number">1</span>], reverse=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> [label[<span class="number">0</span>] <span class="keyword">for</span> label <span class="keyword">in</span> sort_labels]</span><br><span class="line"></span><br><span class="line">model2 = ImgModel2(ResNet50)</span><br></pre></td></tr></table></figure>
+
+<p>改进了模型，同时也要对应调整一下函数 <code>is_dog_or_cat2()</code> 和函数 <code>find_unknown2()</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">is_dog_or_cat2</span><span class="params">(img_path)</span>:</span></span><br><span class="line">    predictions = model2.predict(img_path)[:<span class="number">10</span>]</span><br><span class="line">    <span class="keyword">for</span> prediction <span class="keyword">in</span> predictions:</span><br><span class="line">        <span class="keyword">if</span> (prediction &gt;= <span class="number">151</span>) <span class="keyword">and</span> (prediction &lt;= <span class="number">268</span>):</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="keyword">if</span> (prediction &gt;= <span class="number">281</span>) <span class="keyword">and</span> (prediction &lt;= <span class="number">285</span>):</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">find_unknown2</span><span class="params">(datasets)</span>:</span></span><br><span class="line">    unknown = list()</span><br><span class="line">    <span class="keyword">for</span> img_path <span class="keyword">in</span> datasets:</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> is_dog_or_cat2(img_path):</span><br><span class="line">            unknown.append(img_path)</span><br><span class="line">    <span class="keyword">return</span> unknown</span><br></pre></td></tr></table></figure>
+
+<p>在前文未识别出猫狗的 3,430 张图片中，使用改进的模型重新筛选不能识别的图片。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">train_unknown2 = find_unknown2(train_unknown)</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">len(train_unknown2)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>281</code></pre><p>经过第二次改进模型后的筛选，由原来不能识别 3,430 张图片降到 281 张。再来看看这剩下的 281 张图片到底是“何方神圣”，为何如此难以识别。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">randsample(train_unknown2, shape=(<span class="number">10</span>, <span class="number">10</span>), figsize=(<span class="number">16</span>, <span class="number">16</span>))</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/dogs_vs_cats_clean_6.png" alt></p>
+<p>Fuck ! （我想你和我一样，已经忍不住破口而出了…）不难看出，这些图片确实狗糟糕的。简直无 fuck 说，我有100个理由把这些图片排除在训练集之外。</p>
+<h2 id="3-将不能识别出来的图片移出训练集"><a href="#3-将不能识别出来的图片移出训练集" class="headerlink" title="3. 将不能识别出来的图片移出训练集"></a>3. 将不能识别出来的图片移出训练集</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> shutil</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">move_train_unknown</span><span class="params">(train_unknown)</span>:</span></span><br><span class="line">    train_unknown_dir = <span class="string">'datasets/train_unknown'</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> os.path.isdir(train_unknown_dir):</span><br><span class="line">        os.makedirs(train_unknown_dir)</span><br><span class="line">    <span class="keyword">for</span> img_path <span class="keyword">in</span> train_unknown:</span><br><span class="line">        shutil.move(img_path, train_unknown_dir)</span><br><span class="line">    print(<span class="string">'&#123;&#125; pictures have been moved.'</span>.format(len(train_unknown)))</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">move_train_unknown(train_unknown2)</span><br></pre></td></tr></table></figure>
+
+<pre><code>281 pictures have been moved.</code></pre><p>重新加载训练集</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">train_datasets = load_datasets()[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">print(<span class="string">'&#123;&#125; images left after cleaning.'</span>.format(len(train_datasets)))</span><br><span class="line"></span><br><span class="line">randsample(train_datasets, shape=(<span class="number">10</span>, <span class="number">10</span>), figsize=(<span class="number">16</span>, <span class="number">16</span>))</span><br></pre></td></tr></table></figure>
+
+<pre><code>24719 images left after cleaning.</code></pre><p><img src="http://cdn.kenblog.top/dogs_vs_cats_clean_7.png" alt></p>
+<p>可以看到，经过清洗后的训练集，图片“干净”了不少，这为后续模型的训练提供了良好的开始。</p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="ken wechat" style="width: 200px; max-width: 100%;">
+  <div>微信扫描二维码，第一时间收到最新原创文章！</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="ken 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="ken 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/10/06/kaggle-com-dogs-vs-cats-1/" title="kaggle 图像分类竞赛实战（一）：数据集下载和清洗">http://kenblog.top/2019/10/06/kaggle-com-dogs-vs-cats-1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Kaggle-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0-AI-%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB-%E6%95%B0%E6%8D%AE%E6%B8%85%E6%B4%97/" rel="tag"># Kaggle 深度学习 AI 图像分类 数据清洗</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/10/05/make/" rel="next" title="Make 快速入门">
+                  <i class="fa fa-chevron-left"></i> Make 快速入门
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/10/07/command-line-print-with-ansi-escape-codes/" rel="prev" title="如何在命令行中显示五彩斑斓的“黑”">
+                  如何在命令行中显示五彩斑斓的“黑” <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-kaggle-命令行"><span class="nav-number">2.</span> <span class="nav-text">1. kaggle 命令行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-数据处理"><span class="nav-number">3.</span> <span class="nav-text">2. 数据处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-查看数据集"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 查看数据集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-解压数据集"><span class="nav-number">3.1.1.</span> <span class="nav-text">2.1.1 解压数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-查看训练集和测试集图片数量"><span class="nav-number">3.1.2.</span> <span class="nav-text">2.1.2 查看训练集和测试集图片数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-加载训练集和测试集"><span class="nav-number">3.1.3.</span> <span class="nav-text">2.1.3 加载训练集和测试集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-4-随机查看数据集"><span class="nav-number">3.1.4.</span> <span class="nav-text">2.1.4 随机查看数据集</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-训练集图片清洗"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 训练集图片清洗</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-搭建模型"><span class="nav-number">3.2.1.</span> <span class="nav-text">2.2.1 搭建模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-找出模型无法识别出是狗和猫的图片"><span class="nav-number">3.2.2.</span> <span class="nav-text">2.2.2 找出模型无法识别出是狗和猫的图片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-改进筛选模型"><span class="nav-number">3.2.3.</span> <span class="nav-text">2.2.3 改进筛选模型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-将不能识别出来的图片移出训练集"><span class="nav-number">4.</span> <span class="nav-text">3. 将不能识别出来的图片移出训练集</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/ken_red.jpg"
+      alt="ken">
+  <p class="site-author-name" itemprop="name">ken</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

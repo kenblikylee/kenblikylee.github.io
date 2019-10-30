@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1. 简单介绍行业常说的“数据分析三剑客”或者“机器学习三剑客”，指的就是 numpy(计算), matplotlib(可视化), pandas(分析) 这三个 python 库。如果拿自然科学学科类比，matplotlib 相当于“物理学”，pandas 相当于“化学”，而 numpy 就是“数学”, 是其他学科赖以立足的“基石”。 numpy 之所以是基石，是因为 numpy 为 matpl">
+<meta name="keywords" content="numpy python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python 科学计算的基石 numpy（一）">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;09&#x2F;10&#x2F;python-numpy&#x2F;index.html">
+<meta property="og:site_name" content="ken爱编程">
+<meta property="og:description" content="1. 简单介绍行业常说的“数据分析三剑客”或者“机器学习三剑客”，指的就是 numpy(计算), matplotlib(可视化), pandas(分析) 这三个 python 库。如果拿自然科学学科类比，matplotlib 相当于“物理学”，pandas 相当于“化学”，而 numpy 就是“数学”, 是其他学科赖以立足的“基石”。 numpy 之所以是基石，是因为 numpy 为 matpl">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;numpy_logo.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;np_random_normal.png">
+<meta property="og:updated_time" content="2019-10-30T02:11:26.312Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;numpy_logo.png">
+  <link rel="canonical" href="http://kenblog.top/2019/09/10/python-numpy/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>python 科学计算的基石 numpy（一） | ken爱编程</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ken爱编程</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">面向“对象”编程</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">35</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">35</span></a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/09/10/python-numpy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ken">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/ken_red.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ken爱编程">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            python 科学计算的基石 numpy（一）
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-10 17:24:00" itemprop="dateCreated datePublished" datetime="2019-09-10T17:24:00+08:00">2019-09-10</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 10:11:26" itemprop="dateModified" datetime="2019-10-30T10:11:26+08:00">2019-10-30</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="http://cdn.kenblog.top/numpy_logo.png" alt></p>
+<h2 id="1-简单介绍"><a href="#1-简单介绍" class="headerlink" title="1. 简单介绍"></a>1. 简单介绍</h2><p>行业常说的“数据分析三剑客”或者“机器学习三剑客”，指的就是 numpy(计算), matplotlib(可视化), pandas(分析) 这三个 python 库。如果拿自然科学学科类比，matplotlib 相当于“物理学”，pandas 相当于“化学”，而 numpy 就是“数学”, 是其他学科赖以立足的“基石”。</p>
+<p>numpy 之所以是基石，是因为 numpy 为 matplotlib 和 pandas 等提供了底层数据结构和计算支持。而 numpy 核心数据结构就是<strong>多维数组</strong>(ndarray: N-dimensional array)。</p>
+<a id="more"></a>
+
+<h2 id="2-准备工作"><a href="#2-准备工作" class="headerlink" title="2. 准备工作"></a>2. 准备工作</h2><p>这个小节过渡有点突兀，但是为了下一步顺利运行代码，不得不强行插播这条“准备工作”。</p>
+<h3 id="2-1-安装"><a href="#2-1-安装" class="headerlink" title="2.1 安装"></a>2.1 安装</h3><h3 id="2-1-1-检查是否安装"><a href="#2-1-1-检查是否安装" class="headerlink" title="2.1.1 检查是否安装"></a>2.1.1 检查是否安装</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda list | grep numpy</span><br></pre></td></tr></table></figure>
+
+<p>或:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip freeze | grep numpy</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-1-2-安装"><a href="#2-1-2-安装" class="headerlink" title="2.1.2 安装"></a>2.1.2 安装</h3><p>已安装，请跳过。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda install numpy</span><br></pre></td></tr></table></figure>
+
+<p>或:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install numpy</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-1-3-更新"><a href="#2-1-3-更新" class="headerlink" title="2.1.3 更新"></a>2.1.3 更新</h3><p>已安装，可选择更新。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conda update numpy</span><br></pre></td></tr></table></figure>
+
+<p>或:</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install --upgrade numpy</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-导入"><a href="#2-2-导入" class="headerlink" title="2.2 导入"></a>2.2 导入</h3><p>np 为行业惯例缩写。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-多维数组-numpy-ndarray-N-dimensional-array"><a href="#3-多维数组-numpy-ndarray-N-dimensional-array" class="headerlink" title="3. 多维数组(numpy.ndarray: N-dimensional array)"></a>3. 多维数组(numpy.ndarray: N-dimensional array)</h2><p>如果熟悉 matlab (矩阵实验室)，就知道 matlab 科学计算建立在“矩阵”之上。而，numpy 的多维数组有异曲同工之妙。</p>
+<h3 id="3-1-创建"><a href="#3-1-创建" class="headerlink" title="3.1 创建"></a>3.1 创建</h3><h4 id="3-1-1-使用-np-array-创建"><a href="#3-1-1-使用-np-array-创建" class="headerlink" title="3.1.1 使用 np.array() 创建"></a>3.1.1 使用 np.array() 创建</h4><p>以下通过一个二维列表创建一个 numpy 多维数组(numpy.ndarray) 。在 numpy 中，维度这个概念也叫<code>秩</code> ，英文叫<code>Axes</code> ，因此，这里创建的二维数组，我们也可以称之为<code>秩</code>为 2 的多维数组，它包含了 2 个<code>轴(Axis)</code>。数组的 <code>shape</code> 属性是一个元组，对应多维数组每个 轴(Axis) 长度；<code>size</code> 属性是多维数组所有元素个数，它等于 shape 所有元素的乘积。</p>
+<p>说起来很复杂，但是实际很简单，通过下面的打印输出，我们可以很直观的理解，各个属性之间的关系。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">na = np.array([[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]])</span><br><span class="line"></span><br><span class="line">print(</span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    对象类型:\t&#123;&#125;\n</span></span><br><span class="line"><span class="string">    形状:\t&#123;&#125;\n</span></span><br><span class="line"><span class="string">    维度(秩):\t&#123;&#125;\n</span></span><br><span class="line"><span class="string">    元素个数:\t&#123;&#125;\n</span></span><br><span class="line"><span class="string">    元素类型:\t&#123;&#125;\n</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    .format(type(na), na.shape, na.ndim, na.size, na.dtype))</span><br><span class="line"></span><br><span class="line">na</span><br></pre></td></tr></table></figure>
+
+
+<pre><code>    对象类型:    &lt;class &apos;numpy.ndarray&apos;&gt;
+
+    形状:    (2, 3)
+
+    维度(秩):    2
+
+    元素个数:    6
+
+    元素类型:    int64
+
+
+
+
+
+
+
+array([[1, 2, 3],
+       [4, 5, 6]])</code></pre><h4 id="3-1-2-使用-np-zeros-创建"><a href="#3-1-2-使用-np-zeros-创建" class="headerlink" title="3.1.2 使用 np.zeros() 创建"></a>3.1.2 使用 np.zeros() 创建</h4><p>如果不是事先就知道各元素的数值，使用 np.array() 的方式，难免有些繁琐，相比之下，只是先初始化一个全为 0 的多维数组，np.zeros() 无疑是更适合的选择。使用 np.zeros() 只需提供 shape 参数，也是第一个位置参数，就可以创建指定 shape 的多维数组，并将数组所有元素填充为 0 。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">na = np.zeros((<span class="number">2</span>, <span class="number">3</span>))</span><br><span class="line"></span><br><span class="line">print(<span class="string">"dtype: "</span>, na.dtype)</span><br><span class="line"></span><br><span class="line">na</span><br></pre></td></tr></table></figure>
+
+<pre><code>dtype:  float64
+
+
+
+
+
+array([[0., 0., 0.],
+       [0., 0., 0.]])</code></pre><p>从上面打印的 dtype 属性可以看到，默认元素的数据类型是 float64 。当然，如果不想使用默认类型，可以通过 dtype 参数来设置。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">na = np.zeros((<span class="number">2</span>, <span class="number">3</span>), dtype=<span class="string">"uint8"</span>)</span><br><span class="line"></span><br><span class="line">print(<span class="string">"dtype: "</span>, na.dtype)</span><br><span class="line"></span><br><span class="line">na</span><br></pre></td></tr></table></figure>
+
+<pre><code>dtype:  uint8
+
+
+
+
+
+array([[0, 0, 0],
+       [0, 0, 0]], dtype=uint8)</code></pre><h4 id="3-1-3-使用-np-ones-创建"><a href="#3-1-3-使用-np-ones-创建" class="headerlink" title="3.1.3 使用 np.ones() 创建"></a>3.1.3 使用 np.ones() 创建</h4><p>np.ones() 和 np.zeros 除了填充的不是 0，而是 1，其他都一样。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">np.ones((<span class="number">2</span>, <span class="number">3</span>), dtype=<span class="string">"float"</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>array([[1., 1., 1.],
+       [1., 1., 1.]])</code></pre><h4 id="3-1-4-np-arange"><a href="#3-1-4-np-arange" class="headerlink" title="3.1.4 np.arange()"></a>3.1.4 np.arange()</h4><p>range() 的 numpy 版本实现。传入 start, end, step 参数创建一个1维 numpy 数组。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">np.arange(<span class="number">2</span>, <span class="number">10</span>, <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>array([2, 4, 6, 8])</code></pre><p>虽然 np.arange() 方法只能创建 1 维数组，但是借助 numpy 数组的 reshape() 方法可以在 size 不变的情况下，改变 shape 。注意，reshape() 方法是 numpy 数组实例的方法，因此，它适用于任何想要“重塑”shape场景，包括下面介绍的 np.linsapce() 使用场景。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">np.arange(<span class="number">2</span>, <span class="number">13</span>, <span class="number">2</span>).reshape(<span class="number">2</span>, <span class="number">3</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>array([[ 2,  4,  6],
+       [ 8, 10, 12]])</code></pre><p>除了 reshape() 方法可以改变 shape 外，还有一个方法 resize() 也有相同的功能，区别是，reshape() 不会改变原来的数组，而 resize 会改变。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">a = np.arange(<span class="number">2</span>, <span class="number">13</span>, <span class="number">2</span>)</span><br><span class="line">b = a.reshape(<span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">print(<span class="string">"after call a.reshape():"</span>)</span><br><span class="line">print(<span class="string">"a.shape"</span>, a.shape)</span><br><span class="line">print(<span class="string">"b.shape"</span>, b.shape)</span><br><span class="line">a.resize(<span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">print(<span class="string">"after call a.resize():"</span>)</span><br><span class="line">print(<span class="string">"a.shape"</span>, a.shape)</span><br></pre></td></tr></table></figure>
+
+<pre><code>after call a.reshape():
+a.shape (6,)
+b.shape (2, 3)
+after call a.resize():
+a.shape (2, 3)</code></pre><h4 id="3-1-5-np-linspace"><a href="#3-1-5-np-linspace" class="headerlink" title="3.1.5 np.linspace()"></a>3.1.5 np.linspace()</h4><p>和 np.arange() 很像，也是创建一个 start 到 end 区间的1维 numpy 数组。但有两点不同：</p>
+<ol>
+<li>linsapce 第3个参数不是步长，而是区间内的多少个点</li>
+<li>结果包含 end ，而 np.arange() 不包含 end</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">np.linspace(<span class="number">2</span>, <span class="number">10</span>, <span class="number">5</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>array([ 2.,  4.,  6.,  8., 10.])</code></pre><h4 id="3-1-6-np-random-random"><a href="#3-1-6-np-random-random" class="headerlink" title="3.1.6 np.random.random()"></a>3.1.6 np.random.random()</h4><p>指定 shape 生成随机数填充。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">np.random.random((<span class="number">2</span>, <span class="number">3</span>))</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>array([[0.22031976, 0.91591833, 0.63773627],
+       [0.92104449, 0.69246379, 0.82988843]])</code></pre><h4 id="3-1-7-np-random-normal-mu-sigma-len"><a href="#3-1-7-np-random-normal-mu-sigma-len" class="headerlink" title="3.1.7 np.random.normal(mu, sigma, len)"></a>3.1.7 np.random.normal(mu, sigma, len)</h4><p>创建均值为 mu , 标准差为 sigma, 长度为 len 标准正态分布的一维数组。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br><span class="line"></span><br><span class="line">mu = <span class="number">2</span></span><br><span class="line">sigma = <span class="number">0.5</span></span><br><span class="line">v = np.random.normal(mu, sigma, <span class="number">10000</span>)</span><br><span class="line"></span><br><span class="line">plt.hist(v, bins=<span class="number">50</span>, density=<span class="number">1</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/np_random_normal.png" alt></p>
+<h3 id="3-2-读取"><a href="#3-2-读取" class="headerlink" title="3.2 读取"></a>3.2 读取</h3><h4 id="3-2-1-元组索引"><a href="#3-2-1-元组索引" class="headerlink" title="3.2.1 元组索引"></a>3.2.1 元组索引</h4><p>元组长度等于数组维度(Axes 秩)，也就是多维数组的每个轴(Axis)都有个索引，元组括号可省略。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">na = np.random.random((<span class="number">2</span>, <span class="number">3</span>))</span><br><span class="line"></span><br><span class="line">print(na[(<span class="number">1</span>, <span class="number">2</span>)])</span><br><span class="line">print(na[<span class="number">1</span>, <span class="number">2</span>])</span><br></pre></td></tr></table></figure>
+
+<pre><code>0.7547734386512726
+0.7547734386512726</code></pre><h4 id="3-2-2-普通多维列表方式"><a href="#3-2-2-普通多维列表方式" class="headerlink" title="3.2.2  普通多维列表方式"></a>3.2.2  普通多维列表方式</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">na[<span class="number">1</span>][<span class="number">2</span>]</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>0.7547734386512726</code></pre><h3 id="3-3-统计运算"><a href="#3-3-统计运算" class="headerlink" title="3.3 统计运算"></a>3.3 统计运算</h3><h4 id="3-3-1-求最大值"><a href="#3-3-1-求最大值" class="headerlink" title="3.3.1 求最大值"></a>3.3.1 求最大值</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">v = np.random.normal(<span class="number">10</span>, <span class="number">1</span>, <span class="number">10000</span>)</span><br><span class="line"></span><br><span class="line">v.max()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>13.949035793082137</code></pre><h4 id="3-3-2-求最小值"><a href="#3-3-2-求最小值" class="headerlink" title="3.3.2 求最小值"></a>3.3.2 求最小值</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v.min()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>6.31475048427698</code></pre><h4 id="3-3-3-求和"><a href="#3-3-3-求和" class="headerlink" title="3.3.3 求和"></a>3.3.3 求和</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v.sum()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>100051.11447780298</code></pre><h4 id="3-3-4-求均值"><a href="#3-3-4-求均值" class="headerlink" title="3.3.4 求均值"></a>3.3.4 求均值</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v.mean()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>10.005111447780298</code></pre><h4 id="3-3-5-求标准差"><a href="#3-3-5-求标准差" class="headerlink" title="3.3.5 求标准差"></a>3.3.5 求标准差</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v.std()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>0.996315432751019</code></pre><h4 id="3-3-6-求中位数"><a href="#3-3-6-求中位数" class="headerlink" title="3.3.6 求中位数"></a>3.3.6 求中位数</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">np.median(v)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>10.005551763169866</code></pre><h3 id="3-4-为什么要使用-numpy-多维数组"><a href="#3-4-为什么要使用-numpy-多维数组" class="headerlink" title="3.4 为什么要使用 numpy 多维数组"></a>3.4 为什么要使用 numpy 多维数组</h3><p>到此，你可能会有疑问，感觉 numpy 多维数组也不过如此，和列表差不多啊。对，从结构和使用方式上，的确 numpy 多维数组和列表有诸多相似的地方。在大数据分析，机器学习上尤其是深度学习，等需要对大量数据进行计算的场景，它的性能将远超普通列表。</p>
+<p>下面计算一个长度为 300,000,000 （3亿）的数组的均值，分布使用列表和 numpy 数组计算。前者用了 15 秒，后者只用不到 2 毫秒。为什么会有这么大的差距，原因在于，numpy 底层运算是用 C 语言实现的，而 C 语言的性能相比于 python 是不言而喻的。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">a = list(range(<span class="number">300000000</span>))</span><br><span class="line">na = np.array(na)</span><br><span class="line"></span><br><span class="line">start_time = time()</span><br><span class="line">sum(a) / len(a)</span><br><span class="line">print(<span class="string">"calculate mean by list cost time &#123;&#125; s"</span>.format(time() - start_time))</span><br><span class="line"></span><br><span class="line">start_time = time()</span><br><span class="line">na.mean()</span><br><span class="line">print(<span class="string">"calculate mean by numpy.ndarray cost time &#123;&#125; s"</span>.format(time() - start_time))</span><br></pre></td></tr></table></figure>
+
+<pre><code>calculate mean by list cost time 20.95879817008972 s
+calculate mean by numpy.ndarray cost time 0.0011792182922363281 s</code></pre>
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="ken wechat" style="width: 200px; max-width: 100%;">
+  <div>微信扫描二维码，第一时间收到最新原创文章！</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="ken 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="ken 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/09/10/python-numpy/" title="python 科学计算的基石 numpy（一）">http://kenblog.top/2019/09/10/python-numpy/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/numpy-python/" rel="tag"># numpy python</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/09/python-pandas-1/" rel="next" title="python 数据分析工具包 pandas（一）">
+                  <i class="fa fa-chevron-left"></i> python 数据分析工具包 pandas（一）
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/11/python-crawl-juejin/" rel="prev" title="python 自动抓取分析文章阅读量——掘金专栏版">
+                  python 自动抓取分析文章阅读量——掘金专栏版 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-简单介绍"><span class="nav-number">1.</span> <span class="nav-text">1. 简单介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-准备工作"><span class="nav-number">2.</span> <span class="nav-text">2. 准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-安装"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-1-检查是否安装"><span class="nav-number">2.2.</span> <span class="nav-text">2.1.1 检查是否安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-2-安装"><span class="nav-number">2.3.</span> <span class="nav-text">2.1.2 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-3-更新"><span class="nav-number">2.4.</span> <span class="nav-text">2.1.3 更新</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-导入"><span class="nav-number">2.5.</span> <span class="nav-text">2.2 导入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-多维数组-numpy-ndarray-N-dimensional-array"><span class="nav-number">3.</span> <span class="nav-text">3. 多维数组(numpy.ndarray: N-dimensional array)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-创建"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 创建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-使用-np-array-创建"><span class="nav-number">3.1.1.</span> <span class="nav-text">3.1.1 使用 np.array() 创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-使用-np-zeros-创建"><span class="nav-number">3.1.2.</span> <span class="nav-text">3.1.2 使用 np.zeros() 创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-3-使用-np-ones-创建"><span class="nav-number">3.1.3.</span> <span class="nav-text">3.1.3 使用 np.ones() 创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-4-np-arange"><span class="nav-number">3.1.4.</span> <span class="nav-text">3.1.4 np.arange()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-5-np-linspace"><span class="nav-number">3.1.5.</span> <span class="nav-text">3.1.5 np.linspace()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-6-np-random-random"><span class="nav-number">3.1.6.</span> <span class="nav-text">3.1.6 np.random.random()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-7-np-random-normal-mu-sigma-len"><span class="nav-number">3.1.7.</span> <span class="nav-text">3.1.7 np.random.normal(mu, sigma, len)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-读取"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 读取</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-元组索引"><span class="nav-number">3.2.1.</span> <span class="nav-text">3.2.1 元组索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-普通多维列表方式"><span class="nav-number">3.2.2.</span> <span class="nav-text">3.2.2  普通多维列表方式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-统计运算"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 统计运算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-1-求最大值"><span class="nav-number">3.3.1.</span> <span class="nav-text">3.3.1 求最大值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-2-求最小值"><span class="nav-number">3.3.2.</span> <span class="nav-text">3.3.2 求最小值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-3-求和"><span class="nav-number">3.3.3.</span> <span class="nav-text">3.3.3 求和</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-4-求均值"><span class="nav-number">3.3.4.</span> <span class="nav-text">3.3.4 求均值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-5-求标准差"><span class="nav-number">3.3.5.</span> <span class="nav-text">3.3.5 求标准差</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-6-求中位数"><span class="nav-number">3.3.6.</span> <span class="nav-text">3.3.6 求中位数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-为什么要使用-numpy-多维数组"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 为什么要使用 numpy 多维数组</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/ken_red.jpg"
+      alt="ken">
+  <p class="site-author-name" itemprop="name">ken</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

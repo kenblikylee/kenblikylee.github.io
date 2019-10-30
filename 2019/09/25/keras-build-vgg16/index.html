@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1. VGG 模型架构VGG 由牛津大学视觉几何组（Visual Geometry Group）开发。包含两个版本：VGG16 和 VGG19，分别有16个层级和19个层级。本文只介绍 VGG16 。根据 arxiv.org 上公布的论文，VGG 的卷积核大小为 (3, 3)，最大池化层核大小 (2, 2)，隐藏层激活函数为 ReLu, 输出层激活函数为 softmax。如果我们能知道模型各层的输">
+<meta name="keywords" content="keras vgg16 cnn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Keras 手动搭建 VGG 卷积神经网络识别 ImageNet 1000 种常见分类">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;09&#x2F;25&#x2F;keras-build-vgg16&#x2F;index.html">
+<meta property="og:site_name" content="ken爱编程">
+<meta property="og:description" content="1. VGG 模型架构VGG 由牛津大学视觉几何组（Visual Geometry Group）开发。包含两个版本：VGG16 和 VGG19，分别有16个层级和19个层级。本文只介绍 VGG16 。根据 arxiv.org 上公布的论文，VGG 的卷积核大小为 (3, 3)，最大池化层核大小 (2, 2)，隐藏层激活函数为 ReLu, 输出层激活函数为 softmax。如果我们能知道模型各层的输">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dog.jpeg">
+<meta property="og:updated_time" content="2019-10-30T02:27:51.984Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;dog.jpeg">
+  <link rel="canonical" href="http://kenblog.top/2019/09/25/keras-build-vgg16/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Keras 手动搭建 VGG 卷积神经网络识别 ImageNet 1000 种常见分类 | ken爱编程</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ken爱编程</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">面向“对象”编程</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">35</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">35</span></a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/09/25/keras-build-vgg16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ken">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/ken_red.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ken爱编程">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            Keras 手动搭建 VGG 卷积神经网络识别 ImageNet 1000 种常见分类
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-25 16:28:07" itemprop="dateCreated datePublished" datetime="2019-09-25T16:28:07+08:00">2019-09-25</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 10:27:51" itemprop="dateModified" datetime="2019-10-30T10:27:51+08:00">2019-10-30</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index">
+                    <span itemprop="name">深度学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-VGG-模型架构"><a href="#1-VGG-模型架构" class="headerlink" title="1. VGG 模型架构"></a>1. VGG 模型架构</h2><p>VGG 由牛津大学视觉几何组（Visual Geometry Group）开发。包含两个版本：VGG16 和 VGG19，分别有16个层级和19个层级。本文只介绍 VGG16 。根据 arxiv.org 上公布的<span class="exturl" data-url="aHR0cHM6Ly9hcnhpdi5vcmcvcGRmLzE0MDkuMTU1Ni5wZGY=" title="https://arxiv.org/pdf/1409.1556.pdf">论文<i class="fa fa-external-link"></i></span>，VGG 的卷积核大小为 (3, 3)，最大池化层核大小 (2, 2)，隐藏层激活函数为 <code>ReLu</code>, 输出层激活函数为 <code>softmax</code>。如果我们能知道模型各层的输入输出 shape 及层叠顺序，就能使用 Keras 自己搭建一个 VGG 。幸运的是，我们不需要从晦涩难懂的论文中提炼出模型的这些参数细节，Keras 可以直接给到我们这个模型全部细节。</p>
+<p>如下使用 Keras 直接创建一个 VGG16 模型，并加载在 ImageNet 上训练好的权重：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras.applications.vgg16 <span class="keyword">import</span> VGG16</span><br><span class="line"></span><br><span class="line">VGG16_model = VGG16(weights=<span class="string">'imagenet'</span>)</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+
+
+
+<pre><code>Using TensorFlow backend.</code></pre><p>既然这是一个 Keras 模型，是不是和自己搭建的模型一样可以使用 <code>summary()</code> 方法一览模型的架构呢？答案是可以的。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">VGG16_model.summary()</span><br></pre></td></tr></table></figure>
+
+<pre><code>_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+input_1 (InputLayer)         (None, 224, 224, 3)       0         
+_________________________________________________________________
+block1_conv1 (Conv2D)        (None, 224, 224, 64)      1792      
+_________________________________________________________________
+block1_conv2 (Conv2D)        (None, 224, 224, 64)      36928     
+_________________________________________________________________
+block1_pool (MaxPooling2D)   (None, 112, 112, 64)      0         
+_________________________________________________________________
+block2_conv1 (Conv2D)        (None, 112, 112, 128)     73856     
+_________________________________________________________________
+block2_conv2 (Conv2D)        (None, 112, 112, 128)     147584    
+_________________________________________________________________
+block2_pool (MaxPooling2D)   (None, 56, 56, 128)       0         
+_________________________________________________________________
+block3_conv1 (Conv2D)        (None, 56, 56, 256)       295168    
+_________________________________________________________________
+block3_conv2 (Conv2D)        (None, 56, 56, 256)       590080    
+_________________________________________________________________
+block3_conv3 (Conv2D)        (None, 56, 56, 256)       590080    
+_________________________________________________________________
+block3_pool (MaxPooling2D)   (None, 28, 28, 256)       0         
+_________________________________________________________________
+block4_conv1 (Conv2D)        (None, 28, 28, 512)       1180160   
+_________________________________________________________________
+block4_conv2 (Conv2D)        (None, 28, 28, 512)       2359808   
+_________________________________________________________________
+block4_conv3 (Conv2D)        (None, 28, 28, 512)       2359808   
+_________________________________________________________________
+block4_pool (MaxPooling2D)   (None, 14, 14, 512)       0         
+_________________________________________________________________
+block5_conv1 (Conv2D)        (None, 14, 14, 512)       2359808   
+_________________________________________________________________
+block5_conv2 (Conv2D)        (None, 14, 14, 512)       2359808   
+_________________________________________________________________
+block5_conv3 (Conv2D)        (None, 14, 14, 512)       2359808   
+_________________________________________________________________
+block5_pool (MaxPooling2D)   (None, 7, 7, 512)         0         
+_________________________________________________________________
+flatten (Flatten)            (None, 25088)             0         
+_________________________________________________________________
+fc1 (Dense)                  (None, 4096)              102764544 
+_________________________________________________________________
+fc2 (Dense)                  (None, 4096)              16781312  
+_________________________________________________________________
+predictions (Dense)          (None, 1000)              4097000   
+=================================================================
+Total params: 138,357,544
+Trainable params: 138,357,544
+Non-trainable params: 0
+_________________________________________________________________</code></pre><p>有了以上信息，我们已经具备手动构建一个 VGG16 模型所有信息。SO，撸起袖子，说干咱就干！</p>
+<h2 id="2-从零构建-VGG16"><a href="#2-从零构建-VGG16" class="headerlink" title="2. 从零构建 VGG16"></a>2. 从零构建 VGG16</h2><p>本文使用 Keras 函数式 API 构建，当然也可以使用序列化模型，读者可以自己尝试。</p>
+<h3 id="2-1-导入-Keras-模型和层"><a href="#2-1-导入-Keras-模型和层" class="headerlink" title="2.1 导入  Keras 模型和层"></a>2.1 导入  Keras 模型和层</h3><p>从上文打印出来的模型架构，可以看到，VGG16 用到了卷积层(Conv2D), 最大池化层(MaxPooling2D), 扁平层(Flatten), 全联接层(Dense)。因此，我们从 keras.layers 中导入这些层。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Model</span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Input, Conv2D, MaxPooling2D, Flatten, Dense</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-设计模型层"><a href="#2-2-设计模型层" class="headerlink" title="2.2 设计模型层"></a>2.2 设计模型层</h3><p>VGG16 包含了 13 个卷积层，3个全连接层(最后1个是输出层)，一共16个有参数的层，这也是 VGG16 中 16 的含义。当然还有 5 个最大池化层和 1 个扁平层，而这些层是没有参数或者权重的，因此，VGG 不把这些层计入总层数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 输入层</span></span><br><span class="line">inputs = Input(shape=(<span class="number">224</span>, <span class="number">224</span>, <span class="number">3</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 卷积层和最大池化层</span></span><br><span class="line">conv1 = Conv2D(<span class="number">64</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(inputs)</span><br><span class="line">conv2 = Conv2D(<span class="number">64</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(conv1)</span><br><span class="line">pool1 = MaxPooling2D(pool_size=<span class="number">2</span>)(conv2)</span><br><span class="line"></span><br><span class="line">conv3 = Conv2D(<span class="number">128</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(pool1)</span><br><span class="line">conv4 = Conv2D(<span class="number">128</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(conv3)</span><br><span class="line">pool2 = MaxPooling2D(pool_size=<span class="number">2</span>)(conv4)</span><br><span class="line"></span><br><span class="line">conv5 = Conv2D(<span class="number">256</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(pool2)</span><br><span class="line">conv6 = Conv2D(<span class="number">256</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(conv5)</span><br><span class="line">conv7 = Conv2D(<span class="number">256</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(conv6)</span><br><span class="line">pool3 = MaxPooling2D(pool_size=<span class="number">2</span>)(conv7)</span><br><span class="line"></span><br><span class="line">conv8 = Conv2D(<span class="number">512</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(pool3)</span><br><span class="line">conv9 = Conv2D(<span class="number">512</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(conv8)</span><br><span class="line">conv10 = Conv2D(<span class="number">512</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(conv9)</span><br><span class="line">pool4 = MaxPooling2D(pool_size=<span class="number">2</span>)(conv10)</span><br><span class="line"></span><br><span class="line">conv11 = Conv2D(<span class="number">512</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(pool4)</span><br><span class="line">conv12 = Conv2D(<span class="number">512</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(conv11)</span><br><span class="line">conv13 = Conv2D(<span class="number">512</span>, (<span class="number">3</span>,<span class="number">3</span>), padding=<span class="string">'same'</span>, activation=<span class="string">'relu'</span>)(conv12)</span><br><span class="line">pool5 = MaxPooling2D(pool_size=<span class="number">2</span>)(conv13)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 扁平层</span></span><br><span class="line">flat = Flatten()(pool5)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全联接层</span></span><br><span class="line">fc1 = Dense(<span class="number">4096</span>, activation=<span class="string">'relu'</span>)(flat)</span><br><span class="line">fc2 = Dense(<span class="number">4096</span>, activation=<span class="string">'relu'</span>)(fc1)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出层</span></span><br><span class="line">outputs = Dense(<span class="number">1000</span>, activation=<span class="string">'softmax'</span>)(fc2)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-创建并预览模型"><a href="#2-3-创建并预览模型" class="headerlink" title="2.3 创建并预览模型"></a>2.3 创建并预览模型</h3><p>在使用函数是API，对照前文打印 VGG16 模型架构，依葫芦画瓢，设计出模型各层参数及层间衔接关系后，就可以使用 <code>Model(inputs, outputs)</code>，指定 <code>inputs</code> 和 <code>outputs</code> 参数创建自己的 VGG16 模型。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">my_VGG16_model = Model(inputs=inputs, outputs=outputs)</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>summary()</code> 方法查看自己的 VGG16 模型，检查是否和前文的模型结构一致。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">my_VGG16_model.summary()</span><br></pre></td></tr></table></figure>
+
+<pre><code>_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+input_2 (InputLayer)         (None, 224, 224, 3)       0         
+_________________________________________________________________
+conv2d_1 (Conv2D)            (None, 224, 224, 64)      1792      
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 224, 224, 64)      36928     
+_________________________________________________________________
+max_pooling2d_1 (MaxPooling2 (None, 112, 112, 64)      0         
+_________________________________________________________________
+conv2d_3 (Conv2D)            (None, 112, 112, 128)     73856     
+_________________________________________________________________
+conv2d_4 (Conv2D)            (None, 112, 112, 128)     147584    
+_________________________________________________________________
+max_pooling2d_2 (MaxPooling2 (None, 56, 56, 128)       0         
+_________________________________________________________________
+conv2d_5 (Conv2D)            (None, 56, 56, 256)       295168    
+_________________________________________________________________
+conv2d_6 (Conv2D)            (None, 56, 56, 256)       590080    
+_________________________________________________________________
+conv2d_7 (Conv2D)            (None, 56, 56, 256)       590080    
+_________________________________________________________________
+max_pooling2d_3 (MaxPooling2 (None, 28, 28, 256)       0         
+_________________________________________________________________
+conv2d_8 (Conv2D)            (None, 28, 28, 512)       1180160   
+_________________________________________________________________
+conv2d_9 (Conv2D)            (None, 28, 28, 512)       2359808   
+_________________________________________________________________
+conv2d_10 (Conv2D)           (None, 28, 28, 512)       2359808   
+_________________________________________________________________
+max_pooling2d_4 (MaxPooling2 (None, 14, 14, 512)       0         
+_________________________________________________________________
+conv2d_11 (Conv2D)           (None, 14, 14, 512)       2359808   
+_________________________________________________________________
+conv2d_12 (Conv2D)           (None, 14, 14, 512)       2359808   
+_________________________________________________________________
+conv2d_13 (Conv2D)           (None, 14, 14, 512)       2359808   
+_________________________________________________________________
+max_pooling2d_5 (MaxPooling2 (None, 7, 7, 512)         0         
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 25088)             0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 4096)              102764544 
+_________________________________________________________________
+dense_2 (Dense)              (None, 4096)              16781312  
+_________________________________________________________________
+dense_3 (Dense)              (None, 1000)              4097000   
+=================================================================
+Total params: 138,357,544
+Trainable params: 138,357,544
+Non-trainable params: 0
+_________________________________________________________________</code></pre><h2 id="3-使用模型对图片进行分类"><a href="#3-使用模型对图片进行分类" class="headerlink" title="3. 使用模型对图片进行分类"></a>3. 使用模型对图片进行分类</h2><h3 id="3-1-图片预处理"><a href="#3-1-图片预处理" class="headerlink" title="3.1 图片预处理"></a>3.1 图片预处理</h3><p>要使用 VGG16 对图片进行分类，首先需要对图片进行预处理，转换成张量，如下助手函数就是完成这一功能，指定图片存储路径，返回一个 VGG16 模型能够处理的 4 维张量(numpy 多维数组)。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> keras.preprocessing <span class="keyword">import</span> image</span><br><span class="line"><span class="keyword">from</span> keras.applications.vgg16 <span class="keyword">import</span> preprocess_input</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">path_to_tensor</span><span class="params">(img_path)</span>:</span></span><br><span class="line">    <span class="comment"># 用 PIL 加载 RGB 图像为 PIL.Image.Image 类型</span></span><br><span class="line">    img = image.load_img(img_path, target_size=(<span class="number">224</span>, <span class="number">224</span>))</span><br><span class="line">    <span class="comment"># 将 PIL.Image.Image 类型转化为格式为 (224, 224, 3) 的3维张量</span></span><br><span class="line">    x = image.img_to_array(img)</span><br><span class="line">    <span class="comment"># 将3维张量转化为格式为 (1, 224, 224, 3) 的4维张量</span></span><br><span class="line">    tensor = np.expand_dims(x, axis=<span class="number">0</span>)</span><br><span class="line">    <span class="comment"># VGG 张量预处理</span></span><br><span class="line">    <span class="keyword">return</span> preprocess_input(tensor)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-使用模型预测分类"><a href="#3-2-使用模型预测分类" class="headerlink" title="3.2 使用模型预测分类"></a>3.2 使用模型预测分类</h3><p>模型直接输出是一个长为 1000 <code>numpy</code> 数组，对应 1000 个分类的概率。我们这里不需要知道每一个分类的概率值，而只需要知道概率最大的分类，作为模型预测的分类。因此，<code>model_predict()</code> 函数在返回前，使用 <code>numpy.argmax()</code> 获取概率最大的分类索引(也是图片的分类标签)。 </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">model_predict</span><span class="params">(model, img_path)</span>:</span></span><br><span class="line">    tensor = path_to_tensor(img_path)</span><br><span class="line">    predict_label = model.predict(tensor)</span><br><span class="line">    <span class="keyword">return</span> np.argmax(predict_label)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-对比测试"><a href="#3-3-对比测试" class="headerlink" title="3.3 对比测试"></a>3.3 对比测试</h3><p>分别使用前文创建的 VGG16_model 和自己创建的 my_VGG16_model 对同一张图片进行预测。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">img_path = <span class="string">'dog.jpeg'</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">'VGG16_model predict label: &#123;&#125;'</span>.format(model_predict(VGG16_model, img_path)))</span><br><span class="line">print(<span class="string">'my_VGG16_model predict label: &#123;&#125;'</span>.format(model_predict(my_VGG16_model, img_path)))</span><br></pre></td></tr></table></figure>
+
+<pre><code>VGG16_model predict label: 245
+my_VGG16_model predict label: 788</code></pre><p>发现，我们自己创建的 VGG16 和系统加载的 VGG16 预测值不一样。哪里出问题了呢？事实上，我们刚才只是创建了一个和 VGG16 架构一样的模型，但是它还未经过训练，模型的权重还是随机初始化的，而加载的 VGG16 已经加载了 ImageNet 数据集上预训练的权重。知道问题，是不是，只要我们将模型的权重设置成和 VGG16 一样就可以了？不妨一试。</p>
+<h3 id="3-4-设置权重"><a href="#3-4-设置权重" class="headerlink" title="3.4 设置权重"></a>3.4 设置权重</h3><p>Keras 的模型提供了 <code>get_weights()</code> 和 <code>set_weights()</code> 方法，分别用来获取和设置模型的权重。因此，我顺理成章地想到，获取 <code>VGG16_model</code> 的权重，并用这个权重设置 <code>my_VGG16_model</code> 的权重。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">weights = VGG16_model.get_weights()</span><br><span class="line"></span><br><span class="line">my_VGG16_model.set_weights(weights)</span><br></pre></td></tr></table></figure>
+
+<p>一切正常，接下来，再重新运行前面的代码，看看两个模型的预测是否回归一致。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">'VGG16_model predict label: &#123;&#125;'</span>.format(model_predict(VGG16_model, img_path)))</span><br><span class="line">print(<span class="string">'my_VGG16_model predict label: &#123;&#125;'</span>.format(model_predict(my_VGG16_model, img_path)))</span><br></pre></td></tr></table></figure>
+
+<pre><code>VGG16_model predict label: 245
+my_VGG16_model predict label: 245</code></pre><p>Awsome! 一切如我们所料。可见两个模型给出了同一个数值 245 。 问题来了，这个 245 到底指代什么呢？正如前面所说，这个值是 ImageNet 给出的 1000 个常见分类的索引。我们想象一个字典，它的值是分类的文本名称，它的键就是我们模型预测出来的标签。那么这个字典在哪里呢？答案在这里：<span class="exturl" data-url="aHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20veXJldmFyLzk0MmQzYTBhYzA5ZWM5ZTVlYjNh" title="https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a">https://gist.github.com/yrevar/942d3a0ac09ec9e5eb3a<i class="fa fa-external-link"></i></span></p>
+<h3 id="3-5-真实分类名称"><a href="#3-5-真实分类名称" class="headerlink" title="3.5 真实分类名称"></a>3.5 真实分类名称</h3><p>上文链接的作者给出了使用 <code>pickle</code> 加载得到字典的 <code>.pkl</code> <span class="exturl" data-url="aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS95cmV2YXIvNjEzNWYxYmQ4ZGNmMmUwY2M2ODMvcmF3L2QxMzNkNjFhMDlkN2U1YTNiMzZiOGMxMTFhOGRkNWM0YjVkNTYwZWUvaW1hZ2VuZXQxMDAwX2Nsc2lkX3RvX2h1bWFuLnBrbA==" title="https://gist.githubusercontent.com/yrevar/6135f1bd8dcf2e0cc683/raw/d133d61a09d7e5a3b36b8c111a8dd5c4b5d560ee/imagenet1000_clsid_to_human.pkl">文件地址<i class="fa fa-external-link"></i></span> 。将这个文件下载到本地，然后使用 <code>pickle.load()</code> 加载文件即可得到我们需要的字典。</p>
+<p>注意：浏览器直接另存下载后的文件会自动增加一个 .txt 的后缀，笔者这里已经手动去掉了这个后缀。否则，完整文件名为 <code>imagenet1000_clsid_to_human.pkl.txt</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'imagenet1000_clsid_to_human.pkl'</span>, <span class="string">'rb'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    cat1000 = pickle.load(f)</span><br></pre></td></tr></table></figure>
+
+<p>接下来，终于可以瞅瞅刚才模型预测的 245 到底是个啥?</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat1000[<span class="number">245</span>]</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>&apos;French bulldog&apos;</code></pre><p>英文不好，找谷歌和百度翻译一下，’French bulldog’ 是“法国斗牛犬”。从文件名 ‘dog.jpeg’ ，我们可以初步判定模型预测对了一半，至少它成功识别出是一条狗子。到底是不是法国斗牛犬。看下图：</p>
+<p><img src="http://cdn.kenblog.top/dog.jpeg" alt></p>
+<p>此时此刻，是不是应该为我们自己亲手搭建的模型来点掌声呢^^。</p>
+<h3 id="3-6-更友好的图片分类函数"><a href="#3-6-更友好的图片分类函数" class="headerlink" title="3.6 更友好的图片分类函数"></a>3.6 更友好的图片分类函数</h3><p>既然，我们验证了自己刚才搭建的 VGG 模型已经奏效，并且我们还得到了 1000 个分类的文本字典，不妨将我们的模型封装一下，以便更加容易使用。有了前面的基础，我们只需要简单组合一下，就能得到一个很好用的函数，它传入图片路径 <code>img_path</code> 返回图片分类的文本名称。如果你的英文和笔者一样，建议勤加使用 Goolgle or 百度翻译。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">imgcate</span><span class="params">(img_path)</span>:</span></span><br><span class="line">    label = model_predict(my_VGG16_model, img_path)</span><br><span class="line">    <span class="keyword">return</span> cat1000[label]</span><br></pre></td></tr></table></figure>
+
+<p>读者可以尽情尝试各种图片，体验AI的乐趣。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">print(imgcate(<span class="string">'dog.jpeg'</span>))</span><br><span class="line">print(imgcate(<span class="string">'xx.jpeg'</span>))</span><br></pre></td></tr></table></figure>
+
+<pre><code>French bulldog
+maillot, tank suit</code></pre>
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="ken wechat" style="width: 200px; max-width: 100%;">
+  <div>微信扫描二维码，第一时间收到最新原创文章！</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="ken 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="ken 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/09/25/keras-build-vgg16/" title="Keras 手动搭建 VGG 卷积神经网络识别 ImageNet 1000 种常见分类">http://kenblog.top/2019/09/25/keras-build-vgg16/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/keras-vgg16-cnn/" rel="tag"># keras vgg16 cnn</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/24/keras-build-cnn/" rel="next" title="Keras 搭建图片分类 CNN （卷积神经网络）">
+                  <i class="fa fa-chevron-left"></i> Keras 搭建图片分类 CNN （卷积神经网络）
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/27/kcrawler/" rel="prev" title="python 开源爬虫工具 kcrawler">
+                  python 开源爬虫工具 kcrawler <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-VGG-模型架构"><span class="nav-number">1.</span> <span class="nav-text">1. VGG 模型架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-从零构建-VGG16"><span class="nav-number">2.</span> <span class="nav-text">2. 从零构建 VGG16</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-导入-Keras-模型和层"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 导入  Keras 模型和层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-设计模型层"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 设计模型层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-创建并预览模型"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 创建并预览模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-使用模型对图片进行分类"><span class="nav-number">3.</span> <span class="nav-text">3. 使用模型对图片进行分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-图片预处理"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 图片预处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-使用模型预测分类"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 使用模型预测分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-对比测试"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 对比测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-设置权重"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 设置权重</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-真实分类名称"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 真实分类名称</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-更友好的图片分类函数"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 更友好的图片分类函数</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/ken_red.jpg"
+      alt="ken">
+  <p class="site-author-name" itemprop="name">ken</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

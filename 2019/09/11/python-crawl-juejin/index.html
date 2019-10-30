@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="人人都可以掌握的实用数据分析。内容涵盖：网络爬虫，数据分析，数据可视化，数据保存到 csv 和 excel 文件，以及命令行传参。麻雀虽小，五脏俱全。">
+<meta name="keywords" content="python 网络爬虫 数据分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python 自动抓取分析文章阅读量——掘金专栏版">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;09&#x2F;11&#x2F;python-crawl-juejin&#x2F;index.html">
+<meta property="og:site_name" content="ken爱编程">
+<meta property="og:description" content="人人都可以掌握的实用数据分析。内容涵盖：网络爬虫，数据分析，数据可视化，数据保存到 csv 和 excel 文件，以及命令行传参。麻雀虽小，五脏俱全。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;juejin_posts_api.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;juejin_post_viewCount.png">
+<meta property="og:updated_time" content="2019-10-30T03:00:42.332Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;juejin_posts_api.png">
+  <link rel="canonical" href="http://kenblog.top/2019/09/11/python-crawl-juejin/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>python 自动抓取分析文章阅读量——掘金专栏版 | ken爱编程</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ken爱编程</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">面向“对象”编程</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">35</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">35</span></a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/09/11/python-crawl-juejin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ken">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/ken_red.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ken爱编程">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            python 自动抓取分析文章阅读量——掘金专栏版
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-11 15:58:31" itemprop="dateCreated datePublished" datetime="2019-09-11T15:58:31+08:00">2019-09-11</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 11:00:42" itemprop="dateModified" datetime="2019-10-30T11:00:42+08:00">2019-10-30</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>人人都可以掌握的实用数据分析。内容涵盖：网络爬虫，数据分析，数据可视化，数据保存到 csv 和 excel 文件，以及命令行传参。麻雀虽小，五脏俱全。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1. 准备工作"></a>1. 准备工作</h2><h3 id="1-1-用到技术"><a href="#1-1-用到技术" class="headerlink" title="1.1 用到技术"></a>1.1 用到技术</h3><ul>
+<li>python3</li>
+<li>requests: http 爬取 json 数据</li>
+<li>pandas: 分析，保存数据</li>
+<li>matplotlib: 数据可视化分析</li>
+</ul>
+<h3 id="1-2-安装"><a href="#1-2-安装" class="headerlink" title="1.2 安装"></a>1.2 安装</h3><p>如已安装，请跳过。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip install requests</span><br><span class="line">pip install pandas</span><br><span class="line">pip install matplotlib</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-导入"><a href="#1-3-导入" class="headerlink" title="1.3 导入"></a>1.3 导入</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-URL分析"><a href="#2-URL分析" class="headerlink" title="2.  URL分析"></a>2.  URL分析</h2><h3 id="2-1-复制-json-接口请求-URL"><a href="#2-1-复制-json-接口请求-URL" class="headerlink" title="2.1 复制 json 接口请求 URL"></a>2.1 复制 json 接口请求 URL</h3><p>进入掘金个人主页，打开开发者工具，点击“专栏” tab ，在开发者工具”Network-&gt;XHR-&gt;Name-&gt;get_entry_by_self-&gt;Headers-&gt;Request URL” 复制 url。</p>
+<p><img src="http://cdn.kenblog.top/juejin_posts_api.png" alt></p>
+<p>例如我的是：’<span class="exturl" data-url="aHR0cHM6Ly90aW1lbGluZS1tZXJnZXItbXMuanVlamluLmltL3YxL2dldF9lbnRyeV9ieV9zZWxmP3NyYz13ZWImYW1wO3VpZD01YmQyYjhiMjUxODgyNTJhNzg0ZDE5ZDcmYW1wO2RldmljZV9pZD0xNTY3NzQ4NDIwMDM5JmFtcDt0b2tlbj1leUpoWTJObGMzTmZkRzlyWldKVFRIVlBjVlJHUTFCc2VXZFRaSEY0SWl3aWNtVm1jbVZ6YUY5MGIydGxiaUk2SW1KSFprSkRWRGxXUWtaaVFVTk1kVFlpTENKMGIydGxibDkwZVhCbElqb2liV0ZqSWl3aVpYaHdhWEpsWDJsdUlqb3lOVGt5TURBd2ZRJTNEJTNEJmFtcDt0YXJnZXRVaWQ9NWJkMmI4YjI1MTg4MjUyYTc4NGQxOWQ3JmFtcDt0eXBlPXBvc3QmYW1wO2xpbWl0PTIwJmFtcDtvcmRlcj1jcmVhdGVkQXQmIzM5Ow==" title="https://timeline-merger-ms.juejin.im/v1/get_entry_by_self?src=web&amp;uid=5bd2b8b25188252a784d19d7&amp;device_id=1567748420039&amp;token=eyJhY2Nlc3NfdG9rZWJTTHVPcVRGQ1BseWdTZHF4IiwicmVmcmVzaF90b2tlbiI6ImJHZkJDVDlWQkZiQUNMdTYiLCJ0b2tlbl90eXBlIjoibWFjIiwiZXhwaXJlX2luIjoyNTkyMDAwfQ%3D%3D&amp;targetUid=5bd2b8b25188252a784d19d7&amp;type=post&amp;limit=20&amp;order=createdAt&#39;">https://timeline-merger-ms.juejin.im/v1/get_entry_by_self?src=web&amp;uid=5bd2b8b25188252a784d19d7&amp;device_id=1567748420039&amp;token=eyJhY2Nlc3NfdG9rZWJTTHVPcVRGQ1BseWdTZHF4IiwicmVmcmVzaF90b2tlbiI6ImJHZkJDVDlWQkZiQUNMdTYiLCJ0b2tlbl90eXBlIjoibWFjIiwiZXhwaXJlX2luIjoyNTkyMDAwfQ%3D%3D&amp;targetUid=5bd2b8b25188252a784d19d7&amp;type=post&amp;limit=20&amp;order=createdAt&#39;<i class="fa fa-external-link"></i></span></p>
+<p>如果，你已经迫不及待想要看到效果，可以在复制这个 url 后，直接跳到本文 第 6 节。</p>
+<p>不管怎样，还是建议花点时间看完整篇文章，了解足够多细节，以便灵活运用本文提供的方法。</p>
+<h3 id="2-2-分析-URL"><a href="#2-2-分析-URL" class="headerlink" title="2.2 分析 URL"></a>2.2 分析 URL</h3><p>将上面复制的 url 赋值给下方代码中 <code>juejin_zhuanlan_api_full_url</code> 变量。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">juejin_zhuanlan_api_full_url = <span class="string">'https://timeline-merger-ms.juejin.im/v1/get_entry_by_self?src=web&amp;uid=5bd2b8b25188252a784d19d7&amp;device_id=1567748420039&amp;token=eyJhY2Nlc3NfdG9rZW4iOiJTTcVRGQ1BseWdTZHF4IiwicmVmcmVzaF90b2tlbiI6ImJHZkJDVDlWQkZiQUNMdTYiLCJ0b2tlbl90eXBlIjoibWFjIiwiZXhwaXJlX2luIjoyNTkyMDAwfQ%3D%3D&amp;targetUid=5bd2b8b25188252a784d19d7&amp;type=post&amp;limit=20&amp;order=createdAt'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decode_url</span><span class="params">(url)</span>:</span></span><br><span class="line">    adr, query = url.split(<span class="string">"?"</span>)</span><br><span class="line">    params = &#123; kv.split(<span class="string">"="</span>)[<span class="number">0</span>]:kv.split(<span class="string">"="</span>)[<span class="number">1</span>] <span class="keyword">for</span> kv <span class="keyword">in</span> query.split(<span class="string">"&amp;"</span>)&#125;</span><br><span class="line">    <span class="keyword">return</span> adr, params</span><br><span class="line"></span><br><span class="line">decode_url(juejin_zhuanlan_api_full_url)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>(&apos;https://timeline-merger-ms.juejin.im/v1/get_entry_by_self&apos;,
+ {&apos;src&apos;: &apos;web&apos;,
+  &apos;uid&apos;: &apos;5bd2b8b25188252a784d19d7&apos;,
+  &apos;device_id&apos;: &apos;156774842039&apos;,
+  &apos;token&apos;: &apos;eyJhY2Nlc3NfdG9rZW4iOiJTTHVPcVRGeWdTZHF4IiwicmVmcmVzaF90b2tlbiI6ImJHZkJDVDlWQkZiQUNMdTYiLCJ0b2tlbl90eXBlIjoibWFjIiwiZXhwaXJlX2luIjoyNTkyMDAwfQ%3D%3D&apos;,
+  &apos;targetUid&apos;: &apos;5bd2b8b25188252a784d19d7&apos;,
+  &apos;type&apos;: &apos;post&apos;,
+  &apos;limit&apos;: &apos;20&apos;,
+  &apos;order&apos;: &apos;createdAt&apos;})</code></pre><h2 id="3-抓取数据"><a href="#3-抓取数据" class="headerlink" title="3. 抓取数据"></a>3. 抓取数据</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encode_url</span><span class="params">(url, params)</span>:</span></span><br><span class="line">    query = <span class="string">"&amp;"</span>.join([<span class="string">"&#123;&#125;=&#123;&#125;"</span>.format(k, v) <span class="keyword">for</span> k, v <span class="keyword">in</span> params.items()])</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"&#123;&#125;?&#123;&#125;"</span>.format(url, query)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_juejin_url</span><span class="params">(uid, device_id, token)</span>:</span></span><br><span class="line">    url = <span class="string">"https://timeline-merger-ms.juejin.im/v1/get_entry_by_self"</span></span><br><span class="line">    params = &#123;<span class="string">'src'</span>: <span class="string">'web'</span>,</span><br><span class="line">              <span class="string">'uid'</span>: uid,</span><br><span class="line">              <span class="string">'device_id'</span>: device_id,</span><br><span class="line">              <span class="string">'token'</span>: token,</span><br><span class="line">              <span class="string">'targetUid'</span>: uid,</span><br><span class="line">              <span class="string">'type'</span>: <span class="string">'post'</span>,</span><br><span class="line">              <span class="string">'limit'</span>: <span class="number">20</span>,</span><br><span class="line">              <span class="string">'order'</span>: <span class="string">'createdAt'</span>&#125;</span><br><span class="line">    <span class="keyword">return</span> encode_url(url, params)</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">uid=<span class="string">'5bd2b8b25188252a784d19d7'</span></span><br><span class="line">device_id=<span class="string">'1567748420039'</span></span><br><span class="line">token=<span class="string">'eyJhY2Nlc3NfdG9rZW4iOiJTTHVPcVRGBseWdTZHF4IiwicmVmcmVzaF90b2tlbiI6ImJHZkJDVDlWQkZiQUNMdTYiLCJ0b2tlbl90eXBlIjoibWFjIiwiZXhwaXJlX2luIjoyNTkyMDAwfQ%3D%3D'</span></span><br><span class="line"></span><br><span class="line">url = get_juejin_url(uid, device_id, token)</span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'Origin'</span>: <span class="string">'https://juejin.im'</span>,</span><br><span class="line">    <span class="string">'Referer'</span>: <span class="string">'https://juejin.im/user/5bd2b8b25188252a784d19d7/posts'</span>,</span><br><span class="line">    <span class="string">'Sec-Fetch-Mode'</span>: <span class="string">'cors'</span>,</span><br><span class="line">    <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Mobile Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">res = requests.get(url, headers=headers)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> res.status_code == <span class="number">200</span>:</span><br><span class="line">    json_data = res.json()</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'数据获取失败，请检查token是否失效'</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-分析数据"><a href="#4-分析数据" class="headerlink" title="4. 分析数据"></a>4. 分析数据</h2><h3 id="4-1-分析-json-数据-找到文章列表字段"><a href="#4-1-分析-json-数据-找到文章列表字段" class="headerlink" title="4.1 分析 json 数据 找到文章列表字段"></a>4.1 分析 json 数据 找到文章列表字段</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> k, v <span class="keyword">in</span> json_data.items():</span><br><span class="line">        print(k, <span class="string">':'</span>, v)</span><br></pre></td></tr></table></figure>
+
+<pre><code>s : 1
+m : ok
+d : {&apos;total&apos;: 11, &apos;entrylist&apos;: [{&apos;collectionCount&apos;: 1, &apos;userRankIndex&apos;: 1.3086902928294, &apos;buildTime&apos;: 1568185450.1271, &apos;commentsCount&apos;: 0, &apos;gfw&apos;: False, &apos;objectId&apos;: &apos;5d7832be6fb9a06ad4516f67&apos;, &apos;checkStatus&apos;: True, &apos;isEvent&apos;: False, ...</code></pre><h3 id="4-2-分析单篇文章-找到感兴趣字段"><a href="#4-2-分析单篇文章-找到感兴趣字段" class="headerlink" title="4.2 分析单篇文章 找到感兴趣字段"></a>4.2 分析单篇文章 找到感兴趣字段</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">article_list = json_data[<span class="string">'d'</span>][<span class="string">'entrylist'</span>]</span><br><span class="line">article = article_list[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">article[<span class="string">'title'</span>], article[<span class="string">'viewsCount'</span>], article[<span class="string">'rankIndex'</span>], article[<span class="string">'createdAt'</span>]</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>(&apos;python 科学计算的基石 numpy（一）&apos;, 57, 0.49695221772782, &apos;2019-09-10T23:33:19.013Z&apos;)</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">interest_list = [(article[<span class="string">'title'</span>], article[<span class="string">'viewsCount'</span>], article[<span class="string">'rankIndex'</span>], article[<span class="string">'createdAt'</span>]) <span class="keyword">for</span> article <span class="keyword">in</span> article_list]</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">print(<span class="string">'&#123;&#125;\t&#123;&#125;\t&#123;&#125;\t&#123;&#125;'</span>.format(<span class="string">'createdAt'</span>, <span class="string">'rankIndex'</span>, <span class="string">'viewsCount'</span>, <span class="string">'title'</span>))</span><br><span class="line"><span class="keyword">for</span> title, viewsCount, rankIndex, createdAt <span class="keyword">in</span> interest_list:</span><br><span class="line">    print(<span class="string">'&#123;&#125;\t&#123;&#125;\t&#123;&#125;\t&#123;&#125;'</span>.format(createdAt.split(<span class="string">'T'</span>)[<span class="number">0</span>], round(rankIndex, <span class="number">10</span>), viewsCount, title))</span><br></pre></td></tr></table></figure>
+
+<pre><code>createdAt    rankIndex    viewsCount    title
+2019-09-10    0.4969522177    57    python 科学计算的基石 numpy（一）
+2019-09-10    0.064785953    115    python 数据分析工具包 pandas（一）
+2019-09-09    0.0265007422    108    OpenCv-Python 开源计算机视觉库 (一)
+2019-09-08    0.0063690043    31    python 数据可视化工具包 matplotlib
+2019-09-07    0.0078304184    104    python 图像处理类库 PIL (二)
+2019-09-06    0.0021220196    10    python 标准库：os
+2019-09-06    0.0025458508    26    python 图像处理类库 PIL (一)
+2019-09-06    0.0073875365    144    python 标准库：random
+2019-09-06    0.0013268195    6    jpeg 图像存储数据格式
+2019-09-06    0.0079665762    6    python 内置函数
+2019-09-06    0.0015289955    8    jupyter notebook 安装 C/C++ kernel</code></pre><h3 id="4-3-pandas-数据分析"><a href="#4-3-pandas-数据分析" class="headerlink" title="4.3 pandas 数据分析"></a>4.3 pandas 数据分析</h3><h4 id="4-3-1-创建-DataFrame-对象"><a href="#4-3-1-创建-DataFrame-对象" class="headerlink" title="4.3.1 创建 DataFrame 对象"></a>4.3.1 创建 DataFrame 对象</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df = pd.DataFrame(interest_list, columns=[<span class="string">'title'</span>, <span class="string">'viewsCount'</span>, <span class="string">'rankIndex'</span>, <span class="string">'createdAt'</span>])</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df_sort_desc = df.sort_values(<span class="string">'viewsCount'</span>, ascending=<span class="literal">False</span>).reset_index(drop=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">df_sort_desc</span><br></pre></td></tr></table></figure>
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}</code></pre><p></style><p></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>title</th>
+      <th>viewsCount</th>
+      <th>rankIndex</th>
+      <th>createdAt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>python 标准库：random</td>
+      <td>144</td>
+      <td>0.007388</td>
+      <td>2019-09-06T06:09:08.408Z</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>python 数据分析工具包 pandas（一）</td>
+      <td>115</td>
+      <td>0.064786</td>
+      <td>2019-09-10T07:37:53.507Z</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>OpenCv-Python 开源计算机视觉库 (一)</td>
+      <td>108</td>
+      <td>0.026501</td>
+      <td>2019-09-09T06:18:14.059Z</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>python 图像处理类库 PIL (二)</td>
+      <td>104</td>
+      <td>0.007830</td>
+      <td>2019-09-07T11:25:48.391Z</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>python 科学计算的基石 numpy（一）</td>
+      <td>57</td>
+      <td>0.496952</td>
+      <td>2019-09-10T23:33:19.013Z</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>python 数据可视化工具包 matplotlib</td>
+      <td>31</td>
+      <td>0.006369</td>
+      <td>2019-09-08T09:29:00.172Z</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>python 图像处理类库 PIL (一)</td>
+      <td>26</td>
+      <td>0.002546</td>
+      <td>2019-09-06T06:10:48.300Z</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>python 标准库：os</td>
+      <td>10</td>
+      <td>0.002122</td>
+      <td>2019-09-06T11:06:17.881Z</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>jupyter notebook 安装 C/C++ kernel</td>
+      <td>8</td>
+      <td>0.001529</td>
+      <td>2019-09-06T06:00:19.673Z</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>jpeg 图像存储数据格式</td>
+      <td>6</td>
+      <td>0.001327</td>
+      <td>2019-09-06T06:07:25.442Z</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>python 内置函数</td>
+      <td>6</td>
+      <td>0.007967</td>
+      <td>2019-09-06T06:04:26.794Z</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<h4 id="4-3-2-可视化分析"><a href="#4-3-2-可视化分析" class="headerlink" title="4.3.2 可视化分析"></a>4.3.2 可视化分析</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">fig, axes = plt.subplots(<span class="number">2</span>, <span class="number">1</span>, figsize=(<span class="number">10</span>, <span class="number">10</span>))</span><br><span class="line"></span><br><span class="line">plt.subplots_adjust(wspace=<span class="number">0.5</span>, hspace=<span class="number">0.5</span>)</span><br><span class="line"></span><br><span class="line">df = df.sort_values(<span class="string">'viewsCount'</span>)</span><br><span class="line"></span><br><span class="line">df.plot(subplots=<span class="literal">True</span>, ax=axes[<span class="number">0</span>], x=<span class="string">'title'</span>, y=<span class="string">'viewsCount'</span>, kind=<span class="string">'barh'</span>, legend=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">df.plot(subplots=<span class="literal">True</span>, ax=axes[<span class="number">1</span>], labels=df[<span class="string">'title'</span>], y=<span class="string">'viewsCount'</span>, kind=<span class="string">'pie'</span>, legend=<span class="literal">False</span>, labeldistance=<span class="number">1.2</span>)</span><br><span class="line"></span><br><span class="line">plt.subplots_adjust(left=<span class="number">0.3</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/juejin_post_viewCount.png" alt></p>
+<h2 id="5-保存数据"><a href="#5-保存数据" class="headerlink" title="5. 保存数据"></a>5. 保存数据</h2><h3 id="5-1-保存到-csv-文件"><a href="#5-1-保存到-csv-文件" class="headerlink" title="5.1 保存到 csv 文件"></a>5.1 保存到 csv 文件</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">filename = time.strftime(<span class="string">"%Y-%m-%d_%H-%M-%S"</span>, time.localtime())</span><br><span class="line"></span><br><span class="line"><span class="comment">#  保存 csv 文件</span></span><br><span class="line">csv_file = filename + <span class="string">'.csv'</span></span><br><span class="line">df.to_csv(csv_file, index=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-保存到-excel-文件"><a href="#5-2-保存到-excel-文件" class="headerlink" title="5.2 保存到 excel 文件"></a>5.2 保存到 excel 文件</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 保存 excel 文件</span></span><br><span class="line">excel_file = filename + <span class="string">'.xls'</span></span><br><span class="line">sheet_name = time.strftime(<span class="string">"%Y-%m-%d"</span>, time.localtime())</span><br><span class="line">df.to_excel(excel_file, sheet_name=sheet_name, index=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-命令行运行"><a href="#6-命令行运行" class="headerlink" title="6. 命令行运行"></a>6. 命令行运行</h2><h3 id="6-1-代码封装"><a href="#6-1-代码封装" class="headerlink" title="6.1 代码封装"></a>6.1 代码封装</h3><p>将以下代码保存到文件 <code>crawl_juejin.py</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/local/bin/python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'Origin'</span>: <span class="string">'https://juejin.im'</span>,</span><br><span class="line">    <span class="string">'Referer'</span>: <span class="string">'https://juejin.im/user/5bd2b8b25188252a784d19d7/posts'</span>,</span><br><span class="line">    <span class="string">'Sec-Fetch-Mode'</span>: <span class="string">'cors'</span>,</span><br><span class="line">    <span class="string">'User-Agent'</span>: <span class="string">'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Mobile Safari/537.36'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">anlysis_by_url</span><span class="params">(url)</span>:</span></span><br><span class="line">    res = requests.get(url, headers=headers)</span><br><span class="line">    print(<span class="string">"\ncrawl posts data on juejin.\n-----------\nget posts from &#123;&#125; ...\n"</span>.format(url))</span><br><span class="line">    <span class="keyword">if</span> res.status_code != <span class="number">200</span>:</span><br><span class="line">        print(<span class="string">'数据获取失败，请检查token是否失效'</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    json_data = res.json()</span><br><span class="line"></span><br><span class="line">    article_list = json_data[<span class="string">'d'</span>][<span class="string">'entrylist'</span>]</span><br><span class="line">    total = json_data[<span class="string">'d'</span>][<span class="string">'total'</span>]</span><br><span class="line">    print(<span class="string">'got &#123;&#125; posts.\n'</span>.format(total))</span><br><span class="line">    interest_list = [(article[<span class="string">'title'</span>], article[<span class="string">'viewsCount'</span>], article[<span class="string">'rankIndex'</span>], article[<span class="string">'createdAt'</span>])</span><br><span class="line">                     <span class="keyword">for</span> article <span class="keyword">in</span> article_list]</span><br><span class="line">    df = pd.DataFrame(interest_list, columns=[<span class="string">'title'</span>, <span class="string">'viewsCount'</span>, <span class="string">'rankIndex'</span>, <span class="string">'createdAt'</span>])</span><br><span class="line">    df_sort_desc = df.sort_values(<span class="string">'viewsCount'</span>, ascending=<span class="literal">False</span>).reset_index(drop=<span class="literal">True</span>)</span><br><span class="line">    </span><br><span class="line">    print(<span class="string">'data visualization ...\n'</span>)</span><br><span class="line">    fig, axes = plt.subplots(<span class="number">2</span>, <span class="number">1</span>, figsize=(<span class="number">10</span>, <span class="number">10</span>))</span><br><span class="line"></span><br><span class="line">    plt.subplots_adjust(wspace=<span class="number">0.5</span>, hspace=<span class="number">0.5</span>)</span><br><span class="line"></span><br><span class="line">    df = df.sort_values(<span class="string">'viewsCount'</span>)</span><br><span class="line"></span><br><span class="line">    df.plot(subplots=<span class="literal">True</span>, ax=axes[<span class="number">0</span>], x=<span class="string">'title'</span>, y=<span class="string">'viewsCount'</span>, kind=<span class="string">'barh'</span>, legend=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    df.plot(subplots=<span class="literal">True</span>, ax=axes[<span class="number">1</span>], labels=df[<span class="string">'title'</span>], y=<span class="string">'viewsCount'</span>, kind=<span class="string">'pie'</span>, legend=<span class="literal">False</span>, labeldistance=<span class="number">1.2</span>)</span><br><span class="line"></span><br><span class="line">    plt.subplots_adjust(left=<span class="number">0.3</span>)</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line">    filename = time.strftime(<span class="string">"%Y-%m-%d_%H-%M-%S"</span>, time.localtime())</span><br><span class="line">    <span class="comment">#  保存 csv 文件</span></span><br><span class="line">    csv_file = filename + <span class="string">'.csv'</span></span><br><span class="line">    df_sort_desc.to_csv(csv_file, index=<span class="literal">False</span>)</span><br><span class="line">    print(<span class="string">"saved to &#123;&#125;.\n"</span>.format(csv_file))</span><br><span class="line">    <span class="comment"># 保存 excel 文件</span></span><br><span class="line">    excel_file = filename + <span class="string">'.xls'</span></span><br><span class="line">    sheet_name = time.strftime(<span class="string">"%Y-%m-%d"</span>, time.localtime())</span><br><span class="line">    df_sort_desc.to_excel(excel_file, sheet_name=sheet_name, index=<span class="literal">False</span>)</span><br><span class="line">    print(<span class="string">"saved to &#123;&#125;.\n"</span>.format(excel_file))</span><br><span class="line">    print(<span class="string">"\n-----------\npersonal website: https://kenblog.top\njuejin: https://juejin.im/user/5bd2b8b25188252a784d19d7"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_cli_args</span><span class="params">()</span>:</span></span><br><span class="line">    juejin_zhuanlan_api_full_url = <span class="string">'https://timeline-merger-ms.juejin.im/v1/get_entry_by_self?src=web&amp;uid=5bd2b8b25188252a784d19d7&amp;device_id=1567748420039&amp;token=eyJhY2Nlc3NfdG9rZW4iOiJTTHVPcVRGQ1BseWdTZHF4IiwicmVmcmVzaF90b2tlbiI6ImJHZkJDVDlWQkZiQUNMdTYiLCJ0b2tlbl90eXBlIjoibWFjIiwiZXhwaXJlX2luIjoyNTkyMDAwfQ%3D%3D&amp;targetUid=5bd2b8b25188252a784d19d7&amp;type=post&amp;limit=20&amp;order=createdAt'</span></span><br><span class="line">    parser = argparse.ArgumentParser()</span><br><span class="line">    parser.add_argument(<span class="string">'-u'</span>, <span class="string">'--url'</span>, type=str, default=juejin_zhuanlan_api_full_url, help=<span class="string">'URL'</span>)</span><br><span class="line">    args = parser.parse_args()</span><br><span class="line">    <span class="keyword">return</span> args</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    args = get_cli_args()</span><br><span class="line">    anlysis_by_url(args.url)</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-命令行运行"><a href="#6-2-命令行运行" class="headerlink" title="6.2 命令行运行"></a>6.2 命令行运行</h3><p>按照 <strong>2.1</strong> 中介绍方法，找到自己专栏的接口地址 url 。形如:</p>
+<p><code>https://timeline-merger-ms.juejin.im/v1/get_entry_by_self?src=web&amp;uid=5bd2b8b25188252a784d19d7&amp;device_id=1567748420039&amp;token=eyJhY2Nlc3NfdG9rZW4iOiJTTHVPcVRGeWdTZHF4IiwicmVmcmVzaF90b2tlbiI6ImJHZkJDVDlWQkZiQUNMdTYiLCJ0b2tlbl90eXBlIjoibWFjIiwiZXhwaXJlX2luIjoyNTkyMDAwfQ%3D%3D&amp;targetUid=5bd2b8b25188252a784d19d7&amp;type=post&amp;limit=20&amp;order=createdAt</code></p>
+<p>以上是笔者的自己的 URL。如果不提供 url 参数，将默认使用这个地址，但只是作为测试脚本是否正常工作，建议只用自己的。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python crawl_juejin.py --url <span class="string">"https://timeline-merger-ms.juejin.im..."</span></span><br></pre></td></tr></table></figure>
+
+<p>运行后，会爬取自己专栏的文章，同时，可视化显示出来。关闭显示窗口后，将以当前日期和时间作为文件名，在当前目录下保存 csv 文件和 excel 文件。</p>
+<h2 id="猜你喜欢"><a href="#猜你喜欢" class="headerlink" title="猜你喜欢"></a>猜你喜欢</h2><ul>
+<li>[1] <a href="http://kenblog.top/?p=76">python 数据分析工具包 pandas（一）</a></li>
+<li>[2] <a href="http://kenblog.top/?p=69">python 数据可视化工具包 matplotlib</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="ken wechat" style="width: 200px; max-width: 100%;">
+  <div>微信扫描二维码，第一时间收到最新原创文章！</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="ken 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="ken 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/09/11/python-crawl-juejin/" title="python 自动抓取分析文章阅读量——掘金专栏版">http://kenblog.top/2019/09/11/python-crawl-juejin/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/python-%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB-%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag"># python 网络爬虫 数据分析</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/10/python-numpy/" rel="next" title="python 科学计算的基石 numpy（一）">
+                  <i class="fa fa-chevron-left"></i> python 科学计算的基石 numpy（一）
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/16/python-crawl-anjuke/" rel="prev" title="python 自动抓取分析房价数据——安居客版">
+                  python 自动抓取分析房价数据——安居客版 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-准备工作"><span class="nav-number">1.</span> <span class="nav-text">1. 准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-用到技术"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 用到技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-安装"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-导入"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 导入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-URL分析"><span class="nav-number">2.</span> <span class="nav-text">2.  URL分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-复制-json-接口请求-URL"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 复制 json 接口请求 URL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-分析-URL"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 分析 URL</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-抓取数据"><span class="nav-number">3.</span> <span class="nav-text">3. 抓取数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-分析数据"><span class="nav-number">4.</span> <span class="nav-text">4. 分析数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-分析-json-数据-找到文章列表字段"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 分析 json 数据 找到文章列表字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-分析单篇文章-找到感兴趣字段"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 分析单篇文章 找到感兴趣字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-pandas-数据分析"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 pandas 数据分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-1-创建-DataFrame-对象"><span class="nav-number">4.3.1.</span> <span class="nav-text">4.3.1 创建 DataFrame 对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-2-可视化分析"><span class="nav-number">4.3.2.</span> <span class="nav-text">4.3.2 可视化分析</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-保存数据"><span class="nav-number">5.</span> <span class="nav-text">5. 保存数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-保存到-csv-文件"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 保存到 csv 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-保存到-excel-文件"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 保存到 excel 文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-命令行运行"><span class="nav-number">6.</span> <span class="nav-text">6. 命令行运行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-代码封装"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 代码封装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-命令行运行"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 命令行运行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#猜你喜欢"><span class="nav-number">7.</span> <span class="nav-text">猜你喜欢</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/ken_red.jpg"
+      alt="ken">
+  <p class="site-author-name" itemprop="name">ken</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

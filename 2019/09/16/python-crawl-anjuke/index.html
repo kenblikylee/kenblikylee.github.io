@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="引言中秋回家，顺便想将家里闲置的房子卖出去。第一次卖房，没经验，于是决定委托给中介。中介要我定个价。最近几年，房价是涨了不少，但是长期在外，也不了解行情。真要定个价，心里还没个数。网上零零散散看了下，没有个系统的感知。心想，身为一代码农，为何要用这种低效的方式去了解房价。于是，就有了今天这篇专栏，也是继上篇《python 自动抓取分析文章阅读量——掘金专栏版》json 爬虫的一个补充。这次要抓取的">
+<meta name="keywords" content="python 网络爬虫 数据分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python 自动抓取分析房价数据——安居客版">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;09&#x2F;16&#x2F;python-crawl-anjuke&#x2F;index.html">
+<meta property="og:site_name" content="ken爱编程">
+<meta property="og:description" content="引言中秋回家，顺便想将家里闲置的房子卖出去。第一次卖房，没经验，于是决定委托给中介。中介要我定个价。最近几年，房价是涨了不少，但是长期在外，也不了解行情。真要定个价，心里还没个数。网上零零散散看了下，没有个系统的感知。心想，身为一代码农，为何要用这种低效的方式去了解房价。于是，就有了今天这篇专栏，也是继上篇《python 自动抓取分析文章阅读量——掘金专栏版》json 爬虫的一个补充。这次要抓取的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;anjuke_banna2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;anjuke_find_list_container_list.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;anjuke_anlysis_dom.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;anjuke_http_headers.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;anjuke_banna_house_price_hist.png">
+<meta property="og:updated_time" content="2019-10-30T03:00:35.706Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;anjuke_banna2.png">
+  <link rel="canonical" href="http://kenblog.top/2019/09/16/python-crawl-anjuke/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>python 自动抓取分析房价数据——安居客版 | ken爱编程</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ken爱编程</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">面向“对象”编程</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">35</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">35</span></a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/09/16/python-crawl-anjuke/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ken">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/ken_red.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ken爱编程">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            python 自动抓取分析房价数据——安居客版
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-16 11:19:53" itemprop="dateCreated datePublished" datetime="2019-09-16T11:19:53+08:00">2019-09-16</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 11:00:35" itemprop="dateModified" datetime="2019-10-30T11:00:35+08:00">2019-10-30</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>中秋回家，顺便想将家里闲置的房子卖出去。第一次卖房，没经验，于是决定委托给中介。中介要我定个价。最近几年，房价是涨了不少，但是长期在外，也不了解行情。真要定个价，心里还没个数。网上零零散散看了下，没有个系统的感知。心想，身为一代码农，为何要用这种低效的方式去了解房价。于是，就有了今天这篇专栏，也是继上篇《python 自动抓取分析文章阅读量——掘金专栏版》json 爬虫的一个补充。这次要抓取的房价来自安居客，西双版纳房价数据（其他房产相关的垂直平台还未覆盖）。之所以说是上一篇的补充，因为，这次数据来自 html 。废话不多说，撸起袖子开始干。</p>
+<a id="more"></a>
+
+<h2 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1. 准备工作"></a>1. 准备工作</h2><h3 id="1-1-用到技术"><a href="#1-1-用到技术" class="headerlink" title="1.1 用到技术"></a>1.1 用到技术</h3><ul>
+<li>python3</li>
+<li>requests: http 爬取 html</li>
+<li>beautifulsoup4: 从 html 字符串中提取需要的数据</li>
+<li>pandas: 分析，保存数据</li>
+<li>matplotlib: 数据可视化分析</li>
+</ul>
+<h3 id="1-2-安装"><a href="#1-2-安装" class="headerlink" title="1.2 安装"></a>1.2 安装</h3><p>如已安装，请跳过。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pip install requests</span><br><span class="line">pip install beautifulsoup4</span><br><span class="line">pip install pandas</span><br><span class="line">pip install matplotlib</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-导入"><a href="#1-3-导入" class="headerlink" title="1.3 导入"></a>1.3 导入</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-页面分析"><a href="#2-页面分析" class="headerlink" title="2. 页面分析"></a>2. 页面分析</h2><h3 id="2-1-打开页面"><a href="#2-1-打开页面" class="headerlink" title="2.1 打开页面"></a>2.1 打开页面</h3><p>使用 Chrome 浏览器打开页面 <span class="exturl" data-url="aHR0cHM6Ly9iYW5uYW4uYW5qdWtlLmNvbS9jb21tdW5pdHkvP2Zyb209bmF2aWdhdGlvbg==" title="https://bannan.anjuke.com/community/?from=navigation">https://bannan.anjuke.com/community/?from=navigation<i class="fa fa-external-link"></i></span></p>
+<p><img src="http://cdn.kenblog.top/anjuke_banna2.png" alt></p>
+<h3 id="2-2-定位目标元素选择器"><a href="#2-2-定位目标元素选择器" class="headerlink" title="2.2 定位目标元素选择器"></a>2.2 定位目标元素选择器</h3><p>在开发者工具中，找到楼盘列表容器 dom 元素选择器。这里看到的是，id 为 <code>list-content</code>。记下此 <code>id</code>。</p>
+<p><img src="http://cdn.kenblog.top/anjuke_find_list_container_list.png" alt></p>
+<h3 id="2-3-详细了解目标元素-dom-结构"><a href="#2-3-详细了解目标元素-dom-结构" class="headerlink" title="2.3 详细了解目标元素 dom 结构"></a>2.3 详细了解目标元素 dom 结构</h3><p>在开发者工具控制台(Console)中，输入 <code>document.getElementById(&#39;list-content&#39;)</code> 回车。逐次展开 dom 树，找到目标数据所在的元素。下图标注出了本文目标数据字段所在的 dom 元素:</p>
+<ul>
+<li>name: 楼盘名称</li>
+<li>price: 价格</li>
+<li>address 地址</li>
+<li>latitude: 地图位置 纬度</li>
+<li>longitude: 地图位置 经度</li>
+</ul>
+<p><img src="http://cdn.kenblog.top/anjuke_anlysis_dom.png" alt></p>
+<h3 id="2-4-http-请求头"><a href="#2-4-http-请求头" class="headerlink" title="2.4 http 请求头"></a>2.4 http 请求头</h3><p>为了模拟（伪装）用户访问页面，最重要的就是获取浏览器正常请求页面数据的 http 请求头，并在 requests 中设置一样的请求头。其中最重要的请求头部字段就是 <code>user-agent</code> 用户代理。它是服务端用来辨别用户当前访问的设备，操作系统版本，浏览器厂商等信息的重要依据。另外部分网站，也会设置 cookie 字段，存储用户本次访问的会话信息，其中可能也包含了数据访问的权限信息，这种情况下，为了能正确抓取到数据，就必须提供此字段。如果不想做那么多分析，可以简单粗暴的直接将整个 header 复制使用。</p>
+<p><img src="http://cdn.kenblog.top/anjuke_http_headers.png" alt></p>
+<h2 id="3-抓取数据"><a href="#3-抓取数据" class="headerlink" title="3. 抓取数据"></a>3. 抓取数据</h2><h3 id="3-1-根据分页和-cookie-生成-http-请求头"><a href="#3-1-根据分页和-cookie-生成-http-请求头" class="headerlink" title="3.1 根据分页和 cookie 生成 http 请求头"></a>3.1 根据分页和 cookie 生成 http 请求头</h3><p>经过第 2 小节的分析，发现，http 请求头中包含了分页信息和 cookie 。因此，我需要提供一个函数，动态生成 headers 。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_headers</span><span class="params">(page, cookie)</span>:</span></span><br><span class="line">    headers = &#123;</span><br><span class="line">        <span class="string">'authority'</span>: <span class="string">'bannan.anjuke.com'</span>,</span><br><span class="line">        <span class="string">'method'</span>: <span class="string">'GET'</span>,</span><br><span class="line">        <span class="string">'path'</span>: <span class="string">'/community/p&#123;&#125;/'</span>.format(page),</span><br><span class="line">        <span class="string">'scheme'</span>: <span class="string">'https'</span>,</span><br><span class="line">        <span class="string">'accept'</span>: <span class="string">'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3'</span>,</span><br><span class="line">        <span class="string">'accept-encoding'</span>: <span class="string">'gzip, deflate, br'</span>,</span><br><span class="line">        <span class="string">'accept-language'</span>: <span class="string">'zh-CN,zh;q=0.9'</span>,</span><br><span class="line">        <span class="string">'cache-control'</span>: <span class="string">'no-cache'</span>,</span><br><span class="line">        <span class="string">'cookie'</span>: cookie,</span><br><span class="line">        <span class="string">'pragma'</span>: <span class="string">'no-cache'</span>,</span><br><span class="line">        <span class="string">'referer'</span>: <span class="string">'https://bannan.anjuke.com/community/p1/'</span>,</span><br><span class="line">        <span class="string">'sec-fetch-mode'</span>: <span class="string">'navigate'</span>,</span><br><span class="line">        <span class="string">'sec-fetch-site'</span>: <span class="string">'none'</span>,</span><br><span class="line">        <span class="string">'sec-fetch-user'</span>: <span class="string">'?1'</span>,</span><br><span class="line">        <span class="string">'upgrade-insecure-requests'</span>: <span class="string">'1'</span>,</span><br><span class="line">        <span class="string">'user-agent'</span>: <span class="string">'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36'</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> headers</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-抓取分页-html"><a href="#3-2-抓取分页-html" class="headerlink" title="3.2 抓取分页 html"></a>3.2 抓取分页 html</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_html_by_page</span><span class="params">(page, cookie)</span>:</span></span><br><span class="line">    headers = get_headers(page, cookie)</span><br><span class="line">    url = <span class="string">'https://bannan.anjuke.com/community/p&#123;&#125;/'</span>.format(page)</span><br><span class="line">    res = requests.get(url, headers=headers)</span><br><span class="line">    <span class="keyword">if</span> res.status_code != <span class="number">200</span>:</span><br><span class="line">        print(<span class="string">'页面不存在！'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    <span class="keyword">return</span> res.text</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-使用-beautifulsoup-从-html-提取原始数据"><a href="#3-3-使用-beautifulsoup-从-html-提取原始数据" class="headerlink" title="3.3 使用 beautifulsoup 从 html 提取原始数据"></a>3.3 使用 beautifulsoup 从 html 提取原始数据</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">extract_data_from_html</span><span class="params">(html)</span>:</span></span><br><span class="line">    soup = BeautifulSoup(html)</span><br><span class="line">    list_content = soup.find(id=<span class="string">"list-content"</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> list_content:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    items = list_content.find_all(<span class="string">'div'</span>, class_=<span class="string">'li-itemmod'</span>)</span><br><span class="line">    <span class="keyword">if</span> len(items) == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    <span class="keyword">return</span> [extract_data(item) <span class="keyword">for</span> item <span class="keyword">in</span> items]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">extract_data</span><span class="params">(item)</span>:</span></span><br><span class="line">    name = item.find_all(<span class="string">'a'</span>)[<span class="number">1</span>].text.strip()</span><br><span class="line">    address = item.address.text.strip()</span><br><span class="line">    <span class="keyword">if</span> item.strong <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        price = item.strong.text.strip()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        price = <span class="literal">None</span></span><br><span class="line">    finish_date = item.p.text.strip().split(<span class="string">'：'</span>)[<span class="number">1</span>]</span><br><span class="line">    latitude, longitude = [d.split(<span class="string">'='</span>)[<span class="number">1</span>] <span class="keyword">for</span> d <span class="keyword">in</span> item.find_all(<span class="string">'a'</span>)[<span class="number">3</span>].attrs[<span class="string">'href'</span>].split(<span class="string">'#'</span>)[<span class="number">1</span>].split(<span class="string">'&amp;'</span>)[:<span class="number">2</span>]]</span><br><span class="line">    <span class="keyword">return</span> name, address, price, finish_date, latitude, longitude</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-4-自动抓取所有分页数据"><a href="#3-4-自动抓取所有分页数据" class="headerlink" title="3.4 自动抓取所有分页数据"></a>3.4 自动抓取所有分页数据</h3><p>需要按照 2.4 节的方法，拿到 cookie 字段。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">crawl_all_page</span><span class="params">(cookie)</span>:</span></span><br><span class="line">    page = <span class="number">1</span></span><br><span class="line">    data_raw = []</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            html = get_html_by_page(page, cookie)</span><br><span class="line">            data_page = extract_data_from_html(html)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> data_page:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            data_raw += data_page</span><br><span class="line">            print(<span class="string">'crawling &#123;&#125;th page ...'</span>.format(page))</span><br><span class="line">            page += <span class="number">1</span></span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            print(<span class="string">'maybe cookie expired!'</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    print(<span class="string">'crawl &#123;&#125; pages in total.'</span>.format(page<span class="number">-1</span>))</span><br><span class="line">    <span class="keyword">return</span> data_raw</span><br><span class="line"></span><br><span class="line">cookie = <span class="string">'sessid=5AACB464-68A3-1132-E56A-7007F6323355; aQQ_ajkguid=25950BC0-9084-8ACD-F8A7-FDEBE6DF8793; lps=http%3A%2F%2Fwww.anjuke.com%2F%7Chttps%3A%2F%2Fwww.google.com%2F; twe=2; _ga=GA1.2.2115950241.1568515091; _gid=GA1.2.839627504.1568515091; 58tj_uuid=45e69d63-c5ab-4ad6-938c-6edd66eef087; als=0; ajk_member_verify=NpO6n%2BqnF1Ds%2B23tcJKGqCTXlstO1rCj6KaJ14fZr%2Bw%3D; ajk_member_verify2=MTcwOTYyMDk4fENYYk1GMDh8MQ%3D%3D; ctid=303; wmda_uuid=43cb2e45627baaed049809735d96ddc0; wmda_new_uuid=1; wmda_visited_projects=%3B6289197098934; ajk_member_captcha=8c6573731e7ad38bb32372409461bb94; wmda_session_id_6289197098934=1568603284258-3d374e88-7575-dd0d; new_session=1; init_refer=https%253A%252F%252Fwww.anjuke.com%252Fcaptcha-verify%252F%253Fcallback%253Dshield%2526from%253Dantispam%2526serialID%253Dabc4a77486bb629207f53adfd9fd41d8_8635cc4b8554447d8ff882870fd38edf%2526history%253DaHR0cHM6Ly9iYW5uYW4uYW5qdWtlLmNvbS9jb21tdW5pdHkvP2Zyb209bmF2aWdhdGlvbg%25253D%25253D; new_uv=7; __xsptplusUT_8=1; ajkAuthTicket=TT=2ba4d5d3bafb50600cef42b5c9ba9490&amp;TS=1568603284903&amp;PBODY=GHpJ_2vcmP0mvWXGapl7PxF_tEdjOJPOhfneYajD8eY_73T9SP5GP7Y57yd2WFECnSK9nMzV8jySm1lE9_I8r86kK5rOr0dDDKJn6KdQpbMXbhdr3I67d56f3XJmGJArmuqIoBoMcoDw_5cDDPVVfkCNYdMlQ97YfVtb2DxtizU&amp;VER=2; __xsptplus8=8.7.1568603285.1568603285.1%233%7Cwww.google.com%7C%7C%7C%7C%23%23PcwYzNJmsyogWc2ohLkJ8TYAknaOVFpc%23'</span></span><br><span class="line"></span><br><span class="line">data_raw = crawl_all_page(cookie)</span><br></pre></td></tr></table></figure>
+
+<pre><code>crawling 1th page ...
+crawling 2th page ...
+crawling 3th page ...
+crawling 4th page ...
+crawling 5th page ...
+crawling 6th page ...
+crawling 7th page ...
+crawling 8th page ...
+crawling 9th page ...
+crawl 9 pages in total.</code></pre><h2 id="4-分析数据"><a href="#4-分析数据" class="headerlink" title="4. 分析数据"></a>4. 分析数据</h2><h3 id="4-1-创建-pandas-DataFrame-对象"><a href="#4-1-创建-pandas-DataFrame-对象" class="headerlink" title="4.1 创建 pandas.DataFrame 对象"></a>4.1 创建 <code>pandas.DataFrame</code> 对象</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">columns = [<span class="string">'name'</span>, <span class="string">'address'</span>, <span class="string">'price'</span>, <span class="string">'finish_date'</span>, <span class="string">'latitude'</span>, <span class="string">'longitude'</span>]</span><br><span class="line"></span><br><span class="line">df = pd.DataFrame(data_raw, columns=columns)</span><br><span class="line"></span><br><span class="line">print(<span class="string">'&#123;&#125; records.'</span>.format(df.shape[<span class="number">0</span>]))</span><br><span class="line"></span><br><span class="line">df.tail()</span><br></pre></td></tr></table></figure>
+
+<pre><code>253 records.</code></pre><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}</code></pre><p></style><p></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>address</th>
+      <th>price</th>
+      <th>finish_date</th>
+      <th>latitude</th>
+      <th>longitude</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>248</td>
+      <td>彼岸山水</td>
+      <td>［景洪市-龙舟广场］港口路8号</td>
+      <td>None</td>
+      <td>暂无数据</td>
+      <td>22.018101</td>
+      <td>100.809965</td>
+    </tr>
+    <tr>
+      <td>249</td>
+      <td>半岛至尊</td>
+      <td>［景洪市-龙舟广场］清泉路</td>
+      <td>None</td>
+      <td>2011</td>
+      <td>22.007566</td>
+      <td>100.765688</td>
+    </tr>
+    <tr>
+      <td>250</td>
+      <td>缤纷公寓</td>
+      <td>［景洪市-龙舟广场］港口路,近景亮路</td>
+      <td>None</td>
+      <td>暂无数据</td>
+      <td>22.02065</td>
+      <td>100.809476</td>
+    </tr>
+    <tr>
+      <td>251</td>
+      <td>碧水花园</td>
+      <td>［景洪市-龙舟广场］坝吉路32号</td>
+      <td>None</td>
+      <td>暂无数据</td>
+      <td>21.98705</td>
+      <td>100.805573</td>
+    </tr>
+    <tr>
+      <td>252</td>
+      <td>安厦雨林圣堤亚纳</td>
+      <td>［景洪市-龙舟广场］勐泐大道,近菩提大道</td>
+      <td>None</td>
+      <td>2012</td>
+      <td>21.969016</td>
+      <td>100.804316</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<h3 id="4-2-随机取样分析"><a href="#4-2-随机取样分析" class="headerlink" title="4.2 随机取样分析"></a>4.2 随机取样分析</h3><p>使用 sample() 方法，传入随机取样的数量。相对于使用 head() 和 tail() 方法，更能从统计学上了解数据的特点。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df.sample(<span class="number">5</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}</code></pre><p></style><p></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>address</th>
+      <th>price</th>
+      <th>finish_date</th>
+      <th>latitude</th>
+      <th>longitude</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>142</td>
+      <td>阳光城</td>
+      <td>［景洪市-龙舟广场］宣慰大道122号</td>
+      <td>8000</td>
+      <td>暂无数据</td>
+      <td>22.005098</td>
+      <td>100.793373</td>
+    </tr>
+    <tr>
+      <td>213</td>
+      <td>福光小区</td>
+      <td>［景洪市-龙舟广场］曼它拉路522号</td>
+      <td>None</td>
+      <td>暂无数据</td>
+      <td>21.486319</td>
+      <td>101.570071</td>
+    </tr>
+    <tr>
+      <td>245</td>
+      <td>大曼么小区</td>
+      <td>［景洪市-龙舟广场］勐海路92号</td>
+      <td>None</td>
+      <td>暂无数据</td>
+      <td>21.997218</td>
+      <td>100.778</td>
+    </tr>
+    <tr>
+      <td>51</td>
+      <td>梦云南雨林澜山</td>
+      <td>［景洪市-龙舟广场］榕林大道</td>
+      <td>15007</td>
+      <td>暂无数据</td>
+      <td>21.977488</td>
+      <td>100.830815</td>
+    </tr>
+    <tr>
+      <td>133</td>
+      <td>雨林佳苑(别墅)</td>
+      <td>［勐腊县-雨林广场］相思路,近山榕路</td>
+      <td>15862</td>
+      <td>暂无数据</td>
+      <td>21.455503</td>
+      <td>101.557166</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<h3 id="4-3-房价数据清洗"><a href="#4-3-房价数据清洗" class="headerlink" title="4.3  房价数据清洗"></a>4.3  房价数据清洗</h3><p>通过随机取样，发现房价字段 <code>price</code> 有不少缺失数据(None)，影响到下一步的数据统计分析。因此，需要对数据进行清洗和预处理。</p>
+<h4 id="4-3-1-查看房价缺失数据数量"><a href="#4-3-1-查看房价缺失数据数量" class="headerlink" title="4.3.1 查看房价缺失数据数量"></a>4.3.1 查看房价缺失数据数量</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[df[<span class="string">'price'</span>].isna()].shape[<span class="number">0</span>]</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>73</code></pre><h4 id="4-3-2-删除房价缺失的数据记录"><a href="#4-3-2-删除房价缺失的数据记录" class="headerlink" title="4.3.2  删除房价缺失的数据记录"></a>4.3.2  删除房价缺失的数据记录</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df.dropna(subset=[<span class="string">'price'</span>], inplace=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">print(<span class="string">'&#123;&#125; records after drop missing-data.'</span>.format(df.shape[<span class="number">0</span>]))</span><br></pre></td></tr></table></figure>
+
+<pre><code>180 records after drop missing-data.</code></pre><h4 id="4-3-3-转换数值数据类型为浮点型"><a href="#4-3-3-转换数值数据类型为浮点型" class="headerlink" title="4.3.3 转换数值数据类型为浮点型"></a>4.3.3 转换数值数据类型为浮点型</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">df = df.astype(&#123;<span class="string">'price'</span>: <span class="string">'float64'</span>, <span class="string">'latitude'</span>: <span class="string">'float64'</span>, <span class="string">'longitude'</span>: <span class="string">'float64'</span>&#125;)</span><br><span class="line"></span><br><span class="line">df.sample(<span class="number">5</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}</code></pre><p></style><p></p>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>address</th>
+      <th>price</th>
+      <th>finish_date</th>
+      <th>latitude</th>
+      <th>longitude</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>129</td>
+      <td>冠城时代广场</td>
+      <td>［勐海县-景管路］景管路400号</td>
+      <td>8870.0</td>
+      <td>暂无数据</td>
+      <td>21.961283</td>
+      <td>100.442164</td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>阳光假日</td>
+      <td>［景洪市-龙舟广场］勐泐大道46号</td>
+      <td>7708.0</td>
+      <td>2017</td>
+      <td>22.005886</td>
+      <td>100.796546</td>
+    </tr>
+    <tr>
+      <td>82</td>
+      <td>世纪新城</td>
+      <td>［景洪市-龙舟广场］勐渤大道71号</td>
+      <td>10540.0</td>
+      <td>暂无数据</td>
+      <td>21.991023</td>
+      <td>100.801773</td>
+    </tr>
+    <tr>
+      <td>73</td>
+      <td>兴豪门</td>
+      <td>［景洪市-龙舟广场］澜沧江路5号</td>
+      <td>7773.0</td>
+      <td>2014</td>
+      <td>22.021178</td>
+      <td>100.812162</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>绿城春江明月</td>
+      <td>［景洪市-龙舟广场］勐泐大道75号</td>
+      <td>11079.0</td>
+      <td>暂无数据</td>
+      <td>21.987411</td>
+      <td>100.801050</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<h3 id="4-4-统计分析"><a href="#4-4-统计分析" class="headerlink" title="4.4 统计分析"></a>4.4 统计分析</h3><h4 id="4-4-1-最高房价"><a href="#4-4-1-最高房价" class="headerlink" title="4.4.1 最高房价"></a>4.4.1 最高房价</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">'price'</span>].max()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>35748.0</code></pre><h4 id="4-4-2-最低房价"><a href="#4-4-2-最低房价" class="headerlink" title="4.4.2 最低房价"></a>4.4.2 最低房价</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">'price'</span>].min()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>3858.0</code></pre><h4 id="4-4-3-平均房价"><a href="#4-4-3-平均房价" class="headerlink" title="4.4.3 平均房价"></a>4.4.3 平均房价</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">'price'</span>].mean()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>9450.638888888889</code></pre><h4 id="4-4-4-房价中位数"><a href="#4-4-4-房价中位数" class="headerlink" title="4.4.4 房价中位数"></a>4.4.4 房价中位数</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">'price'</span>].median()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>8793.0</code></pre><h4 id="4-4-5-房价分布标准差"><a href="#4-4-5-房价分布标准差" class="headerlink" title="4.4.5 房价分布标准差"></a>4.4.5 房价分布标准差</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df[<span class="string">'price'</span>].std()</span><br></pre></td></tr></table></figure>
+
+
+
+
+<pre><code>3626.466118872251</code></pre><h2 id="5-数据可视化"><a href="#5-数据可视化" class="headerlink" title="5. 数据可视化"></a>5. 数据可视化</h2><p>绘制房价分布直方图：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">fig, ax = plt.subplots()</span><br><span class="line">df.plot(y=<span class="string">'price'</span>, ax=ax, bins=<span class="number">20</span>, kind=<span class="string">'hist'</span>, label=<span class="string">'房价频率直方图'</span>, legend=<span class="literal">False</span>)</span><br><span class="line">ax.set_title(<span class="string">'房价分布直方图'</span>)</span><br><span class="line">ax.set_xlabel(<span class="string">'房价'</span>)</span><br><span class="line">ax.set_ylabel(<span class="string">'频率'</span>)</span><br><span class="line">plt.grid()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/anjuke_banna_house_price_hist.png" alt></p>
+<h2 id="6-命令行运行"><a href="#6-命令行运行" class="headerlink" title="6. 命令行运行"></a>6. 命令行运行</h2><h3 id="6-1-代码封装"><a href="#6-1-代码封装" class="headerlink" title="6.1 代码封装"></a>6.1 代码封装</h3><p>将以下代码保存到文件 crawl_anjuke.py：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/local/bin/python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_headers</span><span class="params">(page, cookie)</span>:</span></span><br><span class="line">    headers = &#123;</span><br><span class="line">        <span class="string">'authority'</span>: <span class="string">'bannan.anjuke.com'</span>,</span><br><span class="line">        <span class="string">'method'</span>: <span class="string">'GET'</span>,</span><br><span class="line">        <span class="string">'path'</span>: <span class="string">'/community/p&#123;&#125;/'</span>.format(page),</span><br><span class="line">        <span class="string">'scheme'</span>: <span class="string">'https'</span>,</span><br><span class="line">        <span class="string">'accept'</span>: <span class="string">'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3'</span>,</span><br><span class="line">        <span class="string">'accept-encoding'</span>: <span class="string">'gzip, deflate, br'</span>,</span><br><span class="line">        <span class="string">'accept-language'</span>: <span class="string">'zh-CN,zh;q=0.9'</span>,</span><br><span class="line">        <span class="string">'cache-control'</span>: <span class="string">'no-cache'</span>,</span><br><span class="line">        <span class="string">'cookie'</span>: cookie,</span><br><span class="line">        <span class="string">'pragma'</span>: <span class="string">'no-cache'</span>,</span><br><span class="line">        <span class="string">'referer'</span>: <span class="string">'https://bannan.anjuke.com/community/p1/'</span>,</span><br><span class="line">        <span class="string">'sec-fetch-mode'</span>: <span class="string">'navigate'</span>,</span><br><span class="line">        <span class="string">'sec-fetch-site'</span>: <span class="string">'none'</span>,</span><br><span class="line">        <span class="string">'sec-fetch-user'</span>: <span class="string">'?1'</span>,</span><br><span class="line">        <span class="string">'upgrade-insecure-requests'</span>: <span class="string">'1'</span>,</span><br><span class="line">        <span class="string">'user-agent'</span>: <span class="string">'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36'</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> headers</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_html_by_page</span><span class="params">(page, cookie)</span>:</span></span><br><span class="line">    headers = get_headers(page, cookie)</span><br><span class="line">    url = <span class="string">'https://bannan.anjuke.com/community/p&#123;&#125;/'</span>.format(page)</span><br><span class="line">    res = requests.get(url, headers=headers)</span><br><span class="line">    <span class="keyword">if</span> res.status_code != <span class="number">200</span>:</span><br><span class="line">        print(<span class="string">'页面不存在！'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    <span class="keyword">return</span> res.text</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">extract_data_from_html</span><span class="params">(html)</span>:</span></span><br><span class="line">    soup = BeautifulSoup(html)</span><br><span class="line">    list_content = soup.find(id=<span class="string">"list-content"</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> list_content:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    items = list_content.find_all(<span class="string">'div'</span>, class_=<span class="string">'li-itemmod'</span>)</span><br><span class="line">    <span class="keyword">if</span> len(items) == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">    <span class="keyword">return</span> [extract_data(item) <span class="keyword">for</span> item <span class="keyword">in</span> items]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">extract_data</span><span class="params">(item)</span>:</span></span><br><span class="line">    name = item.find_all(<span class="string">'a'</span>)[<span class="number">1</span>].text.strip()</span><br><span class="line">    address = item.address.text.strip()</span><br><span class="line">    <span class="keyword">if</span> item.strong <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        price = item.strong.text.strip()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        price = <span class="literal">None</span></span><br><span class="line">    finish_date = item.p.text.strip().split(<span class="string">'：'</span>)[<span class="number">1</span>]</span><br><span class="line">    latitude, longitude = [d.split(<span class="string">'='</span>)[<span class="number">1</span>] <span class="keyword">for</span> d <span class="keyword">in</span> item.find_all(<span class="string">'a'</span>)[<span class="number">3</span>].attrs[<span class="string">'href'</span>].split(<span class="string">'#'</span>)[<span class="number">1</span>].split(<span class="string">'&amp;'</span>)[:<span class="number">2</span>]]</span><br><span class="line">    <span class="keyword">return</span> name, address, price, finish_date, latitude, longitude</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">crawl_all_page</span><span class="params">(cookie)</span>:</span></span><br><span class="line">    page = <span class="number">1</span></span><br><span class="line">    data_raw = []</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            html = get_html_by_page(page, cookie)</span><br><span class="line">            data_page = extract_data_from_html(html)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> data_page:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            data_raw += data_page</span><br><span class="line">            print(<span class="string">'crawling &#123;&#125;th page ...'</span>.format(page))</span><br><span class="line">            page += <span class="number">1</span></span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            print(<span class="string">'maybe cookie expired!'</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    print(<span class="string">'crawl &#123;&#125; pages in total.'</span>.format(page<span class="number">-1</span>))</span><br><span class="line">    <span class="keyword">return</span> data_raw</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_df</span><span class="params">(data)</span>:</span></span><br><span class="line">    columns = [<span class="string">'name'</span>, <span class="string">'address'</span>, <span class="string">'price'</span>, <span class="string">'finish_date'</span>, <span class="string">'latitude'</span>, <span class="string">'longitude'</span>]</span><br><span class="line">    <span class="keyword">return</span> pd.DataFrame(data, columns=columns)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">clean_data</span><span class="params">(df)</span>:</span></span><br><span class="line">    df.dropna(subset=[<span class="string">'price'</span>], inplace=<span class="literal">True</span>)</span><br><span class="line">    df = df.astype(&#123;<span class="string">'price'</span>: <span class="string">'float64'</span>, <span class="string">'latitude'</span>: <span class="string">'float64'</span>, <span class="string">'longitude'</span>: <span class="string">'float64'</span>&#125;)</span><br><span class="line">    <span class="keyword">return</span> df</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">visual</span><span class="params">(df)</span>:</span></span><br><span class="line">    fig, ax = plt.subplots()</span><br><span class="line">    df.plot(y=<span class="string">'price'</span>, ax=ax, bins=<span class="number">20</span>, kind=<span class="string">'hist'</span>, label=<span class="string">'房价频率直方图'</span>, legend=<span class="literal">False</span>)</span><br><span class="line">    ax.set_title(<span class="string">'房价分布直方图'</span>)</span><br><span class="line">    ax.set_xlabel(<span class="string">'房价'</span>)</span><br><span class="line">    ax.set_ylabel(<span class="string">'频率'</span>)</span><br><span class="line">    plt.grid()</span><br><span class="line">    plt.show()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(cookie)</span>:</span></span><br><span class="line">    data = crawl_all_page(cookie)</span><br><span class="line">    df = create_df(data)</span><br><span class="line">    df = clean_data(df)</span><br><span class="line">    visual(df)</span><br><span class="line">    df.sort_values(<span class="string">'price'</span>, inplace=<span class="literal">True</span>)</span><br><span class="line">    df.reset_index(drop=<span class="literal">True</span>, inplace=<span class="literal">True</span>)</span><br><span class="line">    <span class="comment">#  保存 csv 文件</span></span><br><span class="line">    filename = time.strftime(<span class="string">"%Y-%m-%d"</span>, time.localtime())</span><br><span class="line">    csv_file = filename + <span class="string">'.csv'</span></span><br><span class="line">    df.to_csv(<span class="string">'anjuke_banna_house_price.csv'</span>, index=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_cli_args</span><span class="params">()</span>:</span></span><br><span class="line">    parser = argparse.ArgumentParser()</span><br><span class="line">    parser.add_argument(<span class="string">'-c'</span>, <span class="string">'--cookie'</span>, type=str, help=<span class="string">'cookie.'</span>)</span><br><span class="line">    args = parser.parse_args()</span><br><span class="line">    <span class="keyword">return</span> args</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    args = get_cli_args()</span><br><span class="line">    run(args.cookie)</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-命令行运行"><a href="#6-2-命令行运行" class="headerlink" title="6.2 命令行运行"></a>6.2 命令行运行</h3><p>cookie 获取方式，参考 2.4 小节。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python crawl_anjuke.py --cookie <span class="string">"sessid=5AACB464-68A3-1132-E56A-7007F6..."</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><em>warm tips: 数据保存可参考 <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vcG9zdC81ZDc5ODQ3NDUxODgyNTY0M2ExMGNmYTg=" title="https://juejin.im/post/5d798474518825643a10cfa8">python 自动抓取分析文章阅读量——掘金专栏版<i class="fa fa-external-link"></i></span> 第 5 小节.</em></p>
+<h2 id="猜你喜欢"><a href="#猜你喜欢" class="headerlink" title="猜你喜欢"></a>猜你喜欢</h2><ul>
+<li>[1] <a href="http://kenblog.top/?p=76">python 数据分析工具包 pandas（一）</a></li>
+<li>[2] <a href="http://kenblog.top/?p=69">python 数据可视化工具包 matplotlib</a></li>
+</ul>
+<hr>
+<p>坚持写专栏不易，如果觉得本文对你有帮助，记得点个赞。感谢支持！</p>
+<ul>
+<li>个人网站: <a href="https://kenblog.top/">https://kenblog.top</a></li>
+<li>github 站点: <span class="exturl" data-url="aHR0cHM6Ly9rZW5ibGlreWxlZS5naXRodWIuaW8v" title="https://kenblikylee.github.io/">https://kenblikylee.github.io<i class="fa fa-external-link"></i></span></li>
+<li>掘金: <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vdXNlci81YmQyYjhiMjUxODgyNTJhNzg0ZDE5ZDcvcG9zdHM=" title="https://juejin.im/user/5bd2b8b25188252a784d19d7/posts">https://juejin.im/user/5bd2b8b25188252a784d19d7<i class="fa fa-external-link"></i></span></li>
+<li>知乎: <span class="exturl" data-url="aHR0cHM6Ly93d3cuemhpaHUuY29tL3Blb3BsZS9rZW5ibGlreS9wb3N0cw==" title="https://www.zhihu.com/people/kenbliky/posts">https://www.zhihu.com/people/kenbliky/posts<i class="fa fa-external-link"></i></span></li>
+<li>CSDN: <span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zNzU0MzczMQ==" title="https://blog.csdn.net/weixin_37543731">https://blog.csdn.net/weixin_37543731<i class="fa fa-external-link"></i></span></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="ken wechat" style="width: 200px; max-width: 100%;">
+  <div>微信扫描二维码，第一时间收到最新原创文章！</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="ken 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="ken 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/09/16/python-crawl-anjuke/" title="python 自动抓取分析房价数据——安居客版">http://kenblog.top/2019/09/16/python-crawl-anjuke/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/python-%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB-%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag"># python 网络爬虫 数据分析</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/11/python-crawl-juejin/" rel="next" title="python 自动抓取分析文章阅读量——掘金专栏版">
+                  <i class="fa fa-chevron-left"></i> python 自动抓取分析文章阅读量——掘金专栏版
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/17/python-crawl-anjuke2/" rel="prev" title="python 命令行抓取分析北上广深房价数据">
+                  python 命令行抓取分析北上广深房价数据 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-准备工作"><span class="nav-number">2.</span> <span class="nav-text">1. 准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-用到技术"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 用到技术</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-安装"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-导入"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 导入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-页面分析"><span class="nav-number">3.</span> <span class="nav-text">2. 页面分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-打开页面"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 打开页面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-定位目标元素选择器"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 定位目标元素选择器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-详细了解目标元素-dom-结构"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 详细了解目标元素 dom 结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-http-请求头"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 http 请求头</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-抓取数据"><span class="nav-number">4.</span> <span class="nav-text">3. 抓取数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-根据分页和-cookie-生成-http-请求头"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 根据分页和 cookie 生成 http 请求头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-抓取分页-html"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 抓取分页 html</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-使用-beautifulsoup-从-html-提取原始数据"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 使用 beautifulsoup 从 html 提取原始数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-自动抓取所有分页数据"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 自动抓取所有分页数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-分析数据"><span class="nav-number">5.</span> <span class="nav-text">4. 分析数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-创建-pandas-DataFrame-对象"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 创建 pandas.DataFrame 对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-随机取样分析"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 随机取样分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-房价数据清洗"><span class="nav-number">5.3.</span> <span class="nav-text">4.3  房价数据清洗</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-1-查看房价缺失数据数量"><span class="nav-number">5.3.1.</span> <span class="nav-text">4.3.1 查看房价缺失数据数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-2-删除房价缺失的数据记录"><span class="nav-number">5.3.2.</span> <span class="nav-text">4.3.2  删除房价缺失的数据记录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-3-转换数值数据类型为浮点型"><span class="nav-number">5.3.3.</span> <span class="nav-text">4.3.3 转换数值数据类型为浮点型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-统计分析"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 统计分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-1-最高房价"><span class="nav-number">5.4.1.</span> <span class="nav-text">4.4.1 最高房价</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-2-最低房价"><span class="nav-number">5.4.2.</span> <span class="nav-text">4.4.2 最低房价</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-3-平均房价"><span class="nav-number">5.4.3.</span> <span class="nav-text">4.4.3 平均房价</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-4-房价中位数"><span class="nav-number">5.4.4.</span> <span class="nav-text">4.4.4 房价中位数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-5-房价分布标准差"><span class="nav-number">5.4.5.</span> <span class="nav-text">4.4.5 房价分布标准差</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-数据可视化"><span class="nav-number">6.</span> <span class="nav-text">5. 数据可视化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-命令行运行"><span class="nav-number">7.</span> <span class="nav-text">6. 命令行运行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-代码封装"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 代码封装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-命令行运行"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 命令行运行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#猜你喜欢"><span class="nav-number">8.</span> <span class="nav-text">猜你喜欢</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/ken_red.jpg"
+      alt="ken">
+  <p class="site-author-name" itemprop="name">ken</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">35</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
