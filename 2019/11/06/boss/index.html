@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="昨天一个朋友说最近想换工作。想让我帮看下Boss现在的招聘情况如何。正好想到上个月写了个开源爬虫框架kcrawler，最后添加了一个Boss类支持，可以实现快速根据关键词查询不同岗位，不同行业的的招聘情况。有现成可用的库，帮助朋友也是举手之劳。 1. 安装kcrawler是开源的。开发同学可以选择clone源码。但是如果想省事，就直接pip install，然后导入项目使用即可。 1pip ins">
+<meta name="keywords" content="Boss,kcrawler,python,网络爬虫">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单好用的Boss岗位搜索库(附github链接)">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;11&#x2F;06&#x2F;boss&#x2F;index.html">
+<meta property="og:site_name" content="ken爱编程">
+<meta property="og:description" content="昨天一个朋友说最近想换工作。想让我帮看下Boss现在的招聘情况如何。正好想到上个月写了个开源爬虫框架kcrawler，最后添加了一个Boss类支持，可以实现快速根据关键词查询不同岗位，不同行业的的招聘情况。有现成可用的库，帮助朋友也是举手之劳。 1. 安装kcrawler是开源的。开发同学可以选择clone源码。但是如果想省事，就直接pip install，然后导入项目使用即可。 1pip ins">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-05T23:13:05.207Z">
+<meta name="twitter:card" content="summary">
+  <link rel="canonical" href="http://kenblog.top/2019/11/06/boss/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>简单好用的Boss岗位搜索库(附github链接) | ken爱编程</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ken爱编程</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">「ws1txqs」我是一条小青蛇</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">61</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">39</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-微信">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/ps/weixin.html" rel="section"><i class="fa fa-fw fa-weixin"></i>微信</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-云+">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9jbG91ZC50ZW5jZW50LmNvbS9kZXZlbG9wZXIvdXNlci82NTAzNDM2L2FydGljbGVz"><i class="fa fa-fw fa-qq"></i>云+</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-掘金">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vdXNlci81YmQyYjhiMjUxODgyNTJhNzg0ZDE5ZDcvcG9zdHM="><i class="fa fa-fw fa-link"></i>掘金</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-web">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/web/" rel="section"><i class="fa fa-fw fa-compass"></i>web</a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/11/06/boss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ken">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/ken_red.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ken爱编程">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            简单好用的Boss岗位搜索库(附github链接)
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-11-06 07:09:16 / 修改时间：07:13:05" itemprop="dateCreated datePublished" datetime="2019-11-06T07:09:16+08:00">2019-11-06</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>昨天一个朋友说最近想换工作。想让我帮看下Boss现在的招聘情况如何。正好想到上个月写了个开源爬虫框架<code>kcrawler</code>，最后添加了一个<code>Boss</code>类支持，可以实现快速根据关键词查询不同岗位，不同行业的的招聘情况。有现成可用的库，帮助朋友也是举手之劳。</p>
+<h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h2><p><code>kcrawler</code>是开源的。开发同学可以选择<code>clone</code>源码。但是如果想省事，就直接<code>pip install</code>，然后导入项目使用即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install kcrawler</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-使用"><a href="#2-使用" class="headerlink" title="2. 使用"></a>2. 使用</h2><p>提供两个类。</p>
+<ul>
+<li>Crawler: 简单配置爬取任意网站</li>
+<li>Boss: Boss爬取专用</li>
+</ul>
+<h3 id="2-1-爬虫基类-Crawler"><a href="#2-1-爬虫基类-Crawler" class="headerlink" title="2.1 爬虫基类 Crawler"></a>2.1 爬虫基类 Crawler</h3><p><code>kcrawler</code> 提供了一个爬虫基类 <code>Crawler</code> , 它封装了一个通用型爬虫的基础功能。通过传入配置字典来实例化一个网站的<code>crawler</code>对象，然后调用对象的<code>crawler</code>方法，即可实现指定目标数据的爬取。支持html,json,图像的爬取。以下为<code>Boss</code>的配置示例。</p>
+<a id="more"></a>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">queryjobpage_url</span><span class="params">(x)</span>:</span></span><br><span class="line">    p = list()</span><br><span class="line">    <span class="keyword">if</span> x[<span class="number">0</span>]:</span><br><span class="line">        p.append(<span class="string">'i'</span> + str(x[<span class="number">0</span>]))</span><br><span class="line">    <span class="keyword">if</span> x[<span class="number">1</span>]:</span><br><span class="line">        p.append(<span class="string">'c'</span> + str(x[<span class="number">1</span>]))</span><br><span class="line">    <span class="keyword">if</span> x[<span class="number">2</span>]:</span><br><span class="line">        p.append(<span class="string">'p'</span> + str(x[<span class="number">2</span>]))</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'https://www.zhipin.com/&#123;&#125;/'</span>.format(<span class="string">'-'</span>.join(p))</span><br><span class="line"></span><br><span class="line">config = &#123;</span><br><span class="line">    <span class="string">'targets'</span>: &#123;</span><br><span class="line">        <span class="string">'city'</span>: &#123;</span><br><span class="line">            <span class="string">'url'</span>: <span class="string">'https://www.zhipin.com/wapi/zpCommon/data/city.json'</span>,</span><br><span class="line">            <span class="string">'method'</span>: <span class="string">'get'</span>,</span><br><span class="line">            <span class="string">'type'</span>: <span class="string">'json'</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'position'</span>: &#123;</span><br><span class="line">            <span class="string">'url'</span>: <span class="string">'https://www.zhipin.com/wapi/zpCommon/data/position.json'</span>,</span><br><span class="line">            <span class="string">'method'</span>: <span class="string">'get'</span>,</span><br><span class="line">            <span class="string">'type'</span>: <span class="string">'json'</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'industry'</span>: &#123;</span><br><span class="line">            <span class="string">'url'</span>: <span class="string">'https://www.zhipin.com/wapi/zpCommon/data/oldindustry.json'</span>,</span><br><span class="line">            <span class="string">'method'</span>: <span class="string">'get'</span>,</span><br><span class="line">            <span class="string">'type'</span>: <span class="string">'json'</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'conditions'</span>: &#123;</span><br><span class="line">            <span class="string">'url'</span>: <span class="string">'https://www.zhipin.com/wapi/zpgeek/recommend/conditions.json'</span>,</span><br><span class="line">            <span class="string">'method'</span>: <span class="string">'get'</span>,</span><br><span class="line">            <span class="string">'type'</span>: <span class="string">'json'</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'job'</span>: &#123;</span><br><span class="line">            <span class="string">'url'</span>: <span class="string">'https://www.zhipin.com/wapi/zpgeek/recommend/job/list.json'</span>,</span><br><span class="line">            <span class="string">'method'</span>: <span class="string">'get'</span>,</span><br><span class="line">            <span class="string">'type'</span>: <span class="string">'json'</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'queryjob'</span>: &#123;</span><br><span class="line">            <span class="string">'url'</span>: <span class="string">'https://www.zhipin.com/job_detail/'</span>,</span><br><span class="line">            <span class="string">'method'</span>: <span class="string">'get'</span>,</span><br><span class="line">            <span class="string">'type'</span>: <span class="string">'html'</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'queryjobpage'</span>: &#123;</span><br><span class="line">            <span class="string">'url'</span>: queryjobpage_url,</span><br><span class="line">            <span class="string">'method'</span>: <span class="string">'get'</span>,</span><br><span class="line">            <span class="string">'type'</span>: <span class="string">'html'</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'jobcard'</span>: &#123;</span><br><span class="line">            <span class="string">'url'</span>: <span class="string">'https://www.zhipin.com/wapi/zpgeek/view/job/card.json'</span>,</span><br><span class="line">            <span class="string">'method'</span>: <span class="string">'get'</span>,</span><br><span class="line">            <span class="string">'type'</span>: <span class="string">'json'</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">crawler = Crawler(config)</span><br></pre></td></tr></table></figure>
+
+<p>现在完成了爬虫对象的创建。有过爬虫经验的同学可能已经注意到了，怎么没有<code>headers</code>？事实上，有两种方法传入<code>headers</code>。一种是直接在配置字典<code>config</code>增加<code>headers</code>键值。例如：</p>
+<p>在浏览器里整个复制<code>Request Headers</code>，以文档字符串的形式赋值给变量<code>headers</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">headers = <span class="string">'''</span></span><br><span class="line"><span class="string">:authority: www.zhipin.com</span></span><br><span class="line"><span class="string">:method: GET</span></span><br><span class="line"><span class="string">:path: /</span></span><br><span class="line"><span class="string">....</span></span><br><span class="line"><span class="string">cookie: xxx</span></span><br><span class="line"><span class="string">....</span></span><br><span class="line"><span class="string">user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line">config = &#123;<span class="string">'headers'</span>: headers, <span class="string">'targets'</span>: &#123; ... &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二种推荐的方式是在当前目前下新建一个文件名为<code>headers</code>的文件。以同样的方法在浏览器复制整个<code>headers</code>字符串覆盖这个文件，直接覆盖，不用加文档字符变量。当<code>config</code>字典没有提供<code>headers</code>字段时，<code>Crawler</code>会自动从<code>headers</code>文件读取<code>headers</code>字符串。</p>
+<p>完成以上步骤，即可调用<code>crawler.crawl(target)</code>方法爬取数据了。其中<code>target</code>是配置字典<code>config</code>中<code>targets</code>定义的键。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data = crawler.crawl(<span class="string">'job'</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-Boss-类"><a href="#2-2-Boss-类" class="headerlink" title="2.2 Boss 类"></a>2.2 Boss 类</h3><p>使用<code>Crawler</code>爬取的数据是网站的原始数据的，虽然已经转换成字典或者列表，但是要进一步得到感兴趣的字段，还需要自己提取。但是<code>kcrawler</code>已经提供了一个<code>Boss</code>类可以直接使用。</p>
+<p>当然还是建议你先按照前文的方法先在浏览器中复制<code>Request Headers</code>，保存到当前目录下的<code>headers</code>文件中。然后就可以愉快地使用<code>Boss</code>类实例化一个对象，爬取感兴趣的数据。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> kcrawler <span class="keyword">import</span> Boss</span><br><span class="line"></span><br><span class="line">boss = Boss()</span><br></pre></td></tr></table></figure>
+
+<p>看到如下输出，表示成功读取到<code>headers</code>文件的内容。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">read heades from file.</span><br><span class="line">parse headers</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-1-招聘城市"><a href="#2-2-1-招聘城市" class="headerlink" title="2.2.1 招聘城市"></a>2.2.1 招聘城市</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cities = boss.city()</span><br></pre></td></tr></table></figure>
+
+<p>返回：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&apos;id&apos;: 101010000,</span><br><span class="line">  &apos;name&apos;: &apos;北京&apos;,</span><br><span class="line">  &apos;pinyin&apos;: None,</span><br><span class="line">  &apos;firstChar&apos;: &apos;b&apos;,</span><br><span class="line">  &apos;rank&apos;: 1,</span><br><span class="line">  &apos;children&apos;: [&#123;&apos;id&apos;: 101010100,</span><br><span class="line">    &apos;name&apos;: &apos;北京&apos;,</span><br><span class="line">    &apos;pinyin&apos;: &apos;beijing&apos;,</span><br><span class="line">    &apos;firstChar&apos;: &apos;b&apos;,</span><br><span class="line">    &apos;rank&apos;: 1&#125;]&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 101020000,</span><br><span class="line">  &apos;name&apos;: &apos;上海&apos;,</span><br><span class="line">...</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-2-热门城市"><a href="#2-2-2-热门城市" class="headerlink" title="2.2.2 热门城市"></a>2.2.2 热门城市</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hotcities = boss.hotcity()</span><br></pre></td></tr></table></figure>
+
+<p>返回：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&apos;id&apos;: 100010000, &apos;name&apos;: &apos;全国&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 101010100, &apos;name&apos;: &apos;北京&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 101020100, &apos;name&apos;: &apos;上海&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 101280100, &apos;name&apos;: &apos;广州&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 101280600, &apos;name&apos;: &apos;深圳&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 101210100, &apos;name&apos;: &apos;杭州&apos;&#125;,</span><br><span class="line">...]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-3-当前登陆用户所在城市"><a href="#2-2-3-当前登陆用户所在城市" class="headerlink" title="2.2.3 当前登陆用户所在城市"></a>2.2.3 当前登陆用户所在城市</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user_city = boss.userCity()</span><br></pre></td></tr></table></figure>
+
+<p>返回：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">嘿嘿，就不告诉你。。。</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-4-行业"><a href="#2-2-4-行业" class="headerlink" title="2.2.4 行业"></a>2.2.4 行业</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">industries = boss.industry()</span><br></pre></td></tr></table></figure>
+
+<p>返回：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&apos;id&apos;: 100001, &apos;name&apos;: &apos;电子商务&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100002, &apos;name&apos;: &apos;游戏&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100003, &apos;name&apos;: &apos;媒体&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100004, &apos;name&apos;: &apos;广告营销&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100005, &apos;name&apos;: &apos;数据服务&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100006, &apos;name&apos;: &apos;医疗健康&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100007, &apos;name&apos;: &apos;生活服务&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100008, &apos;name&apos;: &apos;O2O&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100009, &apos;name&apos;: &apos;旅游&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100010, &apos;name&apos;: &apos;分类信息&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100011, &apos;name&apos;: &apos;音乐/视频/阅读&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100012, &apos;name&apos;: &apos;在线教育&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: 100013, &apos;name&apos;: &apos;社交网络&apos;&#125;,</span><br><span class="line">...]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-5-当前登陆用户期望岗位（三个）"><a href="#2-2-5-当前登陆用户期望岗位（三个）" class="headerlink" title="2.2.5 当前登陆用户期望岗位（三个）"></a>2.2.5 当前登陆用户期望岗位（三个）</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">expects = boss.expect()</span><br></pre></td></tr></table></figure>
+
+<p>返回：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&apos;id&apos;: xxx, &apos;positionName&apos;: &apos;xxx&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: xxx, &apos;positionName&apos;: &apos;xxx&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: xxx, &apos;positionName&apos;: &apos;xxx&apos;&#125;]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-6-给当前登陆用户推荐的岗位列表"><a href="#2-4-6-给当前登陆用户推荐的岗位列表" class="headerlink" title="2.4.6 给当前登陆用户推荐的岗位列表"></a>2.4.6 给当前登陆用户推荐的岗位列表</h4><p><code>boss.job(i, page)</code> 方法需要提供两个参数，第一个是<code>boss.expect()</code>返回列表的索引，例如0代表第一个期望岗位的推荐岗位；第二个参数<code>page</code>用于指定数据分页，例如1是第一页。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobs = boss.job(<span class="number">0</span>, <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>返回:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&apos;id&apos;: &apos;be8bfdcdf7e99df90XV-0t-8FVo~&apos;,</span><br><span class="line">  &apos;jobName&apos;: &apos;深度学习平台经理/技术中级&apos;,</span><br><span class="line">  &apos;salaryDesc&apos;: &apos;30-50K&apos;,</span><br><span class="line">  &apos;jobLabels&apos;: [&apos;深圳 福田区 购物公园&apos;, &apos;5-10年&apos;, &apos;本科&apos;],</span><br><span class="line">  &apos;brandName&apos;: &apos;中国平安&apos;,</span><br><span class="line">  &apos;brandIndustry&apos;: &apos;互联网金融&apos;,</span><br><span class="line">  &apos;lid&apos;: &apos;411f6b88-8a83-437a-aa5f-5de0fc4da2b7.190-GroupC,194-GroupB.1&apos;&#125;,</span><br><span class="line"> &#123;&apos;id&apos;: &apos;f649c225a1b9038f0nZ609W5E1o~&apos;,</span><br><span class="line">  &apos;jobName&apos;: &apos;推荐系统评测工程师&apos;,</span><br><span class="line">  &apos;salaryDesc&apos;: &apos;20-35K&apos;,</span><br><span class="line">  &apos;jobLabels&apos;: [&apos;深圳 南山区 科技园&apos;, &apos;1-3年&apos;, &apos;本科&apos;],</span><br><span class="line">  &apos;brandName&apos;: &apos;腾讯&apos;,</span><br><span class="line">  &apos;brandIndustry&apos;: &apos;互联网&apos;,</span><br><span class="line"> &#123;&apos;id&apos;: &apos;94cfec046b98b9671H150tS8E1M~&apos;,</span><br><span class="line">  &apos;jobName&apos;: &apos;用户数据挖掘工程师&apos;,</span><br><span class="line">  &apos;salaryDesc&apos;: &apos;20-40K·15薪&apos;,</span><br><span class="line">  &apos;jobLabels&apos;: [&apos;深圳 南山区 南山中心&apos;, &apos;经验不限&apos;, &apos;本科&apos;],</span><br><span class="line">  &apos;brandName&apos;: &apos;今日头条&apos;,</span><br><span class="line">  &apos;brandIndustry&apos;: &apos;移动互联网&apos;,</span><br><span class="line">  &apos;lid&apos;: &apos;411f6b88-8a83-437a-aa5f-5de0fc4da2b7.190-GroupC,194-GroupB.4&apos;&#125;,</span><br><span class="line">...]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-7-通过关键词搜索岗位"><a href="#2-4-7-通过关键词搜索岗位" class="headerlink" title="2.4.7 通过关键词搜索岗位"></a>2.4.7 通过关键词搜索岗位</h4><p><code>city</code>, <code>industry</code>, <code>position</code> 是上文已经爬取的数据对应ID字段；<code>query</code> 不用说就是查询关键词；这里之所以使用两个不同的方法，因为<code>Boss</code>搜索岗位第一页和第二页及之后的页面的URL组成结构不同，前者固定不变，后者是变化的。这也是为什么前文传入配置字典的URL使用了函数形式。</p>
+<p>因此，如果你只对查询第一页数据感兴趣就使用<code>queryjob</code>方法；如果你想继续查看第二页及以后的数据，就必须使用<code>queryjobpage</code>方法。当然，事实上<code>queryjobpage</code>的方法也可以爬第一页的数据，但是建议分开使用，这样较不容易触发反爬虫机制。毕竟这是用户正常访问时行为。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tencent_jobs1 = boss.queryjob(query=<span class="string">'腾讯'</span>, city=<span class="number">101280600</span>, industry=<span class="literal">None</span>, position=<span class="number">101301</span>)</span><br><span class="line">tencent_jobs2 = boss.queryjobpage(query=<span class="string">'腾讯'</span>, city=<span class="number">101280600</span>, industry=<span class="literal">None</span>, position=<span class="number">101301</span>, page=<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+<p>返回：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[&#123;&apos;jobName&apos;: &apos;天衍实验室-大数据及人工智能高级研究员&apos;,</span><br><span class="line">  &apos;salaryDesc&apos;: &apos;30-60K&apos;,</span><br><span class="line">  &apos;jobLabels&apos;: [&apos;深圳 南山区 科技园&apos;, &apos;3-5年&apos;, &apos;硕士&apos;],</span><br><span class="line">  &apos;brandName&apos;: &apos;腾讯&apos;,</span><br><span class="line">  &apos;brandIndustry&apos;: &apos;互联网&apos;,</span><br><span class="line">  &apos;id&apos;: &apos;ce6f957a5e4cb3100nZ43dm6ElU~&apos;,</span><br><span class="line">  &apos;lid&apos;: &apos;22Uetj173Sz.search.1&apos;&#125;,</span><br><span class="line"> &#123;&apos;jobName&apos;: &apos;QQ信息流推荐算法工程师/研究员&apos;,</span><br><span class="line">  &apos;salaryDesc&apos;: &apos;20-40K·14薪&apos;,</span><br><span class="line">  &apos;jobLabels&apos;: [&apos;深圳 南山区 科技园&apos;, &apos;经验不限&apos;, &apos;本科&apos;],</span><br><span class="line">  &apos;brandName&apos;: &apos;腾讯&apos;,</span><br><span class="line">  &apos;brandIndustry&apos;: &apos;互联网&apos;,</span><br><span class="line">  &apos;id&apos;: &apos;a280e0b17a2aeded03Fz3dq_GFQ~&apos;,</span><br><span class="line">  &apos;lid&apos;: &apos;22Uetj173Sz.search.2&apos;&#125;,</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="github"><a href="#github" class="headerlink" title="github"></a>github</h2><p><span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVlL2tjcmF3bGVy" title="https://github.com/kenblikylee/kcrawler">https://github.com/kenblikylee/kcrawler<i class="fa fa-external-link"></i></span></p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="ken wechat" style="width: 200px; max-width: 100%;">
+  <div>我是一条小青蛇 我有很多小秘密</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="ken 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="ken 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>ken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/11/06/boss/" title="简单好用的Boss岗位搜索库(附github链接)">http://kenblog.top/2019/11/06/boss/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Boss/" rel="tag"># Boss</a>
+            
+              <a href="/tags/kcrawler/" rel="tag"># kcrawler</a>
+            
+              <a href="/tags/python/" rel="tag"># python</a>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" rel="tag"># 网络爬虫</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/04/pitu/" rel="next" title="pitu: 开源命令行P图工具">
+                  <i class="fa fa-chevron-left"></i> pitu: 开源命令行P图工具
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-安装"><span class="nav-number">1.</span> <span class="nav-text">1. 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-使用"><span class="nav-number">2.</span> <span class="nav-text">2. 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-爬虫基类-Crawler"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 爬虫基类 Crawler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Boss-类"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Boss 类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-招聘城市"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 招聘城市</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-热门城市"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 热门城市</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-当前登陆用户所在城市"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.3 当前登陆用户所在城市</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-4-行业"><span class="nav-number">2.2.4.</span> <span class="nav-text">2.2.4 行业</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-5-当前登陆用户期望岗位（三个）"><span class="nav-number">2.2.5.</span> <span class="nav-text">2.2.5 当前登陆用户期望岗位（三个）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-6-给当前登陆用户推荐的岗位列表"><span class="nav-number">2.2.6.</span> <span class="nav-text">2.4.6 给当前登陆用户推荐的岗位列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-7-通过关键词搜索岗位"><span class="nav-number">2.2.7.</span> <span class="nav-text">2.4.7 通过关键词搜索岗位</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#github"><span class="nav-number">3.</span> <span class="nav-text">github</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/ken_red.jpg"
+      alt="ken">
+  <p class="site-author-name" itemprop="name">ken</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">61</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
