@@ -53,17 +53,24 @@
   };
 </script>
 
-  <meta name="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
-<meta name="keywords" content="前端 AI 开源 linux shell 算法 数据分析 机器学习 深度学习 机器视觉 图像识别 面向对象 我是一条小青蛇">
-<meta property="og:type" content="website">
-<meta property="og:title" content="categories">
-<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;categories&#x2F;index.html">
+  <meta name="description" content="所有示例都只调用一个函数：get_jobs(城市, 职业)。执行成功后，函数返回一个 pandas.DataFrame 对象，用做进一步数据分析，其中 平均月薪 已经通过 薪资描述 计算出来（已考虑月薪数，默认12薪）。同时将数据保存到当前目录下的 excel  文件，文件名格式为 城市-职业.xlsx 。例如 北京-人工智能.xlsx 表示北京的人工智能岗位。">
+<meta name="keywords" content="kcrawler,python,网络爬虫">
+<meta property="og:type" content="article">
+<meta property="og:title" content="技术小白都能看懂的工作岗位爬虫利器——包含众多互联网高薪职业">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;11&#x2F;10&#x2F;get-jobs&#x2F;index.html">
 <meta property="og:site_name" content="青笔原创">
-<meta property="og:description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+<meta property="og:description" content="所有示例都只调用一个函数：get_jobs(城市, 职业)。执行成功后，函数返回一个 pandas.DataFrame 对象，用做进一步数据分析，其中 平均月薪 已经通过 薪资描述 计算出来（已考虑月薪数，默认12薪）。同时将数据保存到当前目录下的 excel  文件，文件名格式为 城市-职业.xlsx 。例如 北京-人工智能.xlsx 表示北京的人工智能岗位。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-10-30T01:09:51.524Z">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;jobs_beijing_ai.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;jobs_sh_web.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;jobs_sz_prod.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;jobs_hz_java.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;jobs_gz_ui.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;qrcode_for_gh_1c953f9b4cb9_258.jpg">
+<meta property="og:updated_time" content="2019-11-10T02:16:41.845Z">
 <meta name="twitter:card" content="summary">
-  <link rel="canonical" href="http://kenblog.top/categories/">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;jobs_beijing_ai.png">
+  <link rel="canonical" href="http://kenblog.top/2019/11/10/get-jobs/">
 
 
 <script id="page-configurations">
@@ -71,16 +78,13 @@
   CONFIG.page = {
     sidebar: "",
     isHome: false,
-    isPost: false,
-    isPage: true,
+    isPost: true,
+    isPage: false,
     isArchive: false
   };
 </script>
 
-  <title>
-      categories | 青笔原创
-    
-  </title>
+  <title>技术小白都能看懂的工作岗位爬虫利器——包含众多互联网高薪职业 | 青笔原创</title>
   
     <script>
       function sendPageView() {
@@ -377,78 +381,264 @@
         <div class="content-wrap">
             
 
-  
-    
-    
-  
-    
-    
-  
-    
-    
-  
-    
-    
-  
-    
-    
-  
-    
-    
-  
-    
-    
-  
-    
-    
-  
-  
-
           <div class="content">
             
 
   <div class="posts-expand">
-    
-    
-    
-    <div class="post-block" lang="zh-CN">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/11/10/get-jobs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="青笔">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/photo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="青笔原创">
+    </span>
       <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            技术小白都能看懂的工作岗位爬虫利器——包含众多互联网高薪职业
+            
 
-<h2 class="post-title" itemprop="name headline">categories
-  
+          
+        </h2>
 
-</h2>
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
 
-<div class="post-meta">
-  
+              
+                
+              
 
+              <time title="创建时间：2019-11-10 08:54:51 / 修改时间：10:16:41" itemprop="dateCreated datePublished" datetime="2019-11-10T08:54:51+08:00">2019-11-10</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>所有示例都只调用一个函数：<code>get_jobs(城市, 职业)</code>。执行成功后，函数返回一个 <code>pandas.DataFrame</code> 对象，用做进一步数据分析，其中 <code>平均月薪</code> 已经通过 <code>薪资描述</code> 计算出来（已考虑月薪数，默认12薪）。同时将数据保存到当前目录下的 <code>excel</code>  文件，文件名格式为 <code>城市-职业.xlsx</code> 。例如 <code>北京-人工智能.xlsx</code> 表示北京的<code>人工智能</code>岗位。</p>
+<a id="more"></a>
+
+<blockquote>
+<p>获取 <code>get_jobs</code> 源码，请按文末提示操作 ^^ 。</p>
+</blockquote>
+<h2 id="爬取示例"><a href="#爬取示例" class="headerlink" title="爬取示例"></a>爬取示例</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get_jobs(<span class="string">'北京'</span>, <span class="string">'人工智能'</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/jobs_beijing_ai.png" alt></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get_jobs(<span class="string">'上海'</span>, <span class="string">'web前端'</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/jobs_sh_web.png" alt></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get_jobs(<span class="string">'深圳'</span>, <span class="string">'产品经理'</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/jobs_sz_prod.png" alt></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get_jobs(<span class="string">'杭州'</span>, <span class="string">'Java'</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/jobs_hz_java.png" alt></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get_jobs(<span class="string">'广州'</span>, <span class="string">'UI设计师'</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/jobs_gz_ui.png" alt></p>
+<p>要获取其他城市和职业，请参考下文给出的选项。</p>
+<h2 id="热门城市"><a href="#热门城市" class="headerlink" title="热门城市"></a>热门城市</h2><ul>
+<li>全国</li>
+<li>北京</li>
+<li>上海</li>
+<li>广州</li>
+<li>深圳</li>
+<li>杭州</li>
+<li>天津</li>
+<li>西安</li>
+<li>苏州</li>
+<li>武汉</li>
+<li>厦门</li>
+<li>长沙</li>
+<li>成都</li>
+<li>郑州</li>
+<li>重庆</li>
+</ul>
+<h2 id="热门职业"><a href="#热门职业" class="headerlink" title="热门职业"></a>热门职业</h2><ul>
+<li>高级管理</li>
+<li>技术</li>
+<li>后端开发</li>
+<li>Java</li>
+<li>PHP</li>
+<li>Python</li>
+<li>Node.js</li>
+<li>移动开发</li>
+<li>测试</li>
+<li>运维</li>
+<li>数据</li>
+<li>ETL工程师</li>
+<li>数据仓库</li>
+<li>数据挖掘</li>
+<li>数据分析师</li>
+<li>数据架构师</li>
+<li>项目管理</li>
+<li>前端开发</li>
+<li>web前端</li>
+<li>架构师</li>
+<li>CTO</li>
+<li>人工智能</li>
+<li>机器学习</li>
+<li>深度学习</li>
+<li>图像算法</li>
+<li>语音识别</li>
+<li>图像识别</li>
+<li>算法研究员</li>
+<li>产品</li>
+<li>产品经理</li>
+<li>设计</li>
+<li>视觉设计师</li>
+<li>UI设计师</li>
+<li>UX设计师</li>
+<li>运营</li>
+<li>编辑</li>
+<li>高端市场职位</li>
+</ul>
+<h2 id="获取-get-jobs-源码"><a href="#获取-get-jobs-源码" class="headerlink" title="获取 get_jobs 源码"></a>获取 <code>get_jobs</code> 源码</h2><ol>
+<li>关注公众号 <code>我是一条小青蛇</code> 。</li>
+<li>回复关键词 <code>源码</code></li>
+</ol>
+<p>关注公众号方法：</p>
+<p><strong>1. 扫描二维码</strong></p>
+<p><img src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt></p>
+<p><strong>2. 或搜索微信号</strong>: <code>ws1txqs</code></p>
+<p><strong>3. 或搜索公众号</strong>: <code>我是一条小青蛇</code></p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="青笔 wechat" style="width: 200px; max-width: 100%;">
+  <div>我是一条小青蛇 我有很多小秘密</div>
 </div>
 
-</header>
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="青笔 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="青笔 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
 
       
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>青笔
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/11/10/get-jobs/" title="技术小白都能看懂的工作岗位爬虫利器——包含众多互联网高薪职业">http://kenblog.top/2019/11/10/get-jobs/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
       
-      
-      <div class="post-body">
-          <div class="category-all-page">
-            <div class="category-all-title">
-              目前共计 8 个分类
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/kcrawler/" rel="tag"># kcrawler</a>
+            
+              <a href="/tags/python/" rel="tag"># python</a>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" rel="tag"># 网络爬虫</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/06/boss/" rel="next" title="简单好用的Boss岗位搜索库(附github链接)">
+                  <i class="fa fa-chevron-left"></i> 简单好用的Boss岗位搜索库(附github链接)
+                </a>
+              
             </div>
-            <div class="category-all">
-              <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL/">MySQL</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a><span class="category-list-count">22</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%89%8D%E7%AB%AF/">前端</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86/">图像处理</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">开发工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a><span class="category-list-count">4</span></li></ul>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
             </div>
           </div>
         
-      </div>
-      
-      
-      
-    </div>
+      </footer>
     
+  </article>
+  
+  
+  
 
-    
-    
-    
   </div>
 
 
@@ -483,6 +673,8 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#爬取示例"><span class="nav-number">1.</span> <span class="nav-text">爬取示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#热门城市"><span class="nav-number">2.</span> <span class="nav-text">热门城市</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#热门职业"><span class="nav-number">3.</span> <span class="nav-text">热门职业</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取-get-jobs-源码"><span class="nav-number">4.</span> <span class="nav-text">获取 get_jobs 源码</span></a></li></ol></div>
+        
       </div>
       <!--/noindex-->
 
