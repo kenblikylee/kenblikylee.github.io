@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="每一个程序员都有一款心心念叨的代码编辑器。而在众多妖颜魅惑的编辑器偶像团体前，vim 就像个不加粉饰的农村姑娘，咋一看是那样朴实无华，难有倾心。但只要走近一点，来个亲密接触，又会被她似水柔情所俘获。 这是青笔亲身经历。公司从腾讯空降技术总监，时不时会分享一些他的开发经验。其中说到编辑器，他的脸上总会泛起淡淡桃花，“我就喜欢 vim!” 。尽管我们曾一致向他引荐当下红极一时集美貌与才华于一身的 vs">
+<meta name="keywords" content="linux,vim">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一开始看不上亲密接触后又让你欲罢不能的 vim">
+<meta property="og:url" content="http:&#x2F;&#x2F;kenblog.top&#x2F;2019&#x2F;11&#x2F;13&#x2F;vim&#x2F;index.html">
+<meta property="og:site_name" content="青笔原创">
+<meta property="og:description" content="每一个程序员都有一款心心念叨的代码编辑器。而在众多妖颜魅惑的编辑器偶像团体前，vim 就像个不加粉饰的农村姑娘，咋一看是那样朴实无华，难有倾心。但只要走近一点，来个亲密接触，又会被她似水柔情所俘获。 这是青笔亲身经历。公司从腾讯空降技术总监，时不时会分享一些他的开发经验。其中说到编辑器，他的脸上总会泛起淡淡桃花，“我就喜欢 vim!” 。尽管我们曾一致向他引荐当下红极一时集美貌与才华于一身的 vs">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-his.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-27birth.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vimtutor.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vimtutordir.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-tutor.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-modes.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-hjkl.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-w.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-b.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-sentence.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-pragraph.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-lineG.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-3dd.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-D.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-d0.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-rc.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-usermanual.gif">
+<meta property="og:updated_time" content="2019-11-13T00:13:00.932Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vim-his.png">
+  <link rel="canonical" href="http://kenblog.top/2019/11/13/vim/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>一开始看不上亲密接触后又让你欲罢不能的 vim | 青笔原创</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?38b47286a77efbb64491f5bf4f087415";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">青笔原创</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">专注于做有价值的技术原创</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">62</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">41</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-微信">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/ps/weixin.html" rel="section"><i class="fa fa-fw fa-weixin"></i>微信</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-云+">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9jbG91ZC50ZW5jZW50LmNvbS9kZXZlbG9wZXIvdXNlci82NTAzNDM2L2FydGljbGVz"><i class="fa fa-fw fa-qq"></i>云+</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-掘金">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vdXNlci81YmQyYjhiMjUxODgyNTJhNzg0ZDE5ZDcvcG9zdHM="><i class="fa fa-fw fa-link"></i>掘金</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-web">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/web/" rel="section"><i class="fa fa-fw fa-compass"></i>web</a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://kenblog.top/2019/11/13/vim/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="青笔">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/photo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="青笔原创">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            一开始看不上亲密接触后又让你欲罢不能的 vim
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-11-13 08:11:14 / 修改时间：08:13:00" itemprop="dateCreated datePublished" datetime="2019-11-13T08:11:14+08:00">2019-11-13</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>每一个程序员都有一款心心念叨的代码编辑器。而在众多妖颜魅惑的编辑器偶像团体前，vim 就像个不加粉饰的农村姑娘，咋一看是那样朴实无华，难有倾心。但只要走近一点，来个亲密接触，又会被她似水柔情所俘获。</p>
+<p>这是青笔亲身经历。公司从腾讯空降技术总监，时不时会分享一些他的开发经验。其中说到编辑器，他的脸上总会泛起淡淡桃花，“我就喜欢 vim!” 。尽管我们曾一致向他引荐当下红极一时集美貌与才华于一身的 vscode 。他却依然心有所属，不为所动。</p>
+<p>多少次，我百思不得其解，这个“相貌平平”的 vim 到底有何魔力，能牢牢扣住总监的心弦。在我真正走进她的内心世界，多次昼夜相伴之后。我最终也被她的清新脱俗所拜倒。</p>
+<p>接下来就让我们一起来了解这名神秘的“女子”。</p>
+<a id="more"></a>
+
+<h2 id="1-vim-历史"><a href="#1-vim-历史" class="headerlink" title="1. vim 历史"></a>1. vim 历史</h2><p>以下是网上找到一张图。如对 vim 发展历史感兴趣可以参考维基百科的词条 <code>Vim (text editor)</code>。</p>
+<p><span class="exturl" data-url="aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvVmltXyh0ZXh0X2VkaXRvcik=" title="https://en.wikipedia.org/wiki/Vim_(text_editor)">https://en.wikipedia.org/wiki/Vim_(text_editor)<i class="fa fa-external-link"></i></span></p>
+<p><img src="http://cdn.kenblog.top/vim-his.png" alt></p>
+<p>早期的 UNIX 操作系统上标准的编辑器是 ed ，这是一个面向行的编辑器，只能显示当前编辑的行。1976年，Bill Joy 在 ed 上做了扩展，使之支持了全屏显示和编辑，命名为 ex 。ex 是 ed 的超集，通过在 ex 输入命令 vi 来启动扩展功能。后来这个命令由于经常使用而被独立出来，也就是现在 Linux （包括 macOS）系统预装的命令行编辑器 vi 。直到 1991 年，Bram Moolenaar 才开发了 vi 的改进版（improvement），命名为 VIM （寓意：Vi IMprovement），同年 11 月 4 日发布了 vim 的第一个版本。下图来自 vim.org 网站首页的一条新闻，也就是去年的11月4日迎来了 vim 的27岁生日。</p>
+<p><img src="http://cdn.kenblog.top/vim-27birth.png" alt></p>
+<h2 id="2-内置教程"><a href="#2-内置教程" class="headerlink" title="2. 内置教程"></a>2. 内置教程</h2><p>vim 自带了一个面向初学者开发的教程。可通过独立的子程序 <code>vimtutor</code> 启动教程。</p>
+<p>如果系统已经安装了 vim （macOS 预装了 vim，部分 linux 发行版可能需要手动安装），可以在直接在终端输入 <code>vimtutor</code> 命令打开教程。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vimtutor</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/vimtutor.png" alt></p>
+<p>教程实际也是使用 vim 打开系统上的一个文本文件。文件通常在 <code>/usr/share/vim/vim80/tutor/</code> 目录下。当然，这个目录下有很多个文件，分别是不同语言版本的教程。使用 <code>vimtutor</code> 的不同之处是能自动打开用户所在地的语言版本。</p>
+<p><img src="http://cdn.kenblog.top/vimtutordir.png" alt></p>
+<p>上面看到的简体中文版实际就是文件 <code>/usr/share/vim/vim80/tutor/tutor.zh_cn.utf-8</code> 。</p>
+<p>因此，你可以将其复制一份放到当前目录下，再使用 vim 打开，用做练习，随意编辑文件内容。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/share/vim/vim80/tutor/tutor.zh_cn.utf-8 ./</span><br><span class="line">vim tutor.zh_cn.utf-8</span><br></pre></td></tr></table></figure>
+
+<p>但如果按照教程来练习，个人用起来感觉最舒服的方式是：同时打开两个终端，一个使用 vimtutor 打开本地教程用于阅览，另一个将教程的英文版复制到当前目录，然后使用 vim 在复制的英文版上进行编辑练习（因为我们实际应用场景大多是英文环境，包括编辑代码和配置文件）。</p>
+<p><em>复制英文版教程并进行编辑练习：</em></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/share/vim/vim80/tutor/tutor ./</span><br><span class="line">vim tutor</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/vim-tutor.png" alt></p>
+<h2 id="3-工作模式"><a href="#3-工作模式" class="headerlink" title="3. 工作模式"></a>3. 工作模式</h2><p>对于习惯了 GUI 编辑器的开发者，刚开始接触 vim ，很容易被 vim 的工作模式搞得一头雾水，而且很可能就此放弃使用 vim 。但如果熟悉了，就觉得一切也理所当然。按照维基百科的介绍，vim 一共有 12 种不同模式，但只有 6 种基本模式，剩下 6 种都是基本模式的变种。但实际我们最常接触的只有两类模式：命令模式和编辑模式。其中命令模式又细分为，Normal（默认）模式和 Cmdline (底部命令行) 模式。而 Normal 模式是启动 vim 进入的默认模式，并且在任何模式下，按 <code>ESC</code> (键盘左上角)键都将回到这个模式，作用类似于手机的 Home 键。因此，当你开始迷糊自己当前处在什么模式下，最好的办法就是按 <code>ESC</code> 回到 Normal 模式。我们使用 vim 的绝大多数命令都在 Normal 模式运行，而 Cmdline（命令行）模式通常只在退出和保存时使用，因此，如不特别说明，当我们在说<strong>命令模式</strong>时，就是指代 Normal 模式。此外，本文将 Cmdline 统称为<strong>命令行模式</strong>。</p>
+<p>下图是三种模式的切换方式：</p>
+<p><img src="http://cdn.kenblog.top/vim-modes.png" alt></p>
+<p>如果要简单概括这三种模式的使用场景，那就是：在<strong>命令模式</strong>中执行光标导航，复制粘贴删除，撤销重做，以及查找替换等操作；在<strong>编辑模式</strong>下，编写代码或进行创作；在<strong>命令行模式</strong>模式下，输入 <code>q</code> 退出，输入<code>w</code>保存，输入<code>wq</code>保存并退出。当然这里还不是全部的操作，但是熟悉这些操作，基本就能将 vim 应用得得心应手了。</p>
+<h2 id="4-命令模式"><a href="#4-命令模式" class="headerlink" title="4. 命令模式"></a>4. 命令模式</h2><h3 id="4-1-移动光标"><a href="#4-1-移动光标" class="headerlink" title="4.1 移动光标"></a>4.1 移动光标</h3><p>要使用 vim 熟练地进行代码和文本的编辑，首先需要能够精确快速的将光标定位到要编辑的地方。最基本的就是上下左右移动光标了。这些操作当然可以使用键盘的四个方向键来完成。但是更常用的是使用字母输入区域连续的四个按键 h, j, k, l 。事实上，当你按照标准的手势接触键盘，你右手的食指触碰的就是 j 键（按键有个凸起）。因此，在你保持正常输入的手势下，顺其自然地敲动食指，就能将光标往下移动一行，而紧挨着的中指接触的是 k 键，进行的是和 j 相反的操作，即将光标向上移动一行，你会发现这样用起来相当顺手，这就理解为什么要使用字母按键来进行光标移动操作了。当然这是在命令模式下，按下字母键不会作为输入而改变编辑内容。</p>
+<ul>
+<li><code>h</code>: 向左移动一个字符</li>
+<li><code>l</code>: 向右移动一个字符</li>
+<li><code>j</code>: 向下移动一行</li>
+<li><code>k</code>: 向上移动一行</li>
+</ul>
+<p><img src="http://cdn.kenblog.top/vim-hjkl.png" alt></p>
+<p>虽然可以使用 j, k 左右两边的 h 和 l 来实现向左和向右移动光标。这在一次只移动一个字符时，也还是很方便。但是如果向左或向右移动一个字（word，英文中空格和标点符号隔开的单词，标点符号也算一个字）时，还使用 h 和 l 就显得有些笨拙了。向左（向后）和向右（向前）移动一个字的方法如下：</p>
+<ul>
+<li><code>w</code>: 向右或向前移动一个字，光标定位在字的首字符</li>
+<li><code>b</code>: 向左或向后移动一个字，光标定位在字的首字符</li>
+</ul>
+<p><strong>命令模式</strong>按下字母<code>w</code>将光标向右移动一个字：</p>
+<p><img src="http://cdn.kenblog.top/vim-w.gif" alt></p>
+<p><strong>命令模式</strong>按下字母<code>b</code>将光标向左移动一个字：</p>
+<p><img src="http://cdn.kenblog.top/vim-b.gif" alt></p>
+<p>如果想近一步扩大光标单次移动的范围，就要用到按句子和段落来前后移动来。两对圆括弧<code>(</code>和<code>)</code>分别将光标向后和向前移动一个句子，对应两个花括弧<code>{</code>和<code>}</code>分别将光标向后和向前移动一个段落。</p>
+<ul>
+<li><code>(</code> : 向后移动一个句子，光标定位在句子开始</li>
+<li><code>)</code> : 向前移动一个句子，光标定位在句子开始</li>
+<li><code>{</code> : 向后移动一个段落，光标定位在段落开始</li>
+<li><code>}</code> : 向前移动一个段落，光标定位在段落开始</li>
+</ul>
+<p><strong>命令模式</strong>按下<code>)</code>和<code>(</code>向前和向后移动一个句子：</p>
+<p><img src="http://cdn.kenblog.top/vim-sentence.gif" alt></p>
+<p><strong>命令模式</strong>按下<code>}</code>和<code>{</code>向前和向后移动一个段落：</p>
+<p><img src="http://cdn.kenblog.top/vim-pragraph.gif" alt></p>
+<p>此外你还可以在屏幕所见范围内进行快速移动光标。分别使用大写的<code>H</code>，<code>M</code>，<code>L</code>。但是这三种定位并不是很精确，通常用做快速大范围级定位，然后再使用前面的命令进行更加精确的定位。读者可以自行尝试。</p>
+<ul>
+<li><code>H</code>: 将光标定位到屏幕顶部一行的最左端</li>
+<li><code>M</code>: 将光标定位到屏幕中间一行</li>
+<li><code>L</code>: 将光标定位到拼命的底部一行</li>
+</ul>
+<p>还有一种我们非常熟悉的应用场景，就是在调试程序抛出异常时，通常会显示出异常产生的行号，这时就需要根据行号快速将光标定位到指定的位置。这个命令相比前面的命令要复杂一点，它需要先输入代表行号的一个或多个数字，然后按下大写字母<code>G</code>来完成。例如将光标定位到文件的第 80 行。需要先在命令模式输入80，然后快速按下大写字母<code>G</code>。</p>
+<p><img src="http://cdn.kenblog.top/vim-lineG.gif" alt></p>
+<h3 id="4-2-删除-撤销"><a href="#4-2-删除-撤销" class="headerlink" title="4.2 删除/撤销"></a>4.2 删除/撤销</h3><p>将删除和撤销两个操作放在一起讲，其中一个原因是考虑到可能因为还不知道如何撤销删除操作，而害怕尝试删除操作的心理（尽管我们已经事先做了备份，但这应该是一种普通的心理和人性害怕失去是同样的道理）。我们知道可以撤销，因此在删除这件事上就有了“安全感”。也许你不是这么认为，但是这样还是能帮助我们更好的练习和记忆（我们可以循环往复地练习删除撤销）。</p>
+<p>和移动光标一样，删除也可以按不同粒度进行。如删除单个字符，字，行，句子，段落以及屏幕首尾。删除操作由用字母<code>d</code>加上表示删除范围的标识符构成。同时删除具体范围还受光标当前所在的具体位置决定。例如删除字使用字母组合<code>dw</code>，如果光标出现在单词<code>hello</code>的第二个字符<code>e</code>上，此时在命令模式连续按下<code>d</code>和<code>w</code>，将删除从<code>e</code>开始之后的整个字，但是会<code>e</code>前面的<code>h</code>不会删除，删除后的结果就是还剩一个字母<code>h</code>。其他粒度的删除，也遵循相似的规律。</p>
+<p><strong>删除单个字符</strong></p>
+<p>删除单个字符有两者方法。两者等效，都是删除光标所在的字符，但是使用<code>x</code>更简单一些，因为只需要输入一个字母。</p>
+<ul>
+<li><code>x</code></li>
+<li><code>dl</code></li>
+</ul>
+<p><strong>删除字</strong></p>
+<ul>
+<li><code>dw</code>: 从光标所在位置开始，删除到字的末尾(包含光标所在位置的字符)</li>
+<li><code>db</code>: 与<code>dw</code>相反方向删除，即删除光标所在位置前面的字符(不包含光标所在位置的字符)</li>
+</ul>
+<p><strong>删除行</strong></p>
+<ul>
+<li><code>dd</code>: 删除光标所在的行</li>
+<li><code>3dd</code>: 删除从光标开始的3行，当然这是一个例子，可以更改前面的数字删除任意数量的行</li>
+</ul>
+<p>一次删除3行：</p>
+<p><img src="http://cdn.kenblog.top/vim-3dd.gif" alt></p>
+<p><strong>删除到行尾</strong></p>
+<p>如果你不想删除整行。而是从光标开始到行尾的字符，可以直接使用一个大写<code>D</code>来实现。</p>
+<p>使用大写字母<code>D</code>删除从光标位置开始到行尾的字符：</p>
+<p><img src="http://cdn.kenblog.top/vim-D.gif" alt></p>
+<p><strong>从行首删除</strong></p>
+<p>与删除到行尾对应的是使用<code>d0</code>从行首删除：</p>
+<p><img src="http://cdn.kenblog.top/vim-d0.gif" alt></p>
+<p><strong>d^与d$</strong></p>
+<p>如果对正则表达式熟悉，应该很容易猜到两者的含义。也是删除行首和行尾，但是与前面的 <code>d0</code> 与 <code>D</code> 所不同的是不删除行首和行尾的空格。</p>
+<ul>
+<li><code>d^</code>: 删除光标前面知道行首的字符，<strong>不</strong>包含行首的空格</li>
+<li><code>d$</code>: 删除从光标开始知道行尾的字符，<strong>不</strong>包含行尾的空格</li>
+</ul>
+<p><strong>删除句子和段落</strong></p>
+<p>熟悉了前面的删除，以下删除句子和段落也可以以此类推。唯一区别仅仅在于删除粒度不同。</p>
+<ul>
+<li><code>d(</code>: 从句首删除</li>
+<li><code>d)</code>: 删除到句尾</li>
+<li><code>d{</code>: 从段首删除</li>
+<li><code>d}</code>: 删除到段尾</li>
+</ul>
+<p><strong>替换：删除并输入</strong></p>
+<p>说到删除不得不再提到替换。因为两者就像兄弟一般，实际替换像删除的哥哥，只比弟弟删除多做了一步。就是在删除后紧接着进入编辑模式，在已删除的地方进行编辑。这两个组合动作不就是替换嘛。需要注意的还有，替换会改变当前工作模式，也就是进入下文会讲到的编辑模式，因此在完成输入后，需要按<code>ESC</code>重新回到命令模式。与删除<code>d</code>对应的替换命令是<code>c</code>。因此将删除里讲到的所有操作中的<code>d</code>换成<code>c</code>就是对应的替换操作，当然执行后的细节会有些差异。但是这种差异在你亲自试过后就很容易理解，因此不作过多论述。读者可以自行尝试。</p>
+<p><strong>撤销操作</strong></p>
+<p>撤销操作很简单，命令模式下，按下小写字母<code>u</code>（undo）即可。可以连续按多次，以快速撤销多个历史操作。</p>
+<h3 id="4-3-复制-粘贴"><a href="#4-3-复制-粘贴" class="headerlink" title="4.3 复制/粘贴"></a>4.3 复制/粘贴</h3><p><strong>复制 y</strong></p>
+<p>复制使用字母<code>y</code>。它的用法和删除操作<code>d</code>很像，不同的是<code>y</code>是复制而不是删除。</p>
+<p>下面以复制行为例。其他粒度的复制类比删除操作<code>d</code>即可。</p>
+<p>与<code>dd</code>删除当前行对应的复制当前行操作是<code>yy</code>，当然也可以复制多行，和删除多行格式相似。在<code>yy</code>前加上要复制的行数。例如<code>3yy</code>复制从光标所在行开始的三行。</p>
+<ul>
+<li><code>yy</code>: 复制光标所在的行</li>
+<li><code>3yy</code>: 复制从光标开始的3行，这里只是例子，实际可以是任意行数</li>
+</ul>
+<p><strong>粘贴 p</strong></p>
+<p>粘贴命令就简单多了。它没有没有那么多的粒度区分，而只需要将已经复制的内容插入到当前光标之后或者之前的位置。分别使用小写的<code>p</code>和大写的<code>P</code>。</p>
+<ul>
+<li><code>p</code>: 将复制的内容插入到光标之后</li>
+<li><code>P</code>: 将复制的内容插入到光标之前</li>
+</ul>
+<h3 id="4-4-查找字符串"><a href="#4-4-查找字符串" class="headerlink" title="4.4 查找字符串"></a>4.4 查找字符串</h3><p>在命令模式输入斜杠<code>/</code>（向下查找）或问号<code>?</code>（向上查找），光标定位到终端底部一行，输入要查找的字符串，再按回车（RETURN），首先定位到一个找到的字符串，接着按小写的<code>n</code>查找下一个，按大写的<code>N</code>查找前一个。</p>
+<h2 id="5-进入编辑模式"><a href="#5-进入编辑模式" class="headerlink" title="5. 进入编辑模式"></a>5. 进入编辑模式</h2><p>上面介绍的所有命令都是在命令模式下进行的。如果要开始编写代码或其他文字编辑工作，就需要从命令行模式进入编辑模式，否则输入的字母（除能进入编辑模式的字母外）都将视作命令，而不会编辑到到文件中。</p>
+<p>进入编辑模式有以下6种方式，区别仅在于进入编辑模式后，光标所在的位置的不同。</p>
+<ul>
+<li><code>i</code>: 在当前光标前插入</li>
+<li><code>I</code>: 在行首插入</li>
+<li><code>a</code>: 在当前光标后追加</li>
+<li><code>A</code>: 在行尾追加</li>
+<li><code>o</code>: 在当前光标所在行之<strong>后</strong>添加新行</li>
+<li><code>O</code>: 在当前光标所在行之<strong>前</strong>添加新行</li>
+</ul>
+<h2 id="6-命令行模式"><a href="#6-命令行模式" class="headerlink" title="6. 命令行模式"></a>6. 命令行模式</h2><p>在命令模式下，按下冒号<code>:</code>，在终端底部出现输入行，表示当前是<strong>命令行模式</strong>。在<strong>命令行模式</strong>可以使用 vim 自身支持的很多命令。如前文已经谈到的最常用用到的就是退出和保存。</p>
+<ul>
+<li><code>:q</code> + RETURN: 退出编辑</li>
+<li><code>:w</code> + RETURN: 保存不退出</li>
+<li><code>:wq</code> + RETURN: 保存并退出</li>
+</ul>
+<p>常用的还有对 vim 进行设置。以下命令都需要在输入完后按下回车键 RETURN 才能执行（和在终端执行命令方式差不多）。</p>
+<ul>
+<li><code>:syntax on</code>: 开启语法高亮</li>
+<li><code>:set number</code>: 显示行号</li>
+<li><code>:set tabstop=4</code>: 设置 Tab 键宽度</li>
+<li><code>:set expandtab</code>: 使用空格替代 Tab</li>
+<li><code>:set softtabstop=4</code>: 设置软件 Tab (自动Tab)宽度为 4</li>
+<li><code>:set shiftwidth=4</code>: 设置自动缩进宽度为 4</li>
+<li><code>:set autoindent</code>: 开启自动缩进，通常用于编写程序</li>
+</ul>
+<p><img src="http://cdn.kenblog.top/vim-rc.gif" alt></p>
+<p>当然以上对 vim 的设置仅仅影响当前打开的 vim 。要想每次打开都使用同样的设置，需要将设置命令统一保存到 vim 的配置文件 <code>~/.vimrc</code> 中，方法下一节将讲到。</p>
+<p>此外，可以使用<code>help</code>来获取帮助。例如输入<code>:help user-manual</code> + RETURN 查看用户手册。</p>
+<p><img src="http://cdn.kenblog.top/vim-usermanual.gif" alt></p>
+<p>如果说以上都是 vim 内部执行命令，那么在命令行模式下，实际也可以调用外部 shell 的命令。方法是以感叹号<code>!</code>开头，标识感叹号<code>!</code>之后的命令是一条外部 shell 的命令。如查看当前目录下的文件，<code>:!ls -l</code>。第一次按下 RETURN 会隐藏当前编辑区域，显示终端界面，第二次按下 RETURN 再次回到 vim 编辑界面。</p>
+<h2 id="7-配置文件"><a href="#7-配置文件" class="headerlink" title="7. 配置文件"></a>7. 配置文件</h2><p>前文已经讲到如果想要每次打开 vim 都使用同样和界面和设置，需要将设置命令统一保存在配置文件中。在 linux 系统（含macOS）推荐保存的路径是 <code>~/.vimrc</code>。如果从来没有设置过，这个文件可能还不存在。这就需要我们先创建一个。为了不覆盖已有的，我们可以使用如下命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">test</span> -f ~/.vimrc || vim ~/.vimrc</span><br></pre></td></tr></table></figure>
+
+<p>这条 shell 命令会先判断 <code>~/.vimrc</code> 是否存在，不存在就新建一个空白的配置文件，并使用 vim 打开这个新建的配置文件。</p>
+<p>可选的方式也可以复制一份系统的上的配置文件，然后在此基础上添加和覆盖默认配置。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">test</span> -f ~/.vimrc || cp /usr/share/vim/vimrc ~/.vimrc</span><br></pre></td></tr></table></figure>
+
+<p>以下是青笔自己的配置文件参考：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">colorscheme default     &quot; 设置颜色主题</span><br><span class="line">syntax on               &quot; 语法高亮</span><br><span class="line">filetype on             &quot; 检测文件的类型</span><br><span class="line">set number              &quot; 显示行号</span><br><span class="line"></span><br><span class="line">set ruler               &quot; 在编辑过程中，在右下角显示光标位置的状态行</span><br><span class="line">set laststatus=2        &quot; 显示状态栏 (默认值为 1, 无法显示状态栏)</span><br><span class="line">set statusline=\ %&lt;%F[%1*%M%*%n%R%H]%=\ %y\ %0(%&#123;&amp;fileformat&#125;\ %&#123;&amp;encoding&#125;\ %c:%l/%L%)                        &quot; 设置在状态行显示的信息</span><br><span class="line"></span><br><span class="line">set tabstop=4           &quot; Tab键的宽度</span><br><span class="line">set expandtab           &quot; 使用空格替换Tab</span><br><span class="line">set softtabstop=4</span><br><span class="line">set shiftwidth=4        &quot; 统一缩进为4</span><br><span class="line"></span><br><span class="line">set autoindent          &quot; vim使用自动对齐，也就是把当前行的对齐格式应用到下一行(自动缩进)</span><br><span class="line">set cindent             &quot; (cindent是特别针对 C语言语法自动缩进)</span><br><span class="line">set smartindent         &quot; 依据上面的对齐格式，智能的选择对齐方式，对于类似C语言编写上有用</span><br><span class="line"></span><br><span class="line">set scrolloff=3         &quot; 光标移动到buffer的顶部和底部时保持3行距离</span><br><span class="line"></span><br><span class="line">set incsearch           &quot; 输入搜索内容时就显示搜索结果</span><br><span class="line">set hlsearch            &quot; 搜索时高亮显示被找到的文本</span><br><span class="line"></span><br><span class="line">set foldmethod=indent   &quot; 设置缩进折叠</span><br><span class="line">set foldlevel=99        &quot; 设置折叠层数</span><br><span class="line">nnoremap &lt;space&gt; @=((foldclosed(line(&apos;.&apos;)) &lt; 0) ? &apos;zc&apos; : &apos;zo&apos;)&lt;CR&gt;</span><br><span class="line">                        &quot; 用空格键来开关折叠</span><br><span class="line"></span><br><span class="line">&quot; 自动跳转到上次退出的位置</span><br><span class="line">if has(&quot;autocmd&quot;)</span><br><span class="line">    au BufReadPost * if line(&quot;&apos;\&quot;&quot;) &gt; 1 &amp;&amp; line(&quot;&apos;\&quot;&quot;) &lt;= line(&quot;$&quot;) | exe &quot;normal! g&apos;\&quot;&quot; | endif</span><br><span class="line">endif</span><br></pre></td></tr></table></figure>
+
+<p>关于配置文件的更多信息，也可通过 vim 内置的帮助手册来查看。与配置相关的手册为 <code>usr_05</code> 。在命令行模式输入<code>:help usr_05</code>（冒号用于进入命令行模式，输入后回车）即可打开该手册。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文从 vim 的发展历史开始，以具备能够熟练驾驭 vim 编辑器来满足日常代码编写的基本操作为主线，讲解了在 vim 中进行模式切换，光标导航，删除，撤销，替换，复制，粘贴，插入文本，以及配置编辑器外观设置等必要技能。当然，vim 支持的操作和命令还有很多。本文只介绍到基础部分。但是却是我们进行代码编辑最常用到的功能。熟练掌握后，可以进一步查看手册学习更多的技巧。查看手册方式上文已经给出。即在命令行模式输入：<code>:help user-manual</code> 再回车。</p>
+<p>如果本文能让你重新认识了 vim 这位眉目清新又纯洁善良的“姑娘”，并且从此对她有了一份独有的爱意，算是本文创作的最大收获所在^^。</p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="青笔 wechat" style="width: 200px; max-width: 100%;">
+  <div>我是一条小青蛇 我有很多小秘密</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="青笔 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="青笔 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>青笔
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kenblog.top/2019/11/13/vim/" title="一开始看不上亲密接触后又让你欲罢不能的 vim">http://kenblog.top/2019/11/13/vim/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/linux/" rel="tag"># linux</a>
+            
+              <a href="/tags/vim/" rel="tag"># vim</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/10/get-jobs/" rel="next" title="技术小白都能看懂的工作岗位爬虫利器——包含众多互联网高薪职业">
+                  <i class="fa fa-chevron-left"></i> 技术小白都能看懂的工作岗位爬虫利器——包含众多互联网高薪职业
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-vim-历史"><span class="nav-number">1.</span> <span class="nav-text">1. vim 历史</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-内置教程"><span class="nav-number">2.</span> <span class="nav-text">2. 内置教程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-工作模式"><span class="nav-number">3.</span> <span class="nav-text">3. 工作模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-命令模式"><span class="nav-number">4.</span> <span class="nav-text">4. 命令模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-移动光标"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 移动光标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-删除-撤销"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 删除/撤销</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-复制-粘贴"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 复制/粘贴</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-查找字符串"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 查找字符串</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-进入编辑模式"><span class="nav-number">5.</span> <span class="nav-text">5. 进入编辑模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-命令行模式"><span class="nav-number">6.</span> <span class="nav-text">6. 命令行模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-配置文件"><span class="nav-number">7.</span> <span class="nav-text">7. 配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/photo.jpg"
+      alt="青笔">
+  <p class="site-author-name" itemprop="name">青笔</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kenblog.top</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
