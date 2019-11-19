@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言距离尤雨溪首次公开 Vue3 (vue-next)源码有一个多月了。青笔观察到，刚发布国庆期间，出现不少解读 Vue3 源码的文章。当然不少有追风蹭热之嫌，文章草草讲讲响应式原理，或者只是做了一些上层的导读，告诉读者应该先看哪再看哪。不能说这些文章就没有一点价值，它确实能够让你在短时间内，不用过多思考就能了解到一些 Vue3 重中之重的“干货”。但是过于干货的未必就是好的。因为干货通常是经过作">
+<meta name="keywords" content="vue3,vue-next">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue3 深度解析">
+<meta property="og:url" content="http:&#x2F;&#x2F;www.qingbii.com&#x2F;2019&#x2F;11&#x2F;19&#x2F;vue3&#x2F;index.html">
+<meta property="og:site_name" content="青笔原创">
+<meta property="og:description" content="前言距离尤雨溪首次公开 Vue3 (vue-next)源码有一个多月了。青笔观察到，刚发布国庆期间，出现不少解读 Vue3 源码的文章。当然不少有追风蹭热之嫌，文章草草讲讲响应式原理，或者只是做了一些上层的导读，告诉读者应该先看哪再看哪。不能说这些文章就没有一点价值，它确实能够让你在短时间内，不用过多思考就能了解到一些 Vue3 重中之重的“干货”。但是过于干货的未必就是好的。因为干货通常是经过作">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-link-vue.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-link-scope-vue.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-example1.gif">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-packages.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-struct.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-ts-reactivity.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-ts-compiler-core.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-ts-compiler-core2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-runtime-core.png">
+<meta property="og:updated_time" content="2019-11-19T10:43:55.196Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vue3-link-vue.png">
+  <link rel="canonical" href="http://www.qingbii.com/2019/11/19/vue3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Vue3 深度解析 | 青笔原创</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?34fe3c50fd2c28cb66c0cceaf903497f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">青笔原创</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">专注于做有价值的技术原创</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">62</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">42</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-微信">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/ps/weixin.html" rel="section"><i class="fa fa-fw fa-weixin"></i>微信</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-云+">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9jbG91ZC50ZW5jZW50LmNvbS9kZXZlbG9wZXIvdXNlci82NTAzNDM2L2FydGljbGVz"><i class="fa fa-fw fa-qq"></i>云+</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-掘金">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vdXNlci81YmQyYjhiMjUxODgyNTJhNzg0ZDE5ZDcvcG9zdHM="><i class="fa fa-fw fa-link"></i>掘金</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-web">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/web/" rel="section"><i class="fa fa-fw fa-compass"></i>web</a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.qingbii.com/2019/11/19/vue3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="青笔">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/photo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="青笔原创">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            Vue3 深度解析
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-11-19 18:42:21 / 修改时间：18:43:55" itemprop="dateCreated datePublished" datetime="2019-11-19T18:42:21+08:00">2019-11-19</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>距离尤雨溪首次公开 Vue3 (vue-next)源码有一个多月了。青笔观察到，刚发布国庆期间，出现不少解读 Vue3 源码的文章。当然不少有追风蹭热之嫌，文章草草讲讲响应式原理，或者只是做了一些上层的导读，告诉读者应该先看哪再看哪。不能说这些文章就没有一点价值，它确实能够让你在短时间内，不用过多思考就能了解到一些 Vue3 重中之重的“干货”。但是过于干货的未必就是好的。因为干货通常是经过作者咀嚼过后的产物，大部分营养其实只被作者消化了。留给读者的只是一些看似很有料，实则没有营养的残渣。就像一块啃到只剩骨头的排骨。这样的文章通常适合于媒体传播，仅用于快速捕获眼球。但是对于想更细致了解 Vue3 的专业前端开发，这显然远远不够。</p>
+<a id="more"></a>
+
+<p>事实上，这不是青笔第一篇关于 Vue3 的文章。在 Vue3 公布后的第五天，也就是10月10号。青笔没有直接解读源码，而是从一个想要自己开发或参与 Vue3 项目的角度，讲到了构建 Vue3 所用到的构建工具和相关技术。文章不仅仅是给出最后的“干货”，而是把青笔在实践过程中的用到的方式方法，包括得到结果的每一行<code>shell</code>命令，git 技巧等。读者完全可以按照文章的脉络得到和青笔一样的结果。这样做是青笔自身多年软件开发经验，所坚持的一个观点，那就是<strong>“技术不是用来看的，而是用来实操的”</strong>。只有当你能亲自实践才能真正理解其中的内涵，并且这也是最简单和行之有效的学习方式。那些读起来晦涩难懂，繁杂抽象的概念术语，其实最怕的就是被实操，因为一旦遇到一个身怀实操大法的读者，它的所有“江湖禁术”将被见招拆招，一一破解。</p>
+<p>但是想要少走弯路，高效率地实践，前提是有一批相关的文章。</p>
+<p><a href="http://www.qingbii.com/2019/10/10/building-vue3-from-scratch/">从零开始构建 vue3</a></p>
+<p>本文依然坚持这样的一个准则，带你从实践角度来探秘 Vue3 的源码。你也可以理解为“授之以鱼不如授之以渔”。</p>
+<h2 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1. 准备工作"></a>1. 准备工作</h2><p>为了顺利完成后面的实践。请先确保你的电脑已经安装了以下工具。</p>
+<ol>
+<li><span class="exturl" data-url="aHR0cHM6Ly9naXQtc2NtLmNvbS9kb3dubG9hZHM=" title="https://git-scm.com/downloads">git<i class="fa fa-external-link"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9ub2RlanMub3JnL2VuLw==" title="https://nodejs.org/en/">node 10 及以上版本<i class="fa fa-external-link"></i></span> (LTS版)</li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cueWFybnBrZy5jb20vZW4vZG9jcy9pbnN0YWxs" title="https://www.yarnpkg.com/en/docs/install">yarn<i class="fa fa-external-link"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9sZXJuYS5qcy5vcmcv" title="https://lerna.js.org/">lerna<i class="fa fa-external-link"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly93d3cudHlwZXNjcmlwdGxhbmcub3JnL2RvY3MvaGFuZGJvb2svdHlwZXNjcmlwdC1pbi01LW1pbnV0ZXMuaHRtbA==" title="https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html">typescript<i class="fa fa-external-link"></i></span></li>
+</ol>
+<p>其中 <code>lerna</code> 和 <code>typescript</code> 使用 npm 进行全局安装。安装方式如下：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install -g lerna</span><br><span class="line">npm install -g typescript</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-先人一步-体验-Vue3-搭建下一代网页应用"><a href="#2-先人一步-体验-Vue3-搭建下一代网页应用" class="headerlink" title="2. 先人一步 体验 Vue3 搭建下一代网页应用"></a>2. 先人一步 体验 Vue3 搭建下一代网页应用</h2><h3 id="2-1-Composition-API"><a href="#2-1-Composition-API" class="headerlink" title="2.1 Composition API"></a>2.1 Composition API</h3><p>事实上早在 Vue3 源码公布之前，Vue 官方已经透露了代表下一代 Vue 技术的 Vue3 将采取的新的接口使用方式。这种新的方式叫做 <code>Composition API</code> （组合式 API）。而与之相对应的经典 API 也是我们所熟知的 Vue 使用方式叫做 <code>Options API</code>（选项式 API）或 <code>Options-based API</code>（基于选项的 API）。</p>
+<p>在经典的 <code>Options API</code> 中，我们使用一个具有 <code>data</code>, <code>methods</code> 等“选项”的 JS 对象来定义一个页面或者组件。这种简单直接的方式，在应用早期阶段，代码和业务逻辑较简单时，非常的友好亲民，这也是 Vue 以学习门槛较低而广受开发者亲昵的的一个因素。但是，有过开发大型 Vue 应用的开发者应该心有体会。当页面的逻辑越来越多时，我们的组件将变得冗长复杂。很多本可以复用的逻辑和代码，你很难有一种使用起来非常舒适的方式来复用。亲笔自身实践，在 Vue2 中，组件逻辑和代码复用最常用的方式是混入 <code>mixin</code> ，这虽然是一种可行的方式，但是这种方式显然从出生和 Vue 框架紧密耦合。当你想要将一个框架无区别的普通 JS 函数或者对象复用到 Vue2 开发的组件中时，你发现一切都是那么的不优雅。</p>
+<p>基于满足在开发大型 Vue 应用中更优雅地复用已有代码的需求催生下，Vue3 <code>Composition API</code> 似乎是顺势而为，并且势在必得。</p>
+<p><span class="exturl" data-url="aHR0cHM6Ly92dWUtY29tcG9zaXRpb24tYXBpLXJmYy5uZXRsaWZ5LmNvbS8=" title="https://vue-composition-api-rfc.netlify.com/">vue-composition-api-rfc<i class="fa fa-external-link"></i></span></p>
+<h3 id="2-2-第一个-Composition-API-应用"><a href="#2-2-第一个-Composition-API-应用" class="headerlink" title="2.2 第一个 Composition API 应用"></a>2.2 第一个 Composition API 应用</h3><p>据官方介绍，Vue3 正式发布将在明年第一季度。但这并不影响我们提前使用 <code>Composition API</code> 开发一个简单的响应式 WEB 应用。</p>
+<p>并且作为解读 Vue3 源码的前戏，我们将直接在最新源码上进行实操（你很快就会发现这样做的好处）。</p>
+<h4 id="2-2-1-克隆源码与初始化"><a href="#2-2-1-克隆源码与初始化" class="headerlink" title="2.2.1 克隆源码与初始化"></a>2.2.1 克隆源码与初始化</h4><p>为了精简篇幅，这里直接整个给出所有命令。想了解更多细节，推荐青笔另一篇专栏文章 <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vcG9zdC81ZDlmZDExYWYyNjVkYTViYjQxNGMxZTA=" title="https://juejin.im/post/5d9fd11af265da5bb414c1e0">《从零开始构建 vue3》<i class="fa fa-external-link"></i></span> ，里面有对相关细节的详细讲解。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 克隆源码</span></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/vuejs/vue-next.git</span><br><span class="line"><span class="comment"># 进入源码目录</span></span><br><span class="line"><span class="built_in">cd</span> vue-next</span><br><span class="line"><span class="comment"># 安装依赖</span></span><br><span class="line">yarn</span><br><span class="line"><span class="comment"># 初次构建</span></span><br><span class="line">yarn build</span><br><span class="line"><span class="comment"># 建立项目内部 packages 软链</span></span><br><span class="line">lerna bootstrap</span><br></pre></td></tr></table></figure>
+
+<p>这里需要特别讲到的是最后一步 <code>lerna bootstrap</code> ，这里实际就是在项目根目录的 <code>node_modules</code> 创建了一个符号链接（或软链） <code>vue</code> 和一个 scope 目录<code>@vue</code> 。</p>
+<p>在 macOS 或其他 linux 发行版上可以通过如下命令查看链接指向。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ls -l node_modules/ | grep vue</span><br><span class="line">ls -l node_modules/@vue</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/vue3-link-vue.png" alt><br><img src="http://cdn.kenblog.top/vue3-link-scope-vue.png" alt></p>
+<p>可以看到 <code>vue</code> 和 <code>@vue</code> 下的符号链接分别指向了源码目录 <code>packages/</code> 下对应的目录（文件夹）。</p>
+<p>这样，我们就可以在 Vue3 正式发布到 npm 前，直接使用源码里的各个 package ，等效于使用从 npm 安装的其他依赖。并且，由于 Vue3 使用 Typescript 编写，里面已经安装和提供编写 Typescript 所有需要开发依赖和配置。因此，我们可以在源码项目里使用和 Vue3 源码一样的方式书写 Typescript 程序。不用担心，即使还不熟悉 Typescript 也不影响继续阅读本文。</p>
+<h4 id="2-2-2-编写第一个-Vue3-Composition-API-网页"><a href="#2-2-2-编写第一个-Vue3-Composition-API-网页" class="headerlink" title="2.2.2 编写第一个 Vue3 Composition API 网页"></a>2.2.2 编写第一个 Vue3 Composition API 网页</h4><p>为了不污染了 Vue3 源码目录结构。我们可以创建一个新的分支。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b examples</span><br></pre></td></tr></table></figure>
+
+<p>在根目录下创建 <code>examples</code> 目录，用于存放示例代码。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir examples</span><br></pre></td></tr></table></figure>
+
+<p>新建文件 <code>./examples/composition.html</code>，添加如下内容：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span><span class="tag">&lt;<span class="name">title</span>&gt;</span>vue3 - hello composition!<span class="tag">&lt;/<span class="name">title</span>&gt;</span><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;&#123; state.text &#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"../node_modules/vue/dist/vue.global.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="actionscript">    <span class="keyword">const</span> &#123; createApp, reactive, onMounted &#125; = Vue</span></span><br><span class="line"><span class="actionscript">    <span class="keyword">const</span> state = reactive(&#123; text: <span class="string">'hello world!'</span> &#125;)</span></span><br><span class="line"><span class="actionscript">    <span class="keyword">const</span> App = &#123;</span></span><br><span class="line">        setup () &#123;</span><br><span class="line"><span class="javascript">            onMounted(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span></span><br><span class="line"><span class="javascript">                <span class="built_in">console</span>.log(<span class="string">'onMounted: hello world!'</span>)</span></span><br><span class="line">            &#125;)</span><br><span class="line"><span class="actionscript">            <span class="keyword">return</span> &#123; state &#125;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="actionscript">    createApp().mount(App, <span class="string">'#app'</span>)</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>使用 Chrome 浏览器打开这个 html 文件。在控制台可以访问我们定义的全局变量 <code>state</code> 。可以任意修改 <code>state.text</code> 的值，你会看到网页显示的文本会随着新的赋值而变化。</p>
+<p><img src="http://cdn.kenblog.top/vue3-example1.gif" alt></p>
+<p>恭喜你！你已经成功使用 <code>Vue3 Composition API</code> 编写了一个响应式 Web 应用。</p>
+<p>可以看到不同于 Vue2 选项API丑陋的组件定义。<code>Vue3 Composition API</code> 提供一系列 Api 函数，通过简单组合（这也是 Composition 的含义所在），就构建了一个 Vue3 响应式 Web 应用，一切看起来那么自然舒服。可以预见，随着函数式编程的日趋流行，<code>Vue3 Composition API</code> 势必成为构建下一代 Vue 应用的首选和主流方式。</p>
+<h2 id="3-源码探秘"><a href="#3-源码探秘" class="headerlink" title="3. 源码探秘"></a>3. 源码探秘</h2><p>看过青笔专栏<span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vcG9zdC81ZDlmZDExYWYyNjVkYTViYjQxNGMxZTA=" title="https://juejin.im/post/5d9fd11af265da5bb414c1e0">《从零开始构建 vue3》<i class="fa fa-external-link"></i></span>的读者应该知道，Vue3 源码分为几个不同的 <code>package</code> ，存放在目录 <code>./packages/</code> 下，并使用 <code>lerna</code> 来管理多 <code>package</code> 项目。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">packages/</span><br><span class="line">├── compiler-core</span><br><span class="line">├── compiler-dom</span><br><span class="line">├── compiler-sfc</span><br><span class="line">├── reactivity</span><br><span class="line">├── runtime-core</span><br><span class="line">├── runtime-dom</span><br><span class="line">├── server-renderer</span><br><span class="line">├── shared</span><br><span class="line">└── vue</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>compiler-sfc</code> 是 Vue 单文件组件（也就是我们在 Webpack 下使用的 .vue 文件）的实现，<code>server-renderer</code> 是服务端渲染的源码，这两个部分截止本文写作时，还未完成；<code>shared</code> 是各个 <code>package</code> 共享的实用库（相当于我们平时使用的 utils），里面封装的都是一些例如判断是否是数组，是否对象和函数等通用函数，因此从理解 Vue3 源码角度，可以不去关注；而 <code>vue</code> 就是最终要发布的 <code>Vue3</code> 的包，但是从源码来看，这仅仅是内部模块对外的导出出口， 它的源码也只有一个 <code>index.ts</code> 文件，通过这个文件我们可以知道，最终 <code>Vue3</code> 对外提供了哪些接口，也就是前面我们创建<code>Composition API</code> 网页里面使用的全局对象 <code>Vue</code> 里支持的 API 函数。</p>
+<p>缩小我们的关注范围，构成 <code>Vue3</code> 最核心的是以下 5 个 package:</p>
+<ul>
+<li><code>reactivity</code></li>
+<li><code>compiler-core</code></li>
+<li><code>runtime-core</code></li>
+<li><code>compiler-dom</code></li>
+<li><code>runtime-dom</code></li>
+</ul>
+<p>而这其中前 3 个 package 即 <code>reactivity</code>，<code>compiler-core</code>，<code>runtime-core</code> 又是 <code>Vue3</code> 核心中的核心（正如 core 一词所表示的含义）。可以说这 3 个 package 是构建整个 <code>Vue3</code> 项目乃至整个 <code>Vue3</code> 生态的最底层依赖和基石。为了更加生动的理解这句话的含义。我设想一个这样的画面。</p>
+<blockquote>
+<p>在一个秋高气爽的午后，尤雨溪同学抱着自己 13 英寸的 macBookPro 来到自己最常光顾的咖啡店，点了一杯拿铁。打开 VSCode 准备撸代码，冥冥之中看到了一个叫做 AngularJs 的东东。突然一个念头闪现在尤同学的脑海中。”wokao，这家伙，得劲啊! 我也弄一个…”。经过一段苦思冥想。”本尤要做一个更屌的，不仅用于构建 WEB 界面，还能使用前端熟悉的 html 模版构建手机 App 等任何客户端界面”。而要达到这个效果，必须在设计时就要把页面模版解析（编译）和渲染输出进行解耦，于是，尤同学新建一个文件夹，命名为 <code>compiler-core</code> ，用于存放实现将使用 <code>html</code> 编写的模版编译成<code>抽象语法树</code>和<code>渲染桥接函数</code>（用于解耦渲染函数实现的<code>桥</code>）的代码，有了模版编译解析，仅仅只有渲染层的抽象，但还需针对应用级别进行抽象，来运行应用，于是尤同学新建了第二个文件夹，命名为 <code>runtime-core</code> ，用于存放创建应用和应用渲染器的抽象，这其中也包含了构成应用的组件和节点的抽象。到这一步，一个从 html 模版（字符串）构建应用视图界面的抽象已经完成，但是为了将视图显示的内容与数据进行绑定，实现修改数据时，就能响应式地改变视图内容，还需要一个响应数据变化的模块，于是尤同学又新建了第三个文件夹，命名为 <code>reactivity</code> ，经过技术分析，尤同学认为当前使用 ES6 的新特性 <code>Proxy</code> 来实现数据响应是最优雅的方式，于是尤同学决定在这个文件夹里存放管理所有基于 <code>Proxy</code> 封装的响应式模块。不同于前两个 <code>package</code> 是对平台和环境的抽象，<code>reactivity</code> 是一个具像的实现，正如我们前面使用 <code>Composition API</code> 构建的 <code>hello world</code> 网页中使用的 <code>reactive</code> 函数就是导出自 <code>reactivity</code> 。至此，用于实现构建任何用户界面的底层抽象和响应式数据模型已经完成。距离将这个视图设计方式应用到最终的产品中，还差一个将抽象的平台无差别的 <code>compiler-core</code> 和 <code>runtime-core</code> 的平台级实现。但是要实现所有平台的视图渲染，可不是一个小的工作量，前提你要会相关平台界面开发，例如 IOS APP 或 Android APP 的界面开发。可溪，尤同学只学过 Web 前端。于是，尤同学先从自己熟悉的入手，添加了两个用于在浏览器下环境的模块渲染和应用运行时实现，即 <code>compiler-dom</code> 和 <code>runtime-dom</code> 。<br>“…不知不觉，又过了一个秋”。尤同学终于将一年前那个设想在浏览器环境下实现，但是，距离最终目标显然还有一段路要走。尤同学接下来首要任务是先实现单文件组件 package 和 服务端渲染 pacakge ，来满足在 Webpack 环境更好开发 Vue3 应用，以及需要 SEO 场景的服务端渲染应用。</p>
+</blockquote>
+<blockquote>
+<p>温馨提示：本剧情纯属虚构，甚至有点好笑 ^^!</p>
+</blockquote>
+<p>看完这段虚构剧情，想必你已经对当前 <code>Vue3</code> 中 5 个最重要的模块有了一个比较清晰的理解。最后，用一张图来总结它们之间的关系。图片中箭头代表依赖。事实上，我们最终使用的 vue package 就是在浏览器下运行的，因此，vue 直接依赖于 <code>compiler-dom</code> 和 <code>runtime-dom</code> 。而 vue 到 <code>reactive</code> 依赖使用了虚线，是因为，vue 不是直接依赖于 <code>reactivity</code> ，而是通过导出所有 <code>runtime-dom</code> 的导出，而 <code>runtime-dom</code> 又导出了所有 <code>runtime-core</code> ，其中包含了 <code>reactivity</code> 中创建响应式对象的 <code>reactive</code> 函数，通过这种方式间接导出了 <code>reactive</code> ，也就是前文 <code>hello-world</code> WEB 应用中使用的函数。</p>
+<p><img src="http://cdn.kenblog.top/vue3-packages.png" alt></p>
+<h2 id="4-createApp"><a href="#4-createApp" class="headerlink" title="4. createApp"></a>4. createApp</h2><p>我们已经知道构成 Vue3 最核心的 5 个 package 的分工和依赖关系。但是它们之间具体如何相互“协作”，来完成一个完整的 WEB APP 的创建呢。我们以前文使用 <code>Composition API</code> 创建的 <code>hello world</code> 网页应用为例。以下摘取的是 Javascript 代码部分（这里使用了 ES6 的语法编写）。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; createApp, reactive, onMounted &#125; = Vue</span><br><span class="line"><span class="keyword">const</span> state = reactive(&#123; <span class="attr">text</span>: <span class="string">'hello world!'</span> &#125;)</span><br><span class="line"><span class="keyword">const</span> App = &#123;</span><br><span class="line">    setup () &#123;</span><br><span class="line">        onMounted(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">'onMounted: hello world!'</span>)</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="keyword">return</span> &#123; state &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">createApp().mount(App, <span class="string">'#app'</span>)</span><br></pre></td></tr></table></figure>
+
+<p>我们看到最后一行代码，使用了一个 <code>createApp</code> 工厂函数创建了一个 Vue3 应用实例，然后将使用 <code>Composition API</code> 编写的应用根组件 <code>App</code> 挂载到 ID 为 <code>app</code> 的 Dom 元素上。这个过程在 <code>Vue3</code> 内部是如何传递的，或者说我们前面说的 5 个 package 之间如何协作来完成这个 App 创建的。下面是青笔逐行代码追踪后画出了这样一个调用关系图。 </p>
+<p><img src="http://cdn.kenblog.top/vue3-struct.png" alt></p>
+<p>图中添加了背景色的部分是一些比较代表各 package 发挥关键作用的部分。其中黄色部分是 Vue3 在应用中导出的 Api ; 橙色部分是 <code>runtime-core</code> 中创建运行时渲染器；青色部分是 <code>compiler-core</code> 及 <code>compiler-dom</code> 中用于将模版字符串编译成渲染函数的抽象语法树及 dom 渲染实现；绿色部分是 <code>reactivity</code> 导出的两个基本的响应式 API，<code>reactive</code> 函数用于传入一个非响应式普通 JS 对象，返回一个响应式数据对象，而 <code>isReactive</code> 函数用于判断一个对象是否是一个响应式对象。</p>
+<h2 id="5-Typescript"><a href="#5-Typescript" class="headerlink" title="5. Typescript"></a>5. Typescript</h2><p>我们知道 <code>Vue3</code> 使用 <code>Typescript</code> 编写。但是，这不并意味着我们必须从头到尾先把 <code>Typescript</code> 学习一遍，才能看懂 <code>Vue3</code> 的源码。众所周知，Javascript 是一门弱类型的语言，这样带来的好处是减少代码“噪声”（与要实现功能无关的语法成分），让开发者专注于业务逻辑的实现，写出更加简洁易懂的代码；但凡事皆有利弊，当编写对稳定性和安全性有更高要求的大型软件时，类型灵活多变反而成了滋生疑难 BUG 的温床。 因此就有了 <code>Typescript</code> 这样的强类型的语言，不过它仅仅是 Javascript 的超集，就是说任何合法的 <code>Javascript</code> 代码同时也是合法的 <code>Typescript</code> 。 <code>Typescript</code> 的核心就是在 <code>Javascript</code> 语法的基础上增加了对数据类型的约束，以及新增一些数据类型（如：元组，枚举，Any等），接口类型（Interface）。而掌握 <code>Typescript</code> 的真正难点在于掌握在不同场景下限定类型的方式。具体而言就是变量申明，函数传参，函数返回值，复合（Array，Set, Map，WeakSet，WeakMap）元素类型，接口类型和类型别名。</p>
+<p>以下给出了 <code>Typescript</code> 最常用也最基本的类型使用方式。</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 变量申明</span></span><br><span class="line"><span class="keyword">let</span> num: <span class="built_in">number</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">let</span> str: <span class="built_in">string</span> = <span class="string">'hello'</span></span><br><span class="line"><span class="comment">// 函数参数类型与返回值类型</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">a: <span class="built_in">number</span>, b: <span class="built_in">number</span></span>): <span class="title">number</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 复合元素类型</span></span><br><span class="line"><span class="keyword">let</span> arr: <span class="built_in">Array</span>&lt;<span class="built_in">number</span>&gt; = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> <span class="keyword">set</span>: Set&lt;<span class="built_in">number</span>&gt; = <span class="keyword">new</span> Set([<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>])</span><br><span class="line"><span class="keyword">let</span> map: Map&lt;<span class="built_in">string</span>, <span class="built_in">number</span>&gt; = <span class="keyword">new</span> Map([[<span class="string">'key1'</span>, <span class="number">1</span>], [<span class="string">'key2'</span>, <span class="number">2</span>]])</span><br><span class="line"><span class="comment">// 接口类型</span></span><br><span class="line"><span class="keyword">interface</span> Point &#123;</span><br><span class="line">    x: <span class="built_in">number</span></span><br><span class="line">    y: <span class="built_in">number</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> point: Point = &#123; x: <span class="number">10</span>, y: <span class="number">20</span> &#125;</span><br><span class="line"><span class="comment">// 类型别名</span></span><br><span class="line"><span class="keyword">type</span> mathfunc = <span class="function">(<span class="params">a: <span class="built_in">number</span>, b: <span class="built_in">number</span></span>) =&gt;</span> <span class="built_in">number</span></span><br><span class="line"><span class="keyword">const</span> product: mathfunc = <span class="function">(<span class="params">a, b</span>) =&gt;</span> a * b</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(num, str, arr, <span class="keyword">set</span>, map, sum(<span class="number">1</span>, <span class="number">2</span>), product(<span class="number">2</span>, <span class="number">3</span>), point)</span><br></pre></td></tr></table></figure>
+
+<p>以上的例子，还是比较简单易懂的。个人觉得最 <code>Typesript</code> 最难理解的类型，也是 <code>Vue3</code> 源码阅读起来最大的障碍是<code>泛型（Generics）</code>。泛型是一种基于类型的组件（这里的组件是指代码中可复用单元，如函数等）复用机制，这么说有些抽象，简单来说，可以理解为类型变量。通常用于函数，作用类似于面向对象编程里的<strong>函数重载</strong>。</p>
+<p>既然说在 Typescript 里范型就像类型变量，那么这个变量如何定义和使用，下面举个例子。</p>
+<p>函数 <code>identity()</code> 接受 string 类型参数，并返回自身，也是 string 类型。</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">identity</span>(<span class="params">arg: <span class="built_in">string</span></span>): <span class="title">string</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> arg</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在不希望参数和返回类型固定为 string ，同时又希望能限定类型，最好的办法就是使得类型可变，或者说把类型定义为一个变量。这就是所谓的<strong>泛型</strong>。那么这个“类型变量”在哪定义，答案是在函数名称后面，插入一对尖括号”&lt;&gt;”，并在尖括号里定义这个变量，然后就可以将后面参数和返回类型用这个“类型变量替换”。如下：</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">identity</span>&lt;<span class="title">T</span>&gt;(<span class="params">arg: T</span>): <span class="title">T</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> arg</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(identity&lt;<span class="built_in">string</span>&gt;(<span class="string">'hello'</span>))</span><br><span class="line"><span class="built_in">console</span>.log(identity&lt;<span class="built_in">number</span>&gt;(<span class="number">100</span>))</span><br><span class="line"><span class="comment">// 也可省略类型部分</span></span><br><span class="line"><span class="built_in">console</span>.log(identity(<span class="string">'hello'</span>))</span><br><span class="line"><span class="built_in">console</span>.log(identity(<span class="number">100</span>))</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>想了解更多<strong>范型</strong>的使用场景，可参考<span class="exturl" data-url="aHR0cHM6Ly93d3cudHlwZXNjcmlwdGxhbmcub3JnL2RvY3MvaGFuZGJvb2svZ2VuZXJpY3MuaHRtbA==" title="https://www.typescriptlang.org/docs/handbook/generics.html">官方文档<i class="fa fa-external-link"></i></span></p>
+</blockquote>
+<p>如果认真掌握以上 Typescript 的类型使用，那么基本就可以读懂 <code>Vue3</code> 的源码了。虽然，这里列举的特性并非 Typescript 的全部，但是，剩下的已经不影响正确的理解源码，并且相比直接看完并掌握所有 Typescript 的特性，通过阅读 <code>Vue3</code> 源码能让你更快速地掌握最重要的特性和最佳实践方法，可谓一举两得。</p>
+<h2 id="6-实践理解源码核心部分"><a href="#6-实践理解源码核心部分" class="headerlink" title="6. 实践理解源码核心部分"></a>6. 实践理解源码核心部分</h2><p>说了这么多，最后通过 3 个示例代码，实践总结和加深理解 <code>Vue3</code> 最核心 3 个模块的作用，作文本文的收尾。</p>
+<h3 id="6-1-reactivity"><a href="#6-1-reactivity" class="headerlink" title="6.1 reactivity"></a>6.1 reactivity</h3><p>在 <code>./examples</code> 目录新建文件 <code>reactivity.ts</code>，粘贴如下代码：</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; reactive, isReactive &#125; <span class="keyword">from</span> <span class="string">'@vue/reactivity'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> content = &#123; text: <span class="string">'hello'</span> &#125;</span><br><span class="line"><span class="keyword">const</span> state = reactive(content)</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'content is reactive: '</span>, isReactive(content))</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'state is reactive: '</span>, isReactive(state))</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'state '</span>, state)</span><br><span class="line">content.text = <span class="string">'world'</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'state '</span>, state)</span><br></pre></td></tr></table></figure>
+
+<p>编译运行：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tsc reactivity.ts &amp;&amp; node reactivity.js</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/vue3-ts-reactivity.png" alt></p>
+<h3 id="6-2-compiler-core"><a href="#6-2-compiler-core" class="headerlink" title="6.2 compiler-core"></a>6.2 compiler-core</h3><p>在 <code>./examples</code> 目录新建文件 <code>compiler-core.ts</code>，粘贴如下代码：</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; baseCompile <span class="keyword">as</span> compile &#125; <span class="keyword">from</span> <span class="string">'@vue/compiler-core'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> template = <span class="string">'&lt;p&gt;&#123;&#123; state.text &#125;&#125;&lt;/p&gt;'</span></span><br><span class="line"><span class="keyword">const</span> &#123; ast, code &#125; = compile(template)</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'ast\n----'</span>)</span><br><span class="line"><span class="built_in">console</span>.log(ast)</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'code\n----'</span>)</span><br><span class="line"><span class="built_in">console</span>.log(code)</span><br></pre></td></tr></table></figure>
+
+<p>编译运行：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tsc compiler-core.ts &amp;&amp; node compiler-core.js</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/vue3-ts-compiler-core.png" alt><br><img src="http://cdn.kenblog.top/vue3-ts-compiler-core2.png" alt></p>
+<h3 id="6-3-runtime-core"><a href="#6-3-runtime-core" class="headerlink" title="6.3 runtime-core"></a>6.3 runtime-core</h3><p>在 <code>./examples</code> 目录新建文件 <code>runtime-core.ts</code>，粘贴如下代码：</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createRenderer &#125; <span class="keyword">from</span> <span class="string">'@vue/runtime-core'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> patchProp = <span class="function"><span class="keyword">function</span> (<span class="params">el: Element, key: <span class="built_in">string</span>, nextValue: <span class="built_in">any</span>, prevValue: <span class="built_in">any</span>, isSVG: <span class="built_in">boolean</span></span>) </span>&#123;&#125;</span><br><span class="line"><span class="keyword">const</span> nodeOps = &#123;</span><br><span class="line">  insert: <span class="function">(<span class="params">child: Node, parent: Node, anchor?: Node</span>) =&gt;</span> &#123;&#125;,</span><br><span class="line">  remove: <span class="function">(<span class="params">child: Node</span>) =&gt;</span> &#123;&#125;,</span><br><span class="line">  createElement: <span class="function">(<span class="params">tag: <span class="built_in">string</span>, isSVG?: <span class="built_in">boolean</span></span>) =&gt;</span> &#123;&#125;,</span><br><span class="line">  createText: <span class="function">(<span class="params">text: <span class="built_in">string</span></span>) =&gt;</span> &#123;&#125;,</span><br><span class="line">  createComment: <span class="function">(<span class="params">text: <span class="built_in">string</span></span>) =&gt;</span> &#123;&#125;,</span><br><span class="line">  setText: <span class="function">(<span class="params">node: Text, text: <span class="built_in">string</span></span>) =&gt;</span> &#123;&#125;,</span><br><span class="line">  setElementText: <span class="function">(<span class="params">el: HTMLElement, text: <span class="built_in">string</span></span>) =&gt;</span> &#123;&#125;,</span><br><span class="line">  parentNode: <span class="function">(<span class="params">node: Node</span>) =&gt;</span> &#123;&#125;,</span><br><span class="line">  nextSibling: <span class="function">(<span class="params">node: Node</span>) =&gt;</span> &#123;&#125;,</span><br><span class="line">  querySelector: <span class="function">(<span class="params">selector: <span class="built_in">string</span></span>) =&gt;</span> &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> &#123; createApp &#125; = createRenderer(&#123;</span><br><span class="line">  patchProp,</span><br><span class="line">  ...nodeOps</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(createApp())</span><br></pre></td></tr></table></figure>
+
+<p>编译运行：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tsc runtime-core.ts &amp;&amp; node runtime-core.js</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/vue3-runtime-core.png" alt></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文从使用 <code>Vue3</code> 组合式API搭建第一个响应式 Web 应用开篇，由浅入深，先后讲解了构成 <code>Vue3</code> 最重要的 5 个 package 的分工和依赖，并进一步道出构成 <code>Vue3</code> 及构建 <code>Vue3</code> 生态 3 个最底层的 package ，并通过编造一段有趣的故事来帮助读者理解 <code>Vue3</code> 的本质。为了扫除读者深入阅读 <code>Vue3</code> 源码的心理障碍，增加了针对 <code>Vue3</code> 源码所需要掌握的 Typescript 基础知识。最后，通过动手编写 3 个示例代码，分别给出 <code>Vue3</code> 响应式数据，模版编译和创建运行时应用最重要的接口，引导读者动手调试 <code>Vue3</code> 核心代码，来真正吃透 <code>Vue3</code> 的核心原理。</p>
+<p>如果你对 <code>Vue3</code> 源码和最新发展感兴趣，可以关注作者微信号，回复：<code>vue</code> ，加入“Vue3 前端技术交流群”，和作者一起深入探讨学习。</p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="青笔 wechat" style="width: 200px; max-width: 100%;">
+  <div>我是一条小青蛇 我有很多小秘密</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="青笔 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="青笔 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>青笔
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.qingbii.com/2019/11/19/vue3/" title="Vue3 深度解析">http://www.qingbii.com/2019/11/19/vue3/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/vue3/" rel="tag"># vue3</a>
+            
+              <a href="/tags/vue-next/" rel="tag"># vue-next</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/13/vim/" rel="next" title="一开始看不上亲密接触后又让你欲罢不能的 vim">
+                  <i class="fa fa-chevron-left"></i> 一开始看不上亲密接触后又让你欲罢不能的 vim
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-准备工作"><span class="nav-number">2.</span> <span class="nav-text">1. 准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-先人一步-体验-Vue3-搭建下一代网页应用"><span class="nav-number">3.</span> <span class="nav-text">2. 先人一步 体验 Vue3 搭建下一代网页应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Composition-API"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 Composition API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-第一个-Composition-API-应用"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 第一个 Composition API 应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-克隆源码与初始化"><span class="nav-number">3.2.1.</span> <span class="nav-text">2.2.1 克隆源码与初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-编写第一个-Vue3-Composition-API-网页"><span class="nav-number">3.2.2.</span> <span class="nav-text">2.2.2 编写第一个 Vue3 Composition API 网页</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-源码探秘"><span class="nav-number">4.</span> <span class="nav-text">3. 源码探秘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-createApp"><span class="nav-number">5.</span> <span class="nav-text">4. createApp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Typescript"><span class="nav-number">6.</span> <span class="nav-text">5. Typescript</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-实践理解源码核心部分"><span class="nav-number">7.</span> <span class="nav-text">6. 实践理解源码核心部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-reactivity"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 reactivity</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-compiler-core"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 compiler-core</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-runtime-core"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 runtime-core</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/photo.jpg"
+      alt="青笔">
+  <p class="site-author-name" itemprop="name">青笔</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">62</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-1 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qingbii.com</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
