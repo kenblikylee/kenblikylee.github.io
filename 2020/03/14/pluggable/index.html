@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言有挺长时间没有更新博客了。一来是公司比较忙，二是自己也在思考一些新的问题。最近一个月，在我脑海回想最多的一个词语是“插件化架构”。作此文，也是想简单分享一下我对这个问题的见解。 来自 Webpack 的启发 去年有参与过 Udacity 前端课程翻译。其中我翻译了构建工具部分。Webpack 作为当前主流构建工具，深刻影响着前端开发工作流的变革，正如课程中所说，Webpack 聚合当前前端构建">
+<meta name="keywords" content="插件,架构,前端">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前端插件化架构的思考">
+<meta property="og:url" content="http:&#x2F;&#x2F;www.qingbii.com&#x2F;2020&#x2F;03&#x2F;14&#x2F;pluggable&#x2F;index.html">
+<meta property="og:site_name" content="青笔原创">
+<meta property="og:description" content="前言有挺长时间没有更新博客了。一来是公司比较忙，二是自己也在思考一些新的问题。最近一个月，在我脑海回想最多的一个词语是“插件化架构”。作此文，也是想简单分享一下我对这个问题的见解。 来自 Webpack 的启发 去年有参与过 Udacity 前端课程翻译。其中我翻译了构建工具部分。Webpack 作为当前主流构建工具，深刻影响着前端开发工作流的变革，正如课程中所说，Webpack 聚合当前前端构建">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;3&#x2F;14&#x2F;170d74fddb554d88?w=497&amp;h=270&amp;f=jpeg&amp;s=7106">
+<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;3&#x2F;14&#x2F;170d7343bf410531?w=825&amp;h=765&amp;f=png&amp;s=538345">
+<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;3&#x2F;14&#x2F;170d77831314873f?w=765&amp;h=411&amp;f=png&amp;s=58077">
+<meta property="og:updated_time" content="2020-03-14T07:08:17.087Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;3&#x2F;14&#x2F;170d74fddb554d88?w=497&amp;h=270&amp;f=jpeg&amp;s=7106">
+  <link rel="canonical" href="http://www.qingbii.com/2020/03/14/pluggable/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>前端插件化架构的思考 | 青笔原创</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?34fe3c50fd2c28cb66c0cceaf903497f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">青笔原创</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">专注于做有价值的技术原创</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">64</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">43</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-微信">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/ps/weixin.html" rel="section"><i class="fa fa-fw fa-weixin"></i>微信</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-云+">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9jbG91ZC50ZW5jZW50LmNvbS9kZXZlbG9wZXIvdXNlci82NTAzNDM2L2FydGljbGVz"><i class="fa fa-fw fa-qq"></i>云+</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-掘金">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vdXNlci81YmQyYjhiMjUxODgyNTJhNzg0ZDE5ZDcvcG9zdHM="><i class="fa fa-fw fa-link"></i>掘金</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-web">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/web/" rel="section"><i class="fa fa-fw fa-compass"></i>web</a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.qingbii.com/2020/03/14/pluggable/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="青笔">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/photo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="青笔原创">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            前端插件化架构的思考
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-03-14 15:06:05 / 修改时间：15:08:17" itemprop="dateCreated datePublished" datetime="2020-03-14T15:06:05+08:00">2020-03-14</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>有挺长时间没有更新博客了。一来是公司比较忙，二是自己也在思考一些新的问题。最近一个月，在我脑海回想最多的一个词语是“插件化架构”。作此文，也是想简单分享一下我对这个问题的见解。</p>
+<h2 id="来自-Webpack-的启发"><a href="#来自-Webpack-的启发" class="headerlink" title="来自 Webpack 的启发"></a>来自 Webpack 的启发</h2><p><img src="https://user-gold-cdn.xitu.io/2020/3/14/170d74fddb554d88?w=497&h=270&f=jpeg&s=7106" alt></p>
+<p>去年有参与过 Udacity 前端课程翻译。其中我翻译了构建工具部分。Webpack 作为当前主流构建工具，深刻影响着前端开发工作流的变革，正如课程中所说，Webpack 聚合当前前端构建工具所有最热门的构建技术，甚至可以说，它可以作任何构建工具能作的事。那么 Webpack 为什么这么全能，是因为 Webpack 自身这么能干，精通十八般武艺？No !事实上 Webpack 比想象的要“无能”，它的全能是因为它能容万物只所能。因为 Webpack 本身是一个高度插件化设计的系统，它所表现的能力都借助于真正身怀绝技的插件的赋能。当然，我这里所说的插件包含了 Webpack 的内置插件以及通过配置传入的<code>plugins</code>。可以说，Webpack 只抽象了一个软件运行时环境，在不关心和改动这个系统已有代码的前提下，却能独立开发新的插件来充实整个系统的能力。这不就是软件设计中所要追求的开闭原则的最佳实践吗？从 Webpack 的插件化架构设计上所表现出系统良好的开放性，可持续的简洁性，我自然想象到，为何不在业务系统中采用这样的插件化架构。</p>
+<h2 id="什么是插件？"><a href="#什么是插件？" class="headerlink" title="什么是插件？"></a>什么是插件？</h2><p>插件的英文是<code>plugin</code>，拆分开是<code>plug(插头) + in</code>，现实生活生活中，电源插线板就是这样”plugin”应用的例子。插线板和通过插头插入其中的电器构成一个物理世界的插件化系统。插线板通过插孔为“插件”提供电源，而给系统赋予了插件的能力。插入电视的插头，就拥有看电视的功能，插入冰箱的插头就具有冷藏食物的功能，插入台灯的插头，就具备照明的功能，等等。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/14/170d7343bf410531?w=825&h=765&f=png&s=538345" alt></p>
+<p>一个良好设计的插件化系统和插线板的设计也是一样一样的。系统的核心应该是一个可热插拔的“插线板”，负责给系统接入的插件提供电源（插件API），系统的能力是所有插件能力的聚合。和物理世界的插线板不同是，软件插线板的插头没有数量的限制，也就是说系统可以接入任意数量的插件，意味着它的功能可以无限增加。</p>
+<h2 id="如何设计一个插件化的系统？"><a href="#如何设计一个插件化的系统？" class="headerlink" title="如何设计一个插件化的系统？"></a>如何设计一个插件化的系统？</h2><p>如果类比插线板的方式设计一个完全插件化的系统，系统将包含三个部分：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2020/3/14/170d77831314873f?w=765&h=411&f=png&s=58077" alt></p>
+<ul>
+<li>pluggableCore: 插件运行时核心</li>
+<li>pluginApi: 为插件运行提供访问运行时接口</li>
+<li>plugin: 实现具体功能的插件</li>
+</ul>
+<p>其中 <code>pluggableCore</code> 与 <code>pluginApi</code> 是插件化系统的核心部分，或者内部系统，一旦设计好了，不会轻易改变的；而<code>plugin</code>是外部系统，通过<code>pluginApi</code>访问系统内核和全局状态，实现对应用全生命周期的访问和控制，只需要遵循接口的定义，<code>plugin</code> 可以将自身能力赋予给任何插件化系统，而不是与某一个特定的系统耦合在一起。<br>事实上，<code>plugin</code> 也分为两个部分。我们依然可以与现实世界的电器，例如上文的电视机对比，它包含用于接入电源的插头和用于播放电视节目物理实现，我们可以看到，虽然电视机是通过电源线才成为整个系统中的插件一员，但它的物理实现远比电源线复杂的多，甚至可以独立出来一个复杂的系统。同样，插件化系统中，插件的功能实现也可能是一个可独立出来复杂系统，而只是通过一个简单的插件注册或应用接口接入另一个插件的系统。</p>
+<p>以 webpack 的插件为例。以下是 webpack 插件的模版：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> VeryComplicatedSystem <span class="keyword">from</span> <span class="string">"VeryComplicatedSystem"</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AwesomeWebpackPlugin</span> </span>&#123;</span><br><span class="line">    apply(compiler) &#123;</span><br><span class="line">        VeryComplicatedSystem.apply(compiler);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>我们看到插件的电源线就是包含<code>apply</code>方法的类，只需要<code>5</code>行代码。而插件的功能实现可以是一个独立的复杂系统，它还可以是多个插件的聚合。当然从设计上，插件的功能单一更有利于复用。这里所要表达的是我们应该把插件看作一个可以脱离插件系统本身存在的功能完整软件系统，让这个系统成为插件而为另一个插件化系统赋能并不需要重写内部实现，而只是加上一根符合插件标准的电源线而已。这样理解，有助于我们设计出更容易复用的插件，同时也可以复用已有软件的系统。</p>
+<h2 id="插件化架构的优势"><a href="#插件化架构的优势" class="headerlink" title="插件化架构的优势"></a>插件化架构的优势</h2><p>正如前文所说，插件化架构一个显而易见的优势就是它是开闭原则在跨系统级别的最佳实践。何为跨系统，如果说设计模式是设计单个系统的最佳实践，那么我们已经论证，插件化架构可以链接多个子系统，而做到开闭原则。即插件核心和接口不变，系统可以持续接入新插件，来丰富系统的功能。并且，由于新接入的插件是一个独立的子系统，它可独立开发，运行和进行版本管理，不会因为接入的系统复杂而增加接入成本。试想，在一个非插件化的系统中，业务系统就算经过良好设计，随着功能模块的增多，代码量激增，暂且不考虑系统构建和测试，我们想要给系统加入新的功能，甚至是修复已有功能的BUG，都会越来越困难和低效，但插件化架构的系统，增加新功能，不是在一个庞大系统代码库中，而是在一个较小的系统或代码仓库中，因此不管已有系统多复杂，开发新的功能的接入复杂度始终一样。同时，开发编译或修复测试一个插件，也比针对整个系统要简单得多。</p>
+<h2 id="插件与组件的区别"><a href="#插件与组件的区别" class="headerlink" title="插件与组件的区别"></a>插件与组件的区别</h2><p>插件本质也是一种软件复用方式，和我们常说的组件区别是复用的维度不同。组件的复用颗粒度更细，它是技术级复用单元，需要经过进一步加工和组合才能成为解决某一类业务问题的完整部分，而插件是一个更加完整可以解决某一类业务问题的子系统，是业务级别的复用单元。</p>
+<h2 id="插件化架构的未来"><a href="#插件化架构的未来" class="headerlink" title="插件化架构的未来"></a>插件化架构的未来</h2><p>这里不好说它一定是未来。暂且认为是我设想的未来发展的一种可能。即通过建立一个插件标准，实现业务系统的全面插件化，所有以开发和正在的开发的系统都不是耦合在一个特定的系统，而很难独立出来，在不同系统复用。全面的插件化，意味着，我们不用重复造业务轮子，团队和企业可以持续积累自己的插件生态，让软件开可以像汽车等工业制造一样，打造一条标准化装配的流水线。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>本文的观点仅是个人思考，尚未经过权威的论证。其中的设想有过初期实践，但尚未形成一个完整的可以推广的技术框架，这部分笔者本人还在探索中，就不贴出来，感兴趣的读者可以关注我的 github。</p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="青笔 wechat" style="width: 200px; max-width: 100%;">
+  <div>我是一条小青蛇 我有很多小秘密</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="青笔 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="青笔 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>青笔
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.qingbii.com/2020/03/14/pluggable/" title="前端插件化架构的思考">http://www.qingbii.com/2020/03/14/pluggable/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/%E6%8F%92%E4%BB%B6/" rel="tag"># 插件</a>
+            
+              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+            
+              <a href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag"># 前端</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/19/vue3/" rel="next" title="Vue3 深度解析">
+                  <i class="fa fa-chevron-left"></i> Vue3 深度解析
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#来自-Webpack-的启发"><span class="nav-number">2.</span> <span class="nav-text">来自 Webpack 的启发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是插件？"><span class="nav-number">3.</span> <span class="nav-text">什么是插件？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何设计一个插件化的系统？"><span class="nav-number">4.</span> <span class="nav-text">如何设计一个插件化的系统？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插件化架构的优势"><span class="nav-number">5.</span> <span class="nav-text">插件化架构的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插件与组件的区别"><span class="nav-number">6.</span> <span class="nav-text">插件与组件的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插件化架构的未来"><span class="nav-number">7.</span> <span class="nav-text">插件化架构的未来</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">8.</span> <span class="nav-text">结语</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/photo.jpg"
+      alt="青笔">
+  <p class="site-author-name" itemprop="name">青笔</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">64</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-2 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qingbii.com</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
