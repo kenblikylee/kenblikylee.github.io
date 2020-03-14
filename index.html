@@ -411,7 +411,7 @@
                 
               
 
-              <time title="创建时间：2020-03-14 15:06:05 / 修改时间：15:08:17" itemprop="dateCreated datePublished" datetime="2020-03-14T15:06:05+08:00">2020-03-14</time>
+              <time title="创建时间：2020-03-14 15:06:05 / 修改时间：15:12:04" itemprop="dateCreated datePublished" datetime="2020-03-14T15:06:05+08:00">2020-03-14</time>
             </span>
           
             
@@ -450,27 +450,15 @@
           <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>有挺长时间没有更新博客了。一来是公司比较忙，二是自己也在思考一些新的问题。最近一个月，在我脑海回想最多的一个词语是“插件化架构”。作此文，也是想简单分享一下我对这个问题的见解。</p>
 <h2 id="来自-Webpack-的启发"><a href="#来自-Webpack-的启发" class="headerlink" title="来自 Webpack 的启发"></a>来自 Webpack 的启发</h2><p><img src="https://user-gold-cdn.xitu.io/2020/3/14/170d74fddb554d88?w=497&h=270&f=jpeg&s=7106" alt></p>
 <p>去年有参与过 Udacity 前端课程翻译。其中我翻译了构建工具部分。Webpack 作为当前主流构建工具，深刻影响着前端开发工作流的变革，正如课程中所说，Webpack 聚合当前前端构建工具所有最热门的构建技术，甚至可以说，它可以作任何构建工具能作的事。那么 Webpack 为什么这么全能，是因为 Webpack 自身这么能干，精通十八般武艺？No !事实上 Webpack 比想象的要“无能”，它的全能是因为它能容万物只所能。因为 Webpack 本身是一个高度插件化设计的系统，它所表现的能力都借助于真正身怀绝技的插件的赋能。当然，我这里所说的插件包含了 Webpack 的内置插件以及通过配置传入的<code>plugins</code>。可以说，Webpack 只抽象了一个软件运行时环境，在不关心和改动这个系统已有代码的前提下，却能独立开发新的插件来充实整个系统的能力。这不就是软件设计中所要追求的开闭原则的最佳实践吗？从 Webpack 的插件化架构设计上所表现出系统良好的开放性，可持续的简洁性，我自然想象到，为何不在业务系统中采用这样的插件化架构。</p>
-<h2 id="什么是插件？"><a href="#什么是插件？" class="headerlink" title="什么是插件？"></a>什么是插件？</h2><p>插件的英文是<code>plugin</code>，拆分开是<code>plug(插头) + in</code>，现实生活生活中，电源插线板就是这样”plugin”应用的例子。插线板和通过插头插入其中的电器构成一个物理世界的插件化系统。插线板通过插孔为“插件”提供电源，而给系统赋予了插件的能力。插入电视的插头，就拥有看电视的功能，插入冰箱的插头就具有冷藏食物的功能，插入台灯的插头，就具备照明的功能，等等。</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/3/14/170d7343bf410531?w=825&h=765&f=png&s=538345" alt></p>
-<p>一个良好设计的插件化系统和插线板的设计也是一样一样的。系统的核心应该是一个可热插拔的“插线板”，负责给系统接入的插件提供电源（插件API），系统的能力是所有插件能力的聚合。和物理世界的插线板不同是，软件插线板的插头没有数量的限制，也就是说系统可以接入任意数量的插件，意味着它的功能可以无限增加。</p>
-<h2 id="如何设计一个插件化的系统？"><a href="#如何设计一个插件化的系统？" class="headerlink" title="如何设计一个插件化的系统？"></a>如何设计一个插件化的系统？</h2><p>如果类比插线板的方式设计一个完全插件化的系统，系统将包含三个部分：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/3/14/170d77831314873f?w=765&h=411&f=png&s=58077" alt></p>
-<ul>
-<li>pluggableCore: 插件运行时核心</li>
-<li>pluginApi: 为插件运行提供访问运行时接口</li>
-<li>plugin: 实现具体功能的插件</li>
-</ul>
-<p>其中 <code>pluggableCore</code> 与 <code>pluginApi</code> 是插件化系统的核心部分，或者内部系统，一旦设计好了，不会轻易改变的；而<code>plugin</code>是外部系统，通过<code>pluginApi</code>访问系统内核和全局状态，实现对应用全生命周期的访问和控制，只需要遵循接口的定义，<code>plugin</code> 可以将自身能力赋予给任何插件化系统，而不是与某一个特定的系统耦合在一起。<br>事实上，<code>plugin</code> 也分为两个部分。我们依然可以与现实世界的电器，例如上文的电视机对比，它包含用于接入电源的插头和用于播放电视节目物理实现，我们可以看到，虽然电视机是通过电源线才成为整个系统中的插件一员，但它的物理实现远比电源线复杂的多，甚至可以独立出来一个复杂的系统。同样，插件化系统中，插件的功能实现也可能是一个可独立出来复杂系统，而只是通过一个简单的插件注册或应用接口接入另一个插件的系统。</p>
-<p>以 webpack 的插件为例。以下是 webpack 插件的模版：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> VeryComplicatedSystem <span class="keyword">from</span> <span class="string">"VeryComplicatedSystem"</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AwesomeWebpackPlugin</span> </span>&#123;</span><br><span class="line">    apply(compiler) &#123;</span><br><span class="line">        VeryComplicatedSystem.apply(compiler);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-<p>我们看到插件的电源线就是包含<code>apply</code>方法的类，只需要<code>5</code>行代码。而插件的功能实现可以是一个独立的复杂系统，它还可以是多个插件的聚合。当然从设计上，插件的功能单一更有利于复用。这里所要表达的是我们应该把插件看作一个可以脱离插件系统本身存在的功能完整软件系统，让这个系统成为插件而为另一个插件化系统赋能并不需要重写内部实现，而只是加上一根符合插件标准的电源线而已。这样理解，有助于我们设计出更容易复用的插件，同时也可以复用已有软件的系统。</p>
-<h2 id="插件化架构的优势"><a href="#插件化架构的优势" class="headerlink" title="插件化架构的优势"></a>插件化架构的优势</h2><p>正如前文所说，插件化架构一个显而易见的优势就是它是开闭原则在跨系统级别的最佳实践。何为跨系统，如果说设计模式是设计单个系统的最佳实践，那么我们已经论证，插件化架构可以链接多个子系统，而做到开闭原则。即插件核心和接口不变，系统可以持续接入新插件，来丰富系统的功能。并且，由于新接入的插件是一个独立的子系统，它可独立开发，运行和进行版本管理，不会因为接入的系统复杂而增加接入成本。试想，在一个非插件化的系统中，业务系统就算经过良好设计，随着功能模块的增多，代码量激增，暂且不考虑系统构建和测试，我们想要给系统加入新的功能，甚至是修复已有功能的BUG，都会越来越困难和低效，但插件化架构的系统，增加新功能，不是在一个庞大系统代码库中，而是在一个较小的系统或代码仓库中，因此不管已有系统多复杂，开发新的功能的接入复杂度始终一样。同时，开发编译或修复测试一个插件，也比针对整个系统要简单得多。</p>
-<h2 id="插件与组件的区别"><a href="#插件与组件的区别" class="headerlink" title="插件与组件的区别"></a>插件与组件的区别</h2><p>插件本质也是一种软件复用方式，和我们常说的组件区别是复用的维度不同。组件的复用颗粒度更细，它是技术级复用单元，需要经过进一步加工和组合才能成为解决某一类业务问题的完整部分，而插件是一个更加完整可以解决某一类业务问题的子系统，是业务级别的复用单元。</p>
-<h2 id="插件化架构的未来"><a href="#插件化架构的未来" class="headerlink" title="插件化架构的未来"></a>插件化架构的未来</h2><p>这里不好说它一定是未来。暂且认为是我设想的未来发展的一种可能。即通过建立一个插件标准，实现业务系统的全面插件化，所有以开发和正在的开发的系统都不是耦合在一个特定的系统，而很难独立出来，在不同系统复用。全面的插件化，意味着，我们不用重复造业务轮子，团队和企业可以持续积累自己的插件生态，让软件开可以像汽车等工业制造一样，打造一条标准化装配的流水线。</p>
-<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>本文的观点仅是个人思考，尚未经过权威的论证。其中的设想有过初期实践，但尚未形成一个完整的可以推广的技术框架，这部分笔者本人还在探索中，就不贴出来，感兴趣的读者可以关注我的 github。</p>
-
+          <!--noindex-->
+          
+            <div class="post-button">
+              <a class="btn" href="/2020/03/14/pluggable/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
