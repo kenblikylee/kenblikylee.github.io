@@ -54,19 +54,19 @@
 </script>
 
   <meta name="description" content="前言有挺长时间没有更新博客了。一来是公司比较忙，二是自己也在思考一些新的问题。最近一个月，在我脑海回想最多的一个词语是“插件化架构”。作此文，也是想简单分享一下我对这个问题的见解。 来自 Webpack 的启发 去年有参与过 Udacity 前端课程翻译。其中我翻译了构建工具部分。Webpack 作为当前主流构建工具，深刻影响着前端开发工作流的变革，正如课程中所说，Webpack 聚合当前前端构建">
-<meta name="keywords" content="前端,插件,架构">
+<meta name="keywords" content="插件,架构,前端">
 <meta property="og:type" content="article">
 <meta property="og:title" content="前端插件化架构的思考">
 <meta property="og:url" content="http:&#x2F;&#x2F;www.qingbii.com&#x2F;2020&#x2F;03&#x2F;14&#x2F;pluggable&#x2F;index.html">
 <meta property="og:site_name" content="青笔原创">
 <meta property="og:description" content="前言有挺长时间没有更新博客了。一来是公司比较忙，二是自己也在思考一些新的问题。最近一个月，在我脑海回想最多的一个词语是“插件化架构”。作此文，也是想简单分享一下我对这个问题的见解。 来自 Webpack 的启发 去年有参与过 Udacity 前端课程翻译。其中我翻译了构建工具部分。Webpack 作为当前主流构建工具，深刻影响着前端开发工作流的变革，正如课程中所说，Webpack 聚合当前前端构建">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;3&#x2F;14&#x2F;170d74fddb554d88?w=497&amp;h=270&amp;f=jpeg&amp;s=7106">
-<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;3&#x2F;14&#x2F;170d7343bf410531?w=825&amp;h=765&amp;f=png&amp;s=538345">
-<meta property="og:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;3&#x2F;14&#x2F;170d77831314873f?w=765&amp;h=411&amp;f=png&amp;s=58077">
-<meta property="og:updated_time" content="2020-03-14T07:12:04.886Z">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;webpack.jpeg">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;plugin.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;patch_pannel.jpg">
+<meta property="og:updated_time" content="2020-03-14T07:22:20.154Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;user-gold-cdn.xitu.io&#x2F;2020&#x2F;3&#x2F;14&#x2F;170d74fddb554d88?w=497&amp;h=270&amp;f=jpeg&amp;s=7106">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;webpack.jpeg">
   <link rel="canonical" href="http://www.qingbii.com/2020/03/14/pluggable/">
 
 
@@ -417,7 +417,7 @@
                 
               
 
-              <time title="创建时间：2020-03-14 15:06:05 / 修改时间：15:12:04" itemprop="dateCreated datePublished" datetime="2020-03-14T15:06:05+08:00">2020-03-14</time>
+              <time title="创建时间：2020-03-14 15:06:05 / 修改时间：15:22:20" itemprop="dateCreated datePublished" datetime="2020-03-14T15:06:05+08:00">2020-03-14</time>
             </span>
           
             
@@ -454,15 +454,15 @@
 
       
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>有挺长时间没有更新博客了。一来是公司比较忙，二是自己也在思考一些新的问题。最近一个月，在我脑海回想最多的一个词语是“插件化架构”。作此文，也是想简单分享一下我对这个问题的见解。</p>
-<h2 id="来自-Webpack-的启发"><a href="#来自-Webpack-的启发" class="headerlink" title="来自 Webpack 的启发"></a>来自 Webpack 的启发</h2><p><img src="https://user-gold-cdn.xitu.io/2020/3/14/170d74fddb554d88?w=497&h=270&f=jpeg&s=7106" alt></p>
+<h2 id="来自-Webpack-的启发"><a href="#来自-Webpack-的启发" class="headerlink" title="来自 Webpack 的启发"></a>来自 Webpack 的启发</h2><p><img src="http://cdn.kenblog.top/webpack.jpeg" alt></p>
 <p>去年有参与过 Udacity 前端课程翻译。其中我翻译了构建工具部分。Webpack 作为当前主流构建工具，深刻影响着前端开发工作流的变革，正如课程中所说，Webpack 聚合当前前端构建工具所有最热门的构建技术，甚至可以说，它可以作任何构建工具能作的事。那么 Webpack 为什么这么全能，是因为 Webpack 自身这么能干，精通十八般武艺？No !事实上 Webpack 比想象的要“无能”，它的全能是因为它能容万物只所能。因为 Webpack 本身是一个高度插件化设计的系统，它所表现的能力都借助于真正身怀绝技的插件的赋能。当然，我这里所说的插件包含了 Webpack 的内置插件以及通过配置传入的<code>plugins</code>。可以说，Webpack 只抽象了一个软件运行时环境，在不关心和改动这个系统已有代码的前提下，却能独立开发新的插件来充实整个系统的能力。这不就是软件设计中所要追求的开闭原则的最佳实践吗？从 Webpack 的插件化架构设计上所表现出系统良好的开放性，可持续的简洁性，我自然想象到，为何不在业务系统中采用这样的插件化架构。</p>
 <a id="more"></a>
 
 <h2 id="什么是插件？"><a href="#什么是插件？" class="headerlink" title="什么是插件？"></a>什么是插件？</h2><p>插件的英文是<code>plugin</code>，拆分开是<code>plug(插头) + in</code>，现实生活生活中，电源插线板就是这样”plugin”应用的例子。插线板和通过插头插入其中的电器构成一个物理世界的插件化系统。插线板通过插孔为“插件”提供电源，而给系统赋予了插件的能力。插入电视的插头，就拥有看电视的功能，插入冰箱的插头就具有冷藏食物的功能，插入台灯的插头，就具备照明的功能，等等。</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/3/14/170d7343bf410531?w=825&h=765&f=png&s=538345" alt></p>
+<p><img src="http://cdn.kenblog.top/plugin.png" alt></p>
 <p>一个良好设计的插件化系统和插线板的设计也是一样一样的。系统的核心应该是一个可热插拔的“插线板”，负责给系统接入的插件提供电源（插件API），系统的能力是所有插件能力的聚合。和物理世界的插线板不同是，软件插线板的插头没有数量的限制，也就是说系统可以接入任意数量的插件，意味着它的功能可以无限增加。</p>
 <h2 id="如何设计一个插件化的系统？"><a href="#如何设计一个插件化的系统？" class="headerlink" title="如何设计一个插件化的系统？"></a>如何设计一个插件化的系统？</h2><p>如果类比插线板的方式设计一个完全插件化的系统，系统将包含三个部分：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/3/14/170d77831314873f?w=765&h=411&f=png&s=58077" alt></p>
+<p><img src="http://cdn.kenblog.top/patch_pannel.jpg" alt></p>
 <ul>
 <li>pluggableCore: 插件运行时核心</li>
 <li>pluginApi: 为插件运行提供访问运行时接口</li>
@@ -540,11 +540,11 @@
           
           <div class="post-tags">
             
-              <a href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag"># 前端</a>
-            
               <a href="/tags/%E6%8F%92%E4%BB%B6/" rel="tag"># 插件</a>
             
               <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"># 架构</a>
+            
+              <a href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag"># 前端</a>
             
           </div>
         
