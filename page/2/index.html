@@ -259,7 +259,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">43</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">44</span></a>
 
   </li>
       
@@ -399,6 +399,123 @@
             
 
   <div class="posts-expand">
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.qingbii.com/2019/10/18/centos7-view-envinfo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="青笔">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/photo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="青笔原创">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            
+            <a href="/2019/10/18/centos7-view-envinfo/" class="post-title-link" itemprop="url">linux 查看系统信息和运行状态实用命令汇总</a>
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-18 09:39:14" itemprop="dateCreated datePublished" datetime="2019-10-18T09:39:14+08:00">2019-10-18</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-17 13:08:33" itemprop="dateModified" datetime="2020-03-17T13:08:33+08:00">2020-03-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文所有 shell 命令均在阿里云ECS服务器上测试过，以确保每行代码都是百分百可用的。测试使用的服务器配置信息如下：</p>
+<ul>
+<li>2核8G内存 40G SSD云盘</li>
+<li>CentOS 7.6 64位</li>
+</ul>
+<p>为了精简篇幅，同时又方便直观的了解各命令执行的效果。本文对命令输出的处理方式分为以下三种：</p>
+<ol>
+<li><p>在提供必要的输出信息的命令行前加上 <code>$</code> , 代表该行为要执行的命令，同时也意味着紧接着的是该命令执行后的输出信息，直到遇到下一个以 <code>$</code> 开始的行，用于区分命令和命令的输出，实际运行不用加 <code>$</code>；</p>
+</li>
+<li><p>未加 <code>$</code> 的整个代码块，都不提供输出信息；</p>
+</li>
+<li><p>输出信息量大，但又有一些影响我们了解重要信息的输出，通过管道，使用实用程序 <code>grep</code> 过滤重要信息，格式：<code>$ command | grep xxx</code> 。</p>
+</li>
+</ol>
+          <!--noindex-->
+          
+            <div class="post-button">
+              <a class="btn" href="/2019/10/18/centos7-view-envinfo/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+    
         
   
   
@@ -1511,116 +1628,6 @@
   
 
     
-        
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://www.qingbii.com/2019/09/29/kaggle-cli/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="青笔">
-      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
-      <meta itemprop="image" content="http://cdn.kenblog.top/photo.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="青笔原创">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            
-            <a href="/2019/09/29/kaggle-cli/" class="post-title-link" itemprop="url">Kaggle 命令行工具查看 AI 最新竞赛和下载数据集</a>
-          
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2019-09-29 15:48:11" itemprop="dateCreated datePublished" datetime="2019-09-29T15:48:11+08:00">2019-09-29</time>
-            </span>
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-10-30 12:01:34" itemprop="dateModified" datetime="2019-10-30T12:01:34+08:00">2019-10-30</time>
-              </span>
-            
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Python/" itemprop="url" rel="index">
-                    <span itemprop="name">Python</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h2><h3 id="1-1-普通安装"><a href="#1-1-普通安装" class="headerlink" title="1.1 普通安装"></a>1.1 普通安装</h3><p>kaggle 命令行工具安装在系统搜索路径下。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install kaggle</span><br></pre></td></tr></table></figure>
-
-<h3 id="1-2-Mac-Linux-推荐安装"><a href="#1-2-Mac-Linux-推荐安装" class="headerlink" title="1.2 Mac/Linux 推荐安装"></a>1.2 Mac/Linux 推荐安装</h3><p>kaggle 命令行工具安装在当前登陆用户目录 <code>~/.local/bin</code> 下。</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install --user kaggle</span><br></pre></td></tr></table></figure>
-
-<p>安装完成功后，确保 <code>~/.local/bin</code> 添加到 <code>PATH</code> 环境变量中。</p>
-          <!--noindex-->
-          
-            <div class="post-button">
-              <a class="btn" href="/2019/09/29/kaggle-cli/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-    
   </div>
 
   
@@ -1673,7 +1680,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-count">44</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

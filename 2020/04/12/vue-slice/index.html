@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png?v=7.4.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: true,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言最近公司面试了一些中高级前端，由于公司技术栈以 Vue 为主，而对于中高级前端，必不可少要问及 Vue 源码的问题。很多面试者，对于源码只能简单讲到响应式是基于 Object.defineProperty 或者 Proxy 等老生常谈的基础概念。Vue 经过这么多年的发展，成了很多前端开发者职业生涯不可或缺的一个框架。诚然，每个人都可以在短时间学习一个框架的使用，但是要深入阅读它的源码确实不是">
+<meta name="keywords" content="vue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="手写 Vue （一）">
+<meta property="og:url" content="http:&#x2F;&#x2F;www.qingbii.com&#x2F;2020&#x2F;04&#x2F;12&#x2F;vue-slice&#x2F;index.html">
+<meta property="og:site_name" content="青笔原创">
+<meta property="og:description" content="前言最近公司面试了一些中高级前端，由于公司技术栈以 Vue 为主，而对于中高级前端，必不可少要问及 Vue 源码的问题。很多面试者，对于源码只能简单讲到响应式是基于 Object.defineProperty 或者 Proxy 等老生常谈的基础概念。Vue 经过这么多年的发展，成了很多前端开发者职业生涯不可或缺的一个框架。诚然，每个人都可以在短时间学习一个框架的使用，但是要深入阅读它的源码确实不是">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;data-vnode-dom.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vnode-tree.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vnode-list-render.png">
+<meta property="og:updated_time" content="2020-04-12T08:57:42.485Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;data-vnode-dom.png">
+  <link rel="canonical" href="http://www.qingbii.com/2020/04/12/vue-slice/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>手写 Vue （一） | 青笔原创</title>
+  
+    <script>
+      function sendPageView() {
+        var host = window.location.hostname;
+        if (host == "localhost" && true) return;
+        var uid = localStorage.getItem('uid') || (Math.random() + '.' + Math.random());
+        localStorage.setItem('uid', uid);
+        navigator.sendBeacon('https://www.google-analytics.com/collect', new URLSearchParams({
+          v  : 1,
+          tid: 'UA-149509694-1',
+          cid: uid,
+          t  : 'pageview',
+          dp : encodeURIComponent(location.pathname)
+        }));
+      }
+      document.addEventListener('pjax:complete', sendPageView);
+      sendPageView();
+    </script>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?34fe3c50fd2c28cb66c0cceaf903497f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">青笔原创</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">专注于做有价值的技术原创</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+        
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">64</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+      
+      
+        
+      
+        
+          
+        
+      
+        
+      
+    
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">8</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">44</span></a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-微信">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/ps/weixin.html" rel="section"><i class="fa fa-fw fa-weixin"></i>微信</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-云+">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9jbG91ZC50ZW5jZW50LmNvbS9kZXZlbG9wZXIvdXNlci82NTAzNDM2L2FydGljbGVz"><i class="fa fa-fw fa-qq"></i>云+</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-掘金">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <span class="exturl" data-url="aHR0cHM6Ly9qdWVqaW4uaW0vdXNlci81YmQyYjhiMjUxODgyNTJhNzg0ZDE5ZDcvcG9zdHM="><i class="fa fa-fw fa-link"></i>掘金</span>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-web">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/web/" rel="section"><i class="fa fa-fw fa-compass"></i>web</a>
+
+  </li>
+      
+    
+      
+      
+        
+        
+        <li class="menu-item menu-item-每日英语">
+      
+    
+      
+      
+        
+      
+        
+      
+        
+      
+    
+
+    <a href="/english" rel="section"><i class="fa fa-fw fa-compass"></i>每日英语</a>
+
+  </li>
+      
+    
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <span class="exturl github-corner" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="Follow me on GitHub" aria-label="Follow me on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></span>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://www.qingbii.com/2020/04/12/vue-slice/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="青笔">
+      <meta itemprop="description" content="前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。">
+      <meta itemprop="image" content="http://cdn.kenblog.top/photo.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="青笔原创">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            手写 Vue （一）
+            
+
+          
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-04-12 16:46:22 / 修改时间：16:57:42" itemprop="dateCreated datePublished" datetime="2020-04-12T16:46:22+08:00">2020-04-12</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近公司面试了一些中高级前端，由于公司技术栈以 Vue 为主，而对于中高级前端，必不可少要问及 Vue 源码的问题。很多面试者，对于源码只能简单讲到响应式是基于 <code>Object.defineProperty</code> 或者 <code>Proxy</code> 等老生常谈的基础概念。Vue 经过这么多年的发展，成了很多前端开发者职业生涯不可或缺的一个框架。诚然，每个人都可以在短时间学习一个框架的使用，但是要深入阅读它的源码确实不是一件容易的事。这里面有很多因素，除了业务开发繁忙外，面对一个复杂庞大的代码库，以及众多平时不经常使用的构建工具和新的编程语言等干扰因素，我们时常不知道该从哪里切入。为了应付面试，只能通过一些面经文章和博客，快速获得一些基本的认知，但一旦面试官深入拷问，真正看过源码还是只看过文章，就水落石出。真正读懂源码不是靠一场突击战就能做到的，而是像浇花种树一样，日积月累，反复刻意的练习和回顾，到最后甚至可以自己写出一个框架，才算真正掌握。既然是一场持久战，我们就不能指望在短时间内把整个框架一口吃进去，而是将其分割成一个个小的技术点，一次消化一个单一技术点，连点成线，最后就能吃下整个框架。本文以及接下来一系列文章，尝试将 Vue 源码拆分成独立的技术点，并动手编码实现。</p>
+<a id="more"></a>
+
+<h2 id="如何编写一个-Vue-框架"><a href="#如何编写一个-Vue-框架" class="headerlink" title="如何编写一个 Vue 框架?"></a>如何编写一个 Vue 框架?</h2><p>虽然，绝大多数开发者，职业生涯几乎不会参与到一个框架的开发，更不用说开发一个成功的被广泛使用的框架。但是，我们不妨假设，开发一个框架和开发一个业务产品的基本逻辑是一样的，就是首先，我们需要产品需求分析，然后将需求拆分成不同子模块，分别开发各个子模块后，再集成到一起组成一个完整的系统。</p>
+<p>开发一个框架也应如此。</p>
+<p>首先，需求分析，我们应该先问自己，这个框架要提供的核心功能是什么；其次，要实现这些功能，我们需要实现哪些技术点；最后，如何将这些分离的技术点组合复用成一个完整满足需求的框架。</p>
+<p>按照这个逻辑，那么，Vue 的核心功能是什么？Vue2 为例，创建一个最简单的 Vue 应用的代码如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"vue.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="actionscript"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(</span></span><br><span class="line">  &#123;</span><br><span class="line">    data: &#123;</span><br><span class="line"><span class="actionscript">      text: <span class="string">'hello world!'</span></span></span><br><span class="line">    &#125;,</span><br><span class="line">    render(h) &#123;</span><br><span class="line"><span class="actionscript">      <span class="keyword">return</span> h(<span class="string">'div'</span>, <span class="keyword">this</span>.text)</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="actionscript">).$mount(<span class="string">'#app'</span>)</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这段代码，使用框架导出的一个构造函数 <code>Vue</code> ，传入包含字段<code>data</code>和<code>render</code>的选项对象，创建一个 <code>Vue</code> 实例 <code>vm</code>，并挂载到<code>id</code>为<code>app</code>的<code>dom</code>元素上。</p>
+<p>这段代码在浏览器运行后，可以看到原来的<code>dom</code>元素<code>&lt;div id=&quot;app&quot;&gt;&lt;/div&gt;</code>被替换成<code>&lt;div&gt;hello world!&lt;/div&gt;</code>, 并可以在控制台键入 <code>vm.text = &#39;hello china!&#39;</code>，可以看到在实例的<code>text</code>属性改变后，对应的<code>dom</code>元素的文本内容立即改变了。</p>
+<p>这里包含以下三个环节：</p>
+<ol>
+<li><code>data</code>定义的字段（例如<code>text</code>）被映射到<code>Vue</code>实例的属性中;</li>
+<li><code>render</code>函数传入了一个函数<code>h</code>，并用<code>h</code>函数创建<code>虚拟节点</code>，调用<code>h</code>使用了 1. 中映射的属性字段(<code>this.text</code>);</li>
+<li>实例方法<code>$mout</code>将<code>render</code>返回的<code>虚拟节点</code>渲染到<code>真实dom</code>中;</li>
+</ol>
+<p><img src="http://cdn.kenblog.top/data-vnode-dom.png" alt></p>
+<p>首先，我们定义<code>Vue</code>的构造函数，读取选项对象的<code>data</code>字段，遍历<code>data</code>的所有键值，并克隆到实例对象<code>this</code>上。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Vue</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> data = options.data</span><br><span class="line">  <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(data)</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = keys.length; i &lt; l; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> key = keys[i]</span><br><span class="line">    <span class="keyword">this</span>[key] = data[key]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二步，在 <code>Vue</code> 构造函数调用选项传入的<code>render</code>函数，通过<code>call</code>将<code>render</code>函数上下文对象<code>this</code>指向<code>Vue</code>实例，这样<code>render</code>函数内部可以通过<code>this</code>访问实例的数据，也就是选项对象传入的<code>data</code>。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> render = options.render</span><br><span class="line"><span class="keyword">this</span>.vnode = render.call(<span class="keyword">this</span>, createVNode)</span><br></pre></td></tr></table></figure>
+
+<p>这里传入的函数<code>createVNode</code>也就是上文中的<code>h</code>函数。<code>createVNode</code>可以接受3个参数。</p>
+<ul>
+<li><strong>tag</strong>: string, 节点标签</li>
+<li><strong>data</strong>: object, 节点属性数据（包含 id, class, style）</li>
+<li><strong>children</strong>: array, 子节点数组</li>
+</ul>
+<p>返回一个<code>VNode</code>对象，也就是通常我所说的虚拟DOM。要实现<code>createVNode</code>函数，我们需要先知道<code>VNode</code>到底为何物。所谓虚拟DOM，就是用一个普通的JS对象去建模真实的DOM，因此，直接修改虚拟DOM的属性，不会触发我们在页面可见DOM的改变，但是，它的结构是和真实DOM节点一一对应的。我们知道在浏览器中，每一个DOM节点都是一棵“树”。作为树中一个节点，至少包含两个部分，即节点数据和子节点。对应到DOM，一个节点自身的数据就是元素的标签和属性，子节点可以包含任意多个，因此使用数组表示。<code>createVNode</code>函数用于提供给应用构建视图的虚拟节点树，创建树的过程由外部提供，因此自身不需要递归创建子节点，而是简单接受参数，并根据参数传入类型和数量来决定VNode对应属性赋值。</p>
+<p>目前，我需要的VNode的完整字段包含：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> vnode = &#123;</span><br><span class="line">  tag,</span><br><span class="line">  data,</span><br><span class="line">  children,</span><br><span class="line">  text</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/vnode-tree.png" alt></p>
+<p><code>tag</code> 为元素标签，<code>data</code>为属性数据，当节点是叶子节点，没有<code>children</code>，那么就用<code>text</code>表示节点显示的文本（事实上，文本在真实DOM中也是一个特殊的节点，它没有tag，因此为了处理方便，在虚拟节点中，children 中表示是有 tag 的元素节点）。</p>
+<p>因此，<code>createVNode</code> 接受的参数与我们返回的结果基本一致，仅仅对传入的第2个参数进行判断，如果是字符串，就认为要创建的是一个只有文本的叶子节点，否则将第二个参数作为节点属性数据，第三个参数作为子节点数组。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createVNode</span>(<span class="params">tag, data, children</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> vnode = &#123; <span class="attr">tag</span>: tag, <span class="attr">data</span>: <span class="literal">undefined</span>, <span class="attr">children</span>: <span class="literal">undefined</span>, <span class="attr">text</span>: <span class="literal">undefined</span> &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> data === <span class="string">'string'</span>) &#123;</span><br><span class="line">    vnode.text = data</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    vnode.data = data</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(children)) &#123;</span><br><span class="line">      vnode.children = children</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      vnode.children = [ children ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> vnode</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于<code>children</code>参数的存在，在外部，可以使用<code>createVNode</code>或<code>h</code>创建一个节点树，例如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> vnode = createVNode(<span class="string">'ul'</span>, &#123;&#125;, [</span><br><span class="line">  createVNode(<span class="string">'li'</span>, &#123;&#125;, [</span><br><span class="line">    createVNode(<span class="string">'span'</span>, <span class="string">'text'</span>)</span><br><span class="line">  ]),</span><br><span class="line">  createVNode(<span class="string">'li'</span>, &#123;&#125;, [</span><br><span class="line">    createVNode(<span class="string">'span'</span>, <span class="string">'text'</span>)</span><br><span class="line">  ])</span><br><span class="line">])</span><br></pre></td></tr></table></figure>
+
+<p>创建的虚拟节点树，只是框架对应用视图的内部表示，要获得真实可见的DOM，需要一个函数将<code>VNode</code>转换成真实<code>DOM</code>。定义这个函数为<code>createElm</code>。这个函数除了将<code>VNode</code>转换成真实DOM元素，同时还将创建的DOM元素插入页面中。插入的位置包含了两个真实DOM元素，即插入元素的父节点，以及参考节点，参考节点是要替换的节点，是可选的，存在则插入到参考节点前面，并删除参考节点，不存在则直接将新创建的节点（根据VNode创建的真实DOM节点）插入到父节点中。和<code>createVNode</code>不同的是，<code>createElm</code>接受的<code>vnode</code>参数是一课树，因此，需要使用递归遍历整个<code>VNode</code>树，最后得到实际也是一个真实DOM节点树。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createElm</span>(<span class="params">vnode, parentElm, refElm</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> elm</span><br><span class="line">  <span class="comment">// 创建真实DOM节点</span></span><br><span class="line">  <span class="keyword">if</span> (vnode.tag) &#123;</span><br><span class="line">    elm = <span class="built_in">document</span>.createElement(vnode.tag)</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (vnode.text) &#123;</span><br><span class="line">    elm = <span class="built_in">document</span>.createTextNode(vnode.text)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 将真实DOM节点插入到文档中</span></span><br><span class="line">  <span class="keyword">if</span> (refElm) &#123;</span><br><span class="line">    parentElm.insertBefore(elm, refElm)</span><br><span class="line">    parentElm.removeChild(refElm)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    parentElm.appendChild(elm)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 递归创建子节点</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(vnode.children)) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = vnode.children.length; i &lt; l; i++) &#123;</span><br><span class="line">      <span class="keyword">var</span> childVNode = vnode.children[i]</span><br><span class="line">      createElm(childVNode, elm)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (vnode.text) &#123;</span><br><span class="line">    elm.textContent = vnode.text</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> elm</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有了<code>createElm</code>函数，实现<code>$mount</code>方法的基本功能也就简单了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Vue.prototype.$mount = <span class="function"><span class="keyword">function</span> (<span class="params">id</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> refElm = <span class="built_in">document</span>.querySelector(id)</span><br><span class="line">  <span class="keyword">var</span> parentElm = refElm.parentNode</span><br><span class="line">  createElm(<span class="keyword">this</span>.vnode, parentElm, refElm)</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证最小应用"><a href="#验证最小应用" class="headerlink" title="验证最小应用"></a>验证最小应用</h2><p>到此为止，似乎已经将前文创建简单Vue应用用到的所有功能实现了一遍。接下来，我们将代码整合一下，保存到文件<code>myvue.js</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Vue</span>(<span class="params">options</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> data = options.data</span><br><span class="line">  <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(data)</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = keys.length; i &lt; l; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> key = keys[i]</span><br><span class="line">    <span class="keyword">this</span>[key] = data[key]</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> render = options.render</span><br><span class="line">  <span class="keyword">this</span>.vnode = render.call(<span class="keyword">this</span>, createVNode)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createVNode</span>(<span class="params">tag, data, children</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> vnode = &#123; <span class="attr">tag</span>: tag, <span class="attr">data</span>: <span class="literal">undefined</span>, <span class="attr">children</span>: <span class="literal">undefined</span>, <span class="attr">text</span>: <span class="literal">undefined</span> &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> data === <span class="string">'string'</span>) &#123;</span><br><span class="line">    vnode.text = data</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    vnode.data = data</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(children)) &#123;</span><br><span class="line">      vnode.children = children</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      vnode.children = [ children ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> vnode</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createElm</span>(<span class="params">vnode, parentElm, refElm</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> elm</span><br><span class="line">  <span class="comment">// 创建真实DOM节点</span></span><br><span class="line">  <span class="keyword">if</span> (vnode.tag) &#123;</span><br><span class="line">    elm = <span class="built_in">document</span>.createElement(vnode.tag)</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (vnode.text) &#123;</span><br><span class="line">    elm = <span class="built_in">document</span>.createTextNode(vnode.text)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 将真实DOM节点插入到文档中</span></span><br><span class="line">  <span class="keyword">if</span> (refElm) &#123;</span><br><span class="line">    parentElm.insertBefore(elm, refElm)</span><br><span class="line">    parentElm.removeChild(refElm)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    parentElm.appendChild(elm)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 递归创建子节点</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(vnode.children)) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = vnode.children.length; i &lt; l; i++) &#123;</span><br><span class="line">      <span class="keyword">var</span> childVNode = vnode.children[i]</span><br><span class="line">      createElm(childVNode, elm)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (vnode.text) &#123;</span><br><span class="line">    elm.textContent = vnode.text</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> elm</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Vue.prototype.$mount = <span class="function"><span class="keyword">function</span> (<span class="params">id</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> refElm = <span class="built_in">document</span>.querySelector(id)</span><br><span class="line">  <span class="keyword">var</span> parentElm = refElm.parentNode</span><br><span class="line">  createElm(<span class="keyword">this</span>.vnode, parentElm, refElm)</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后将html文件中的<code>vue.js</code>改成<code>myvue.js</code>:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"myvue.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="actionscript"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(</span></span><br><span class="line">  &#123;</span><br><span class="line">    data: &#123;</span><br><span class="line"><span class="actionscript">      text: <span class="string">'hello world!'</span></span></span><br><span class="line">    &#125;,</span><br><span class="line">    render(h) &#123;</span><br><span class="line"><span class="actionscript">      <span class="keyword">return</span> h(<span class="string">'div'</span>, <span class="keyword">this</span>.text)</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="actionscript">).$mount(<span class="string">'#app'</span>)</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在浏览器打开html文件，可以看到，结果与<code>vue.js</code>显示一致。为了测试节点树的渲染，我们不妨修改一下选项对象：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  data: &#123;</span><br><span class="line">    items: [</span><br><span class="line">      <span class="string">'item1'</span>,</span><br><span class="line">      <span class="string">'item2'</span>,</span><br><span class="line">      <span class="string">'item3'</span>,</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  render(h) &#123;</span><br><span class="line">    <span class="keyword">var</span> children = <span class="keyword">this</span>.items.map(<span class="function"><span class="params">item</span> =&gt;</span> h(<span class="string">'li'</span>, item))</span><br><span class="line">    <span class="keyword">var</span> vnode = h(<span class="string">'ul'</span>, <span class="literal">null</span>, children)</span><br><span class="line">    <span class="built_in">console</span>.log(vnode)</span><br><span class="line">    <span class="keyword">return</span> vnode</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cdn.kenblog.top/vnode-list-render.png" alt></p>
+<h2 id="还要做什么？"><a href="#还要做什么？" class="headerlink" title="还要做什么？"></a>还要做什么？</h2><p>眨一看，好像一切如我们所料。它成功利用我们传入的数据和渲染函数，创建虚拟节点，并且挂载到真实DOM上。但是，目前来看它至少还缺少两个关键功能。</p>
+<ol>
+<li>重新修改实例属性值（例如<code>vm.text</code>）并不能触发页面的重新渲染，也就是没有响应式；</li>
+<li>只有完整创建一个新的DOM树的方法，对于已经创建好的DOM，重新更新，必须销毁整个DOM树，重新创建，即没有对新旧<code>vnode</code>的<code>diff</code>算法，实现只对发生改变的节点重新创建；</li>
+</ol>
+<p>别急，万丈高楼平地起，正如本文开篇所讲，我们需要的是一场持久战，而不是突击战。有了最小可用功能，后面就是在此基础上做迭代和优化。感兴趣的读者，请关注后续系列更新。</p>
+
+    </div>
+
+    
+    
+    
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center;">
+  <img id="wechat_subscriber_qcode" src="http://cdn.kenblog.top/qrcode_for_gh_1c953f9b4cb9_258.jpg" alt="青笔 wechat" style="width: 200px; max-width: 100%;">
+  <div>我是一条小青蛇 我有很多小秘密</div>
+</div>
+
+      
+        
+      
+        <div class="reward-container">
+  <div></div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/wepay.png" alt="青笔 微信支付">
+        <p>微信支付</p>
+      </div>
+        
+      
+      <div style="display: inline-block;">
+        <img src="http://cdn.kenblog.top/alipay2.png" alt="青笔 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>青笔
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://www.qingbii.com/2020/04/12/vue-slice/" title="手写 Vue （一）">http://www.qingbii.com/2020/04/12/vue-slice/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/vue/" rel="tag"># vue</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/03/14/pluggable/" rel="next" title="前端插件化架构的思考">
+                  <i class="fa fa-chevron-left"></i> 前端插件化架构的思考
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何编写一个-Vue-框架"><span class="nav-number">2.</span> <span class="nav-text">如何编写一个 Vue 框架?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#验证最小应用"><span class="nav-number">3.</span> <span class="nav-text">验证最小应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#还要做什么？"><span class="nav-number">4.</span> <span class="nav-text">还要做什么？</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="http://cdn.kenblog.top/photo.jpg"
+      alt="青笔">
+  <p class="site-author-name" itemprop="name">青笔</p>
+  <div class="site-description" itemprop="description">前端，AI，开源，linux, shell, 算法，数据分析，机器学习，深度学习，机器视觉，图像识别。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">64</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2tlbmJsaWt5bGVl" title="GitHub &amp;rarr; https:&#x2F;&#x2F;github.com&#x2F;kenblikylee"><i class="fa fa-fw fa-github"></i>GitHub</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="bWFpbHRvOmtlbmJsaWt5QGdtYWlsLmNvbQ==" title="E-Mail &amp;rarr; mailto:kenbliky@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly93ZWliby5jb20va2VuYmxpa3k=" title="Weibo &amp;rarr; https:&#x2F;&#x2F;weibo.com&#x2F;kenbliky"><i class="fa fa-fw fa-weibo"></i>Weibo</span>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <span class="exturl" data-url="aHR0cHM6Ly90d2l0dGVyLmNvbS9rZW5ibGlreWxlZQ==" title="Twitter &amp;rarr; https:&#x2F;&#x2F;twitter.com&#x2F;kenblikylee"><i class="fa fa-fw fa-twitter"></i>Twitter</span>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+  <div class="beian"><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5taWl0Lmdvdi5jbg==">粤ICP备19096652号-2 </span><span class="exturl" data-url="aHR0cDovL3d3dy5iZWlhbi5nb3YuY24vcG9ydGFsL3JlZ2lzdGVyU3lzdGVtSW5mbz9yZWNvcmRjb2RlPQ=="> </span>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qingbii.com</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme: 'forest',
+      logLevel: 3,
+      flowchart: { curve: 'linear' },
+      gantt: { axisFormat: '%m/%d/%Y' },
+      sequence: { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
