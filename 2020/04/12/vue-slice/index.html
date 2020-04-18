@@ -56,7 +56,7 @@
   <meta name="description" content="前言最近公司面试了一些中高级前端，由于公司技术栈以 Vue 为主，而对于中高级前端，必不可少要问及 Vue 源码的问题。很多面试者，对于源码只能简单讲到响应式是基于 Object.defineProperty 或者 Proxy 等老生常谈的基础概念。Vue 经过这么多年的发展，成了很多前端开发者职业生涯不可或缺的一个框架。诚然，每个人都可以在短时间学习一个框架的使用，但是要深入阅读它的源码确实不是">
 <meta name="keywords" content="vue">
 <meta property="og:type" content="article">
-<meta property="og:title" content="手写 Vue （一）">
+<meta property="og:title" content="手写 Vue （一）：虚拟 DOM">
 <meta property="og:url" content="http:&#x2F;&#x2F;www.qingbii.com&#x2F;2020&#x2F;04&#x2F;12&#x2F;vue-slice&#x2F;index.html">
 <meta property="og:site_name" content="青笔原创">
 <meta property="og:description" content="前言最近公司面试了一些中高级前端，由于公司技术栈以 Vue 为主，而对于中高级前端，必不可少要问及 Vue 源码的问题。很多面试者，对于源码只能简单讲到响应式是基于 Object.defineProperty 或者 Proxy 等老生常谈的基础概念。Vue 经过这么多年的发展，成了很多前端开发者职业生涯不可或缺的一个框架。诚然，每个人都可以在短时间学习一个框架的使用，但是要深入阅读它的源码确实不是">
@@ -64,7 +64,7 @@
 <meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;data-vnode-dom.png">
 <meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vnode-tree.png">
 <meta property="og:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;vnode-list-render.png">
-<meta property="og:updated_time" content="2020-04-12T08:57:42.485Z">
+<meta property="og:updated_time" content="2020-04-18T14:17:31.045Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http:&#x2F;&#x2F;cdn.kenblog.top&#x2F;data-vnode-dom.png">
   <link rel="canonical" href="http://www.qingbii.com/2020/04/12/vue-slice/">
@@ -81,7 +81,7 @@
   };
 </script>
 
-  <title>手写 Vue （一） | 青笔原创</title>
+  <title>手写 Vue （一）：虚拟 DOM | 青笔原创</title>
   
     <script>
       function sendPageView() {
@@ -264,7 +264,7 @@
       
     
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">44</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">45</span></a>
 
   </li>
       
@@ -422,7 +422,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            手写 Vue （一）
+            手写 Vue （一）：虚拟 DOM
             
 
           
@@ -439,11 +439,19 @@
                 
               
 
-              <time title="创建时间：2020-04-12 16:46:22 / 修改时间：16:57:42" itemprop="dateCreated datePublished" datetime="2020-04-12T16:46:22+08:00">2020-04-12</time>
+              <time title="创建时间：2020-04-12 16:46:22" itemprop="dateCreated datePublished" datetime="2020-04-12T16:46:22+08:00">2020-04-12</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-18 22:17:31" itemprop="dateModified" datetime="2020-04-18T22:17:31+08:00">2020-04-18</time>
+              </span>
             
           
             <span class="post-meta-item">
@@ -585,7 +593,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="http://www.qingbii.com/2020/04/12/vue-slice/" title="手写 Vue （一）">http://www.qingbii.com/2020/04/12/vue-slice/</a>
+    <a href="http://www.qingbii.com/2020/04/12/vue-slice/" title="手写 Vue （一）：虚拟 DOM">http://www.qingbii.com/2020/04/12/vue-slice/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</span> 许可协议。转载请注明出处！
@@ -620,6 +628,10 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/04/18/vue-slice2/" rel="prev" title="手写 Vue （二）：响应式">
+                  手写 Vue （二）：响应式 <i class="fa fa-chevron-right"></i>
+                </a>
               
             </div>
           </div>
@@ -684,7 +696,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-count">45</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
